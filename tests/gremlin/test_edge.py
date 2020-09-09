@@ -3,6 +3,9 @@ from .sample_payloads.vertex import CREATE_VERTICES_SAMPLES
 from .sample_payloads.edge import CREATE_EDGES_SAMPLES
 from invana.gremlin.core.element import EdgeElement
 from invana.gremlin.core.exceptions import InvalidQueryArguments
+import os
+
+TEST_GRAPH_HOST = os.environ.get("TESTING_HOST")
 
 
 class TestEdges:
@@ -10,12 +13,12 @@ class TestEdges:
     @pytest.fixture
     def graph_client(self):
         from invana.gremlin import GremlinClient
-        return GremlinClient("ws://192.168.0.10:8182/gremlin")
+        return GremlinClient(f"{TEST_GRAPH_HOST}/gremlin")
 
     @pytest.fixture
     def init_data(self):
         from invana.gremlin import GremlinClient
-        graph_client = GremlinClient("ws://192.168.0.10:8182/gremlin")
+        graph_client = GremlinClient(f"{TEST_GRAPH_HOST}/gremlin")
         for k, vertex_sample in CREATE_VERTICES_SAMPLES.items():
             graph_client.vertex.create(label=vertex_sample["label"], properties=vertex_sample["properties"])
         return graph_client.vertex.read_many()

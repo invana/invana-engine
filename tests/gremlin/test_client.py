@@ -1,5 +1,8 @@
 import pytest
 from .sample_payloads.client import CLIENT_RAW_QUERIES
+import os
+
+TEST_GRAPH_HOST = os.environ.get("TESTING_HOST")
 
 
 class TestGremlinClientClient:
@@ -7,7 +10,7 @@ class TestGremlinClientClient:
     @pytest.fixture
     def graph_client(self):
         from invana.gremlin import GremlinClient
-        return GremlinClient("ws://192.168.0.10:8182/gremlin")
+        return GremlinClient(f"{TEST_GRAPH_HOST}/gremlin")
 
     def test_raw_query(self, graph_client):
         for query_id, raw_query in CLIENT_RAW_QUERIES.items():
