@@ -1,0 +1,32 @@
+# Disable sudo to speed up the build
+sudo: false
+language: python
+
+services:
+  - docker
+
+python:
+  - 3.6
+  - 3.7
+  - 3.8
+
+install:
+  - pip install pipenv
+  - pipenv install --dev
+
+script:
+  - pytest --cov=invana tests/
+
+before_script:
+  - docker pull janusgraph/janusgraph
+  - docker run  --name janusgraph -it -d -p 8182:8182 janusgraph/janusgraph
+  - docker ps -a
+  - docker logs janusgraph
+  - until [ `docker logs janusgraph| wc -l` -gt 50 ]; do echo "gremlin not started yet"; sleep 5; echo `docker logs janusgraph | wc -l`; done
+  - sleep 30
+  - docker logs janusgraph
+
+
+# Push the results back to codecov
+after_success:
+  - codecov
