@@ -16,7 +16,8 @@ class TestVertices:
 
     def test_create_vertex(self, graph_client):
         for k, vertex_sample in CREATE_VERTICES_SAMPLES.items():
-            graph_client.vertex.create(label=vertex_sample["label"], properties=vertex_sample["properties"])
+            response = graph_client.vertex.create(label=vertex_sample["label"], properties=vertex_sample["properties"])
+            assert isinstance(response, VertexElement)
 
     def test_read_vertex(self, graph_client):
         for k, vertex_sample in CREATE_VERTICES_SAMPLES.items():

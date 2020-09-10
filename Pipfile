@@ -10,6 +10,9 @@ pytest = "*"
 
 [packages]
 gremlinpython = "==3.4.6"
+starlette = "*"
+graphene = "*"
+uvicorn = "*"
 
 [requires]
 python_version = "3.8"

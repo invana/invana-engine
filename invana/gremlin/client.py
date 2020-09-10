@@ -9,15 +9,16 @@ class _GremlinClient:
     """
 
     client = _GremlinClient("ws://127.0.0.1:8182/gremlin")
-
-    client.
-
+    client.execute_query("g.V().limit(1).toList()")
     """
 
-    def __init__(self, gremlin_server_url, serializer=None):
+    def __init__(self, gremlin_server_url, serializer=None, transport_factory=None):
         if gremlin_server_url is None:
             raise Exception("Invalid gremlin_server_url. default: ws://127.0.0.1:8182/gremlin")
-        self.connection = DriverRemoteConnection(gremlin_server_url, 'g')
+        self.connection = DriverRemoteConnection(
+            gremlin_server_url, 'g',
+            transport_factory=transport_factory
+        )
         self.g = traversal().withRemote(self.connection)
         self.serializer = serializer
 
@@ -35,15 +36,15 @@ class GremlinClient:
     """
     Usage:
 
-    graph_client = gremlin("ws://127.0.0.1:8182/gremlin")
-
-
+    graph_client = GremlinClient(gremlin_server_url="ws://127.0.0.1:8182/gremlin")
     """
 
-    def __init__(self, gremlin_server_url, serializer=None):
+    def __init__(self, gremlin_server_url, serializer=None, transport_factory=None):
         serializer = serializer or GremlinResponseSerializer()
         self.gremlin_server_url = gremlin_server_url
-        self.gremlin_client = _GremlinClient(gremlin_server_url=gremlin_server_url, serializer=serializer)
+        self.gremlin_client = _GremlinClient(gremlin_server_url=gremlin_server_url,
+                                             serializer=serializer,
+                                             transport_factory=transport_factory)
         self.vertex = Vertex(gremlin_client=self.gremlin_client)
         self.edge = Edge(gremlin_client=self.gremlin_client)
 
