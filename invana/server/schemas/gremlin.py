@@ -1,7 +1,6 @@
 from graphene import ObjectType, String, Field, JSONString, ResolveInfo, Int, NonNull
 from ..utils import get_host, get_client_info
-from ..types.element import GraphElement, GenericJSONField
-
+from ..types.element import GraphElement
 from ..types.gremlin import GremlinClientInfo
 
 
