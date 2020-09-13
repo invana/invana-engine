@@ -47,11 +47,15 @@ class GremlinResponseSerializer:
         }
 
     def serialize_data(self, data):
+        print("===", type(data))
         if isinstance(data, list):
             _serialized_data = []
             for datum in data:
                 _ = self.serialize_data(datum)
-                _serialized_data.extend(_)
+                if type(_) is list:
+                    _serialized_data.extend(_)
+                elif type(_) is dict:
+                    _serialized_data.append(_)
             return _serialized_data
         elif isinstance(data, dict):
             try:

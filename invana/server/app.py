@@ -4,22 +4,19 @@ from starlette.applications import Starlette
 from starlette.routing import Route
 from starlette.graphql import GraphQLApp
 from graphene import Schema
-from .gql import GremlinQuery
 from ..gremlin import GremlinClient
 import os
 import time
+from .schemas.gremlin import Gremlin
 
 gremlin_server_url = os.environ.get("GREMLIN_SERVER_URL")
-
-
 
 if gremlin_server_url is None:
     raise Exception("GREMLIN_SERVER_URL environment variable not set. Please fix it.")
 
-
 routes = [
-    Route('/', GraphQLApp(
-        schema=Schema(query=GremlinQuery),
+    Route('/graphql', GraphQLApp(
+        schema=Schema(query=Gremlin),
     ))
 ]
 
