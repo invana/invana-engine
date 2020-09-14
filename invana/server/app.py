@@ -3,6 +3,7 @@ from starlette.applications import Starlette
 # from graphql.execution.executors.sync import SyncExecutor
 from starlette.routing import Route
 from starlette.graphql import GraphQLApp
+from starlette.responses import JSONResponse
 from graphene import Schema
 from ..gremlin import GremlinClient
 import os
@@ -14,7 +15,14 @@ gremlin_server_url = os.environ.get("GREMLIN_SERVER_URL")
 if gremlin_server_url is None:
     raise Exception("GREMLIN_SERVER_URL environment variable not set. Please fix it.")
 
+
+async def homepage(request):
+    return JSONResponse({'hello': 'world'})
+
+
 routes = [
+    Route('/', homepage),
+
     Route('/graphql', GraphQLApp(
         schema=Schema(query=Gremlin),
     ))
