@@ -1,9 +1,9 @@
-from invana.server.gql import GremlinQuery
+from invana.server.schemas.gremlin import Gremlin
 from graphene import Schema
 import json
 import os
 
-schema = Schema(query=GremlinQuery)
+schema = Schema(query=Gremlin)
 
 
 class TestGraphQuery:
