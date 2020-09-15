@@ -47,7 +47,7 @@ class GremlinResponseSerializer:
         }
 
     def serialize_data(self, data):
-        print("===", type(data))
+        # print("===", type(data))
         if isinstance(data, list):
             _serialized_data = []
             for datum in data:

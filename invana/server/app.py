@@ -17,7 +17,7 @@ if gremlin_server_url is None:
 
 
 async def homepage(request):
-    return JSONResponse({'hello': 'world'})
+    return JSONResponse({'message': 'Glad you are here. Go to /graphql'})
 
 
 routes = [
@@ -40,3 +40,4 @@ print(".................................................")
 print("Starting invana-engine server")
 print(f"Using GREMLIN_SERVER_URL {gremlin_server_url}")
 print(".................................................")
+
