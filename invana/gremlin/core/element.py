@@ -21,8 +21,10 @@ class SerializedElement:
     def __init__(self, data, serializer=None):
         self.data = data
         serialized_data = self.serialized_data(data, serializer=serializer)
-        self.assign_id_label_properties(serialized_data['id'], serialized_data['label'],
-                                        serialized_data['properties'])
+        self.assign_data(serialized_data)
+
+    def assign_data(self, serialized_data):
+        raise NotImplementedError()
 
     def assign_id_label_properties(self, id, label, properties):
         self.id = id
@@ -48,6 +50,35 @@ class SerializedElement:
 class VertexElement(SerializedElement):
     type = "vertex"
 
+    def assign_data(self, serialized_data):
+        self.assign_id_label_properties(serialized_data['id'], serialized_data['label'],
+                                        serialized_data['properties'])
+
 
 class EdgeElement(SerializedElement):
     type = "edge"
+    in_v = None
+    in_v_label = None
+    out_v = None
+    out_v_label = None
+
+    def assign_data(self, serialized_data):
+        self.assign_id_label_properties(serialized_data['id'], serialized_data['label'],
+                                        serialized_data['properties'],
+                                        )
+        self.in_v = serialized_data['inV']
+        self.in_v_label = serialized_data['inVLabel']
+        self.out_v = serialized_data['outV']
+        self.out_v_label = serialized_data['outVLabel']
+
+    def __dict__(self):
+        return {
+            "id": self.id,
+            "label": self.label,
+            "type": self.type,
+            "properties": self.properties,
+            "in_v": self.in_v,
+            "out_v": self.out_v,
+            'in_v_label': self.in_v_label,
+            'out_v_label': self.out_v_label
+        }

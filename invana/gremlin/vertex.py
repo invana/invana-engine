@@ -23,7 +23,7 @@ class Vertex(CRUDOperationsBase):
         _ = self.gremlin_client.g.addV(label)
         for k, v in properties.items():
             _.property(k, v)
-        _vtx = _.valueMap(True).next()
+        _vtx = _.elementMap().next()
         return VertexElement(_vtx, serializer=self.serializer)
 
     def get_or_create(self, label=None, properties=None):
@@ -53,7 +53,7 @@ class Vertex(CRUDOperationsBase):
         if vtx_instance is not None:
             for k, v in properties.items():
                 vtx_instance.property(k, v)
-            _vtx = vtx_instance.valueMap(True).next()
+            _vtx = vtx_instance.elementMap().next()
             return VertexElement(_vtx, serializer=self.serializer)
         return None
 
@@ -66,7 +66,7 @@ class Vertex(CRUDOperationsBase):
         logger.debug("Finding vertex with id {vertex_id} ".format(vertex_id=vertex_id))
         filtered_data = self.gremlin_client.g.V(vertex_id)
         try:
-            _ = filtered_data.valueMap(True).next()
+            _ = filtered_data.elementMap().next()
             if _:
                 return VertexElement(_, serializer=self.serializer)
         except Exception as e:
@@ -78,7 +78,7 @@ class Vertex(CRUDOperationsBase):
         logger.debug("Updating vertex with label {label} and kwargs {query}".format(label=label, query=query))
         filtered_data = self.filter_vertex(label=label, query=query, limit=limit, skip=skip)
         cleaned_data = []
-        for _ in filtered_data.valueMap(True).toList():
+        for _ in filtered_data.elementMap().toList():
             cleaned_data.append(
                 VertexElement(_, serializer=self.serializer)
             )
@@ -91,19 +91,18 @@ class Vertex(CRUDOperationsBase):
     def _delete_many(self, label=None, query=None):
         logger.debug("Deleting the vertex with label:{label},"
                      " query:{query}".format(label=label, query=query))
-        print("=======", self.filter_vertex(label=label, query=query))
         self.drop(self.filter_vertex(label=label, query=query))
 
     def read_in_edge_vertices(self, vertex_id, label=None, query=None, limit=None, skip=None):
         vtx = self.filter_vertex(vertex_id=vertex_id, label=label, query=query, limit=limit, skip=skip)
         cleaned_data = []
-        for _ in vtx.inE().otherV().dedup().valueMap(True).toList():
+        for _ in vtx.inE().otherV().dedup().elementMap().toList():
             cleaned_data.append(VertexElement(_, serializer=self.serializer))
         return cleaned_data
 
     def read_out_edge_vertices(self, vertex_id, label=None, query=None, limit=None, skip=None):
         vtx = self.filter_vertex(vertex_id=vertex_id, label=label, query=query, limit=limit, skip=skip)
         cleaned_data = []
-        for _ in vtx.outE().otherV().dedup().valueMap(True).toList():
+        for _ in vtx.outE().otherV().dedup().elementMap().toList():
             cleaned_data.append(VertexElement(_, serializer=self.serializer))
         return cleaned_data

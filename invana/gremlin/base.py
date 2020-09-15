@@ -28,7 +28,7 @@ class CRUDOperationsBase(metaclass=abc.ABCMeta):
 
         query = {} if query is None else query
         _ = self.gremlin_client.g.V(vertex_id) if vertex_id else self.gremlin_client.g.V()
-        if limit and skip:  # TODO - pagination fixes needed
+        if limit is not None and skip is not None:  # TODO - pagination fixes needed
             _.range(skip, skip + limit)
         if label:
             _.hasLabel(label)

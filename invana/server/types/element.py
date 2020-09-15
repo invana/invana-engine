@@ -17,8 +17,19 @@ class GenericJSONField(Scalar):
         return value
 
 
-class GraphElement(ObjectType):
+class GrapheneVertexType(ObjectType):
     id = String()
     type = String()
     label = String()
     properties = GenericJSONField()
+
+
+class GrapheneEdgeType(ObjectType):
+    id = String()
+    type = String()
+    label = String()
+    properties = GenericJSONField()
+    in_v = String()
+    out_v = String()
+    in_v_label = String()
+    out_v_label = String()

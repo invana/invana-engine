@@ -28,16 +28,13 @@ routes = [
     ))
 ]
 
-app = Starlette(routes=routes)
+app = Starlette(routes=routes, debug=True)
 
 time.sleep(1)
-gremlin_client = GremlinClient(
-    gremlin_server_url=gremlin_server_url
-)
+gremlin_client = GremlinClient(gremlin_server_url=gremlin_server_url)
 
 app.state.gremlin_client = gremlin_client
 print(".................................................")
 print("Starting invana-engine server")
 print(f"Using GREMLIN_SERVER_URL {gremlin_server_url}")
 print(".................................................")
-

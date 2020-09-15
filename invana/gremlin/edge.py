@@ -41,7 +41,7 @@ class Edge(CRUDOperationsBase):
             .to(outv_vtx_instance)
         for property_key, property_value in properties.items():
             _.property(property_key, property_value)
-        edg = _.valueMap(True).next()
+        edg = _.elementMap().next()
         return EdgeElement(edg, serializer=self.serializer)
 
     def update(self, edg_id, properties=None):
@@ -52,7 +52,7 @@ class Edge(CRUDOperationsBase):
         if edge:
             for k, v in properties.items():
                 edge.property(k, v)
-            _edge = edge.valueMap(True).next()
+            _edge = edge.elementMap().next()
             return EdgeElement(_edge, serializer=self.serializer)
         return None
 
@@ -61,7 +61,7 @@ class Edge(CRUDOperationsBase):
             edge_id=edge_id))
         filtered_data = self.filter_edge(edge_id=edge_id)
         try:
-            _ = filtered_data.valueMap(True).next()
+            _ = filtered_data.elementMap().next()
             if _:
                 return EdgeElement(_, serializer=self.serializer)
         except Exception as e:
@@ -71,7 +71,8 @@ class Edge(CRUDOperationsBase):
     def _read_many(self, label=None, query=None, limit=10, skip=0):
         filtered_data = self.filter_edge(label=label, query=query)
         cleaned_data = []
-        for _ in filtered_data.valueMap(True).toList():
+        for _ in filtered_data.elementMap().toList():
+        # for _ in filtered_data.toList():
             cleaned_data.append(EdgeElement(_, serializer=self.serializer))
         return cleaned_data
 

@@ -3,51 +3,42 @@ from gremlin_python.structure.graph import Vertex, Edge
 
 class GremlinResponseSerializer:
 
-    @staticmethod
-    def serialize_vertex_dict(vtx):
+    def get_element_id(self, _id):
+        if type(_id) is dict:
+            _id = _id["@value"]
+        if type(_id) is dict:
+            _id = _id['relationId']
+        if type(_id) is str:
+            _id = _id.strip("#")
+        return _id
+
+    def serialize_element_dict(self, vtx):
         cleaned_data = {"properties": {}}
         for k, v in vtx.items():
             if str(k) == "T.id":
-                cleaned_data['id'] = v.get('@value').strip("#") if type(v) is dict else v
+                cleaned_data['id'] = self.get_element_id(v)
             elif str(k) == "T.label":
                 cleaned_data['label'] = v
+            elif str(k) == "Direction.OUT":
+                _ = self.serialize_element_dict(v)
+                cleaned_data.update({"outV": _['id'], "outVLabel": _['label']})
+            elif str(k) == "Direction.IN":
+                _ = self.serialize_element_dict(v)
+                cleaned_data.update({"inV": _['id'], "inVLabel": _['label']})
             else:
-                cleaned_data['properties'][k] = v[0]  # TODO - fix this.
+                # TODO - check if this is right.
+                cleaned_data['properties'][k] = v[0] if type(v) is list else v
+        if cleaned_data['properties'].keys().__len__() == 0:
+            del cleaned_data['properties']
         return cleaned_data
 
-    @staticmethod
-    def serialize_edge_dict(edg):
-        cleaned_data = {"properties": {}}
+    def serialize_vertex_element(self, vertex):
+        return self.serialize_element_dict(vertex.__dict__())
 
-        for k, v in edg.items():
-            if str(k) == "T.id":
-                cleaned_data['id'] = v.get('@value', {}).get("relationId") if type(v) is dict else v
-            elif str(k) == "T.label":
-                cleaned_data['label'] = v
-            else:
-                cleaned_data['properties'][k] = v  # TODO - fix this.
-        return cleaned_data
-
-    @staticmethod
-    def serialize_vertex_element(vertex):
-        return {
-            "id": vertex.id,
-            "label": vertex.label,
-            "type": "vertex",
-            "properties": None
-        }
-
-    @staticmethod
-    def serialize_edge_element(edge):
-        return {
-            "id": edge.id,
-            "label": edge.label,
-            "type": "edge",
-            "properties": None
-        }
+    def serialize_edge_element(self, edge):
+        return self.serialize_element_dict(edge)
 
     def serialize_data(self, data):
-        # print("===", type(data))
         if isinstance(data, list):
             _serialized_data = []
             for datum in data:
@@ -58,12 +49,7 @@ class GremlinResponseSerializer:
                     _serialized_data.append(_)
             return _serialized_data
         elif isinstance(data, dict):
-            try:
-                # TODO - use better logics to check if data is vertex or edge,
-                # currently simple try except works.
-                return self.serialize_vertex_dict(data)
-            except Exception as e:
-                return self.serialize_edge_dict(data)
+            return self.serialize_element_dict(data)
         elif isinstance(data, Vertex):
             return self.serialize_vertex_element(data)
         elif isinstance(data, Edge):

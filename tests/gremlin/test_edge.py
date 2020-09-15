@@ -63,7 +63,6 @@ class TestEdges:
             )
             assert isinstance(responses, list)
             response2 = graph_client.edge.delete_one(responses[0].id)
-
             responses3 = graph_client.edge.read_one(responses[0].id)
             assert responses3 is None
 
