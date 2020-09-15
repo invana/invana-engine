@@ -26,6 +26,9 @@ class VertexGremlinSchema:
     remove_vertex_by_id = String(id=String(required=True))
     filter_vertex = Field(List(GraphElement), label=String(), query=JSONString(),
                           limit=Int(default_value=default_pagination_size), skip=Int())
+    get_in_edge_vertices = Field(List(GraphElement), id=String(required=True), label=String(), query=JSONString(),
+                                 limit=Int(default_value=default_pagination_size), skip=Int())
+    remove_vertices = String(label=String(), query=JSONString())
 
     def resolve_create_vertex(self, info: ResolveInfo, label: str, properties: str):
         data = info.context['request'].app.state.gremlin_client.vertex.create(label=label, properties=properties)
@@ -43,10 +46,22 @@ class VertexGremlinSchema:
         data = info.context['request'].app.state.gremlin_client.vertex.delete_one(id)
         return data.__dict__() if data else None
 
+    def resolve_remove_vertices(self, info: ResolveInfo, label: str = None, query: str = None):
+        info.context['request'].app.state.gremlin_client.vertex.delete_many(label=label, query=query)
+        return None
+
     def resolve_filter_vertex(self, info: ResolveInfo, label: str = None, query: str = None,
                               limit: int = default_pagination_size, skip: int = 0):
         data = info.context['request'].app.state.gremlin_client.vertex.read_many(
             label=label, query=query, limit=limit, skip=skip
+        )
+        return [datum.__dict__() for datum in data]
+
+    def resolve_get_in_edge_vertices(self, info: ResolveInfo,
+                                     id: str = None, label: str = None, query: str = None,
+                                     limit: int = default_pagination_size, skip: int = 0):
+        data = info.context['request'].app.state.gremlin_client.vertex.read_in_edge_vertices(
+            id, label=label, query=query, limit=limit, skip=skip
         )
         return [datum.__dict__() for datum in data]
 

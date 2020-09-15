@@ -15,17 +15,21 @@ class CRUDOperationsBase(metaclass=abc.ABCMeta):
     def serializer(self):
         return self.gremlin_client.serializer
 
-    def filter_vertex(self, vertex_id=None, label=None, query=None):
+    def filter_vertex(self, vertex_id=None, label=None, query=None, limit=None, skip=None):
         """
 
         :param vertex_id:
         :param label:
         :param query:
+        :param limit:
+        :param skip:
         :return:
         """
 
         query = {} if query is None else query
         _ = self.gremlin_client.g.V(vertex_id) if vertex_id else self.gremlin_client.g.V()
+        if limit and skip:  # TODO - pagination fixes needed
+            _.range(skip, skip + limit)
         if label:
             _.hasLabel(label)
         if query:
@@ -65,10 +69,10 @@ class CRUDOperationsBase(metaclass=abc.ABCMeta):
         return self._read_one(element_id)
 
     @abc.abstractmethod
-    def _read_many(self, label=None, query=None, limit=0, skip=0):
+    def _read_many(self, label=None, query=None, limit=None, skip=None):
         pass
 
-    def read_many(self, label=None, query=None, limit=10, skip=0):
+    def read_many(self, label=None, query=None, limit=None, skip=None):
         return self._read_many(label=label, query=query, limit=limit, skip=skip)
 
     @abc.abstractmethod

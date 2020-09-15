@@ -76,7 +76,7 @@ class Vertex(CRUDOperationsBase):
 
     def _read_many(self, label=None, query=None, limit=10, skip=0):
         logger.debug("Updating vertex with label {label} and kwargs {query}".format(label=label, query=query))
-        filtered_data = self.filter_vertex(label=label, query=query)
+        filtered_data = self.filter_vertex(label=label, query=query, limit=limit, skip=skip)
         cleaned_data = []
         for _ in filtered_data.valueMap(True).toList():
             cleaned_data.append(
@@ -91,17 +91,18 @@ class Vertex(CRUDOperationsBase):
     def _delete_many(self, label=None, query=None):
         logger.debug("Deleting the vertex with label:{label},"
                      " query:{query}".format(label=label, query=query))
+        print("=======", self.filter_vertex(label=label, query=query))
         self.drop(self.filter_vertex(label=label, query=query))
 
-    def read_in_edge_vertices(self, vertex_id):
-        vtx = self.filter_vertex(vertex_id=vertex_id)
+    def read_in_edge_vertices(self, vertex_id, label=None, query=None, limit=None, skip=None):
+        vtx = self.filter_vertex(vertex_id=vertex_id, label=label, query=query, limit=limit, skip=skip)
         cleaned_data = []
         for _ in vtx.inE().otherV().dedup().valueMap(True).toList():
             cleaned_data.append(VertexElement(_, serializer=self.serializer))
         return cleaned_data
 
-    def read_out_edge_vertices(self, vertex_id):
-        vtx = self.filter_vertex(vertex_id=vertex_id)
+    def read_out_edge_vertices(self, vertex_id, label=None, query=None, limit=None, skip=None):
+        vtx = self.filter_vertex(vertex_id=vertex_id, label=label, query=query, limit=limit, skip=skip)
         cleaned_data = []
         for _ in vtx.outE().otherV().dedup().valueMap(True).toList():
             cleaned_data.append(VertexElement(_, serializer=self.serializer))
