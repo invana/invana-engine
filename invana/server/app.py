@@ -8,8 +8,8 @@ from graphene import Schema
 from ..gremlin import GremlinClient
 import os
 import time
-from .schemas.gremlin import Gremlin
-
+from .schemas.query import GremlinQuery
+from .schemas.mutation import GremlinMutation
 gremlin_server_url = os.environ.get("GREMLIN_SERVER_URL")
 
 if gremlin_server_url is None:
@@ -22,9 +22,8 @@ async def homepage(request):
 
 routes = [
     Route('/', homepage),
-
     Route('/graphql', GraphQLApp(
-        schema=Schema(query=Gremlin),
+        schema=Schema(query=GremlinQuery, mutation=GremlinMutation),
     ))
 ]
 
