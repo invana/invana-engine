@@ -6,10 +6,7 @@ default_pagination_size = 10
 
 
 class GremlinVertexQuerySchema:
-    create_vertex = Field(GrapheneVertexType, label=String(required=True), properties=JSONString(required=True))
     get_vertex_by_id = Field(GrapheneVertexType, id=String(required=True))
-    update_vertex_by_id = Field(GrapheneVertexType, id=String(required=True), properties=JSONString(required=True))
-    remove_vertex_by_id = String(id=String(required=True))
     filter_vertex = Field(List(GrapheneVertexType), label=String(), query=JSONString(),
                           limit=Int(default_value=default_pagination_size), skip=Int())
     get_in_edge_vertices = Field(List(GrapheneVertexType), id=String(required=True), label=String(), query=JSONString(),
@@ -20,25 +17,9 @@ class GremlinVertexQuerySchema:
 
     remove_vertices = String(label=String(), query=JSONString())
 
-    def resolve_create_vertex(self, info: ResolveInfo, label: str, properties: str):
-        data = info.context['request'].app.state.gremlin_client.vertex.create(label=label, properties=properties)
-        return data.__dict__() if data else None
-
-    def resolve_update_vertex_by_id(self, info: ResolveInfo, id: str, properties: str):
-        data = info.context['request'].app.state.gremlin_client.vertex.update(id, properties=properties)
-        return data.__dict__() if data else None
-
     def resolve_get_vertex_by_id(self, info: ResolveInfo, id: str):
         data = info.context['request'].app.state.gremlin_client.vertex.read_one(id)
         return data.__dict__() if data else None
-
-    def resolve_remove_vertex_by_id(self, info: ResolveInfo, id: str):
-        data = info.context['request'].app.state.gremlin_client.vertex.delete_one(id)
-        return data.__dict__() if data else None
-
-    def resolve_remove_vertices(self, info: ResolveInfo, label: str = None, query: str = None):
-        info.context['request'].app.state.gremlin_client.vertex.delete_many(label=label, query=query)
-        return None
 
     def resolve_filter_vertex(self, info: ResolveInfo, label: str = None, query: str = None,
                               limit: int = default_pagination_size, skip: int = 0):
@@ -81,8 +62,14 @@ class GremlinEdgeQuerySchema:
         return [datum.__dict__() for datum in data]
 
 
-class GremlinQuery(ObjectType, GremlinEdgeQuerySchema, GremlinVertexQuerySchema, GenericClientInfoSchema):
-    raw_query = String(gremlin=String())
+class GremlinRawQuerySchema:
+    raw_query = Field(List(GrapheneEdgeType), gremlin=String())
 
     def resolve_raw_query(self, info: ResolveInfo, gremlin: str) -> any:
-        return info.context['request'].app.state.gremlin_client.execute_query(gremlin)
+        data = info.context['request'].app.state.gremlin_client.execute_query(gremlin)
+        return data
+
+
+class GremlinQuery(ObjectType, GremlinRawQuerySchema, GremlinEdgeQuerySchema, GremlinVertexQuerySchema,
+                   GenericClientInfoSchema):
+    pass

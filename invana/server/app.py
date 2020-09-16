@@ -11,13 +11,14 @@ import time
 from .schemas.query import GremlinQuery
 from .schemas.mutation import GremlinMutation
 gremlin_server_url = os.environ.get("GREMLIN_SERVER_URL")
+shall_debug = os.environ.get("DEBUG", True)
 
 if gremlin_server_url is None:
     raise Exception("GREMLIN_SERVER_URL environment variable not set. Please fix it.")
 
 
 async def homepage(request):
-    return JSONResponse({'message': 'Glad you are here. Go to /graphql'})
+    return JSONResponse({'message': 'Glad you are here, go to /graphql. Good luck with your quest.'})
 
 
 routes = [
@@ -27,7 +28,7 @@ routes = [
     ))
 ]
 
-app = Starlette(routes=routes, debug=True)
+app = Starlette(routes=routes, debug=shall_debug)
 
 time.sleep(1)
 gremlin_client = GremlinClient(gremlin_server_url=gremlin_server_url)

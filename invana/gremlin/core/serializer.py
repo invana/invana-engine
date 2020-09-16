@@ -12,9 +12,13 @@ class GremlinResponseSerializer:
             _id = _id.strip("#")
         return _id
 
-    def serialize_element_dict(self, vtx):
+    def serialize_element_dict(self, elem):
         cleaned_data = {"properties": {}}
-        for k, v in vtx.items():
+        if "Direction.IN" in elem.keys():
+            cleaned_data['type'] = "edge"
+        else:
+            cleaned_data['type'] = "vertex"
+        for k, v in elem.items():
             if str(k) == "T.id":
                 cleaned_data['id'] = self.get_element_id(v)
             elif str(k) == "T.label":
@@ -30,13 +34,28 @@ class GremlinResponseSerializer:
                 cleaned_data['properties'][k] = v[0] if type(v) is list else v
         if cleaned_data['properties'].keys().__len__() == 0:
             del cleaned_data['properties']
+
         return cleaned_data
 
     def serialize_vertex_element(self, vertex):
-        return self.serialize_element_dict(vertex.__dict__())
+        return {
+            "id": vertex.id,
+            "label": vertex.label,
+            "type": "vertex",
+            "properties": {}
+        }
 
     def serialize_edge_element(self, edge):
-        return self.serialize_element_dict(edge)
+        return {
+            "id": edge.id,
+            "label": edge.label,
+            "type": "edge",
+            "inV": edge.inV.id,
+            "inVLabel": edge.inV.label,
+            "outV": edge.outV.id,
+            "outVLabel": edge.outV.label,
+            "properties": {}
+        }
 
     def serialize_data(self, data):
         if isinstance(data, list):
