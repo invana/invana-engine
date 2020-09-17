@@ -11,10 +11,10 @@ GraphQL APIs for Apache TinkerPop supported graph databases.
 
 ## How to use
 
-`
+```
 export GREMLIN_SERVER_URL="ws://localhost:8182/gremlin"
 uvicorn invana.start_server:app --port 5000
-`
+```
 
 
 
