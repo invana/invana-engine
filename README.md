@@ -1,6 +1,6 @@
 # invana-engine
 
-GraphQL APIs for Apache TinkerPop supported graph databases.
+GraphQL API for Apache TinkerPop supported graph databases.
 
 **Note: Under active development.** 
 
