@@ -115,3 +115,5 @@ class Vertex(CRUDOperationsBase):
         for _ in vtx.outE().otherV().dedup().elementMap().toList():
             cleaned_data.append(VertexElement(_, serializer=self.serializer))
         return cleaned_data
+
+

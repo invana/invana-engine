@@ -1,0 +1,30 @@
+{
+  "name": "Invana Engine",
+  "description": "GraphQL APIs for Apache TinkerPop supported graph databases.",
+  "repository": "https://github.com/invanalabs/invana-engine",
+  "website": "https://invana.io",
+  "logo": "https://avatars3.githubusercontent.com/u/26816714?s=200&v=4",
+  "success_url": "/graphql",
+  "keywords": [
+    "invana-engine",
+    "apache tinkerpop",
+    "graphql",
+    "graph databases"
+  ],
+  "stack": "container",
+  "env": {
+    "GREMLIN_SERVER_URL": {
+      "description": "Gremlin server url. ex: ws://127.0.0.1:8182/gremlin",
+      "required": true
+    },
+    "GREMLIN_SERVER_USER_NAME": {
+      "description": "username to authenticate gremlin server"
+    },
+    "GREMLIN_SERVER_PASSWORD": {
+      "description": "password to authenticate gremlin server"
+    },
+    "GREMLIN_SERVER_ACCESS_TOKEN": {
+      "description": "access token to authenticate gremlin server"
+    }
+  }
+}

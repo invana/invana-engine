@@ -1,7 +1,8 @@
 # invana-engine
-Open source GraphQL server for Apache TinkerPop supported graph databases.
 
-Note: Under active development. 
+GraphQL APIs for Apache TinkerPop supported graph databases.
+
+**Note: Under active development.** 
 
 [![Apache license](https://img.shields.io/badge/license-Apache-blue.svg)](https://github.com/invanalabs/invana-engine/blob/master/LICENSE) 
 [![Build Status](https://travis-ci.org/invanalabs/invana-engine.svg?branch=develop)](https://travis-ci.org/invanalabs/invana-engine)
@@ -10,11 +11,12 @@ Note: Under active development.
 
 ## How to use
 
-```bash
-# start server
-uvicorn invana.server.app:app --reload
+`
+export GREMLIN_SERVER_URL="ws://localhost:8182/gremlin"
+uvicorn invana.start_server:app --port 5000
+`
 
-```
+
 
 ## License 
 
