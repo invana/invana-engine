@@ -1,6 +1,6 @@
 from .base import CRUDOperationsBase
 import logging
-from .core.element import VertexElement
+from .core.element import VertexElement, EdgeElement
 
 logger = logging.getLogger(__name__)
 
@@ -93,16 +93,25 @@ class Vertex(CRUDOperationsBase):
                      " query:{query}".format(label=label, query=query))
         self.drop(self.filter_vertex(label=label, query=query))
 
-    def read_in_edge_vertices(self, vertex_id, label=None, query=None, limit=None, skip=None):
+    def read_in_edges_and_vertices(self, vertex_id, label=None, query=None, limit=None, skip=None):
+        # TODO - fix the performance, filter queries are made twice
         vtx = self.filter_vertex(vertex_id=vertex_id, label=label, query=query, limit=limit, skip=skip)
         cleaned_data = []
+        for _ in vtx.inE().dedup().elementMap().toList():
+            cleaned_data.append(EdgeElement(_, serializer=self.serializer))
+        vtx = self.filter_vertex(vertex_id=vertex_id, label=label, query=query, limit=limit, skip=skip)
+
         for _ in vtx.inE().otherV().dedup().elementMap().toList():
             cleaned_data.append(VertexElement(_, serializer=self.serializer))
         return cleaned_data
 
-    def read_out_edge_vertices(self, vertex_id, label=None, query=None, limit=None, skip=None):
+    def read_out_edges_and_vertices(self, vertex_id, label=None, query=None, limit=None, skip=None):
+        # TODO - fix the performance, filter queries are made twice
         vtx = self.filter_vertex(vertex_id=vertex_id, label=label, query=query, limit=limit, skip=skip)
         cleaned_data = []
+        for _ in vtx.outE().dedup().elementMap().toList():
+            cleaned_data.append(EdgeElement(_, serializer=self.serializer))
+        vtx = self.filter_vertex(vertex_id=vertex_id, label=label, query=query, limit=limit, skip=skip)
         for _ in vtx.outE().otherV().dedup().elementMap().toList():
             cleaned_data.append(VertexElement(_, serializer=self.serializer))
         return cleaned_data

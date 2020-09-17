@@ -9,9 +9,9 @@ class GremlinVertexQuerySchema:
     get_vertex_by_id = Field(GrapheneVertexType, id=String(required=True))
     filter_vertex = Field(List(GrapheneVertexType), label=String(), query=JSONString(),
                           limit=Int(default_value=default_pagination_size), skip=Int())
-    get_in_edge_vertices = Field(List(GrapheneVertexType), id=String(required=True), label=String(), query=JSONString(),
+    get_in_edges_and_vertices = Field(List(GrapheneVertexType), id=String(required=True), label=String(), query=JSONString(),
                                  limit=Int(default_value=default_pagination_size), skip=Int())
-    get_out_edge_vertices = Field(List(GrapheneVertexType), id=String(required=True), label=String(),
+    get_out_edges_and_vertices = Field(List(GrapheneVertexType), id=String(required=True), label=String(),
                                   query=JSONString(),
                                   limit=Int(default_value=default_pagination_size), skip=Int())
 
@@ -28,18 +28,18 @@ class GremlinVertexQuerySchema:
         )
         return [datum.__dict__() for datum in data]
 
-    def resolve_get_in_edge_vertices(self, info: ResolveInfo,
+    def resolve_get_in_edges_and_vertices(self, info: ResolveInfo,
                                      id: str = None, label: str = None, query: str = None,
                                      limit: int = default_pagination_size, skip: int = 0):
-        data = info.context['request'].app.state.gremlin_client.vertex.read_in_edge_vertices(
+        data = info.context['request'].app.state.gremlin_client.vertex.read_in_edges_and_vertices(
             id, label=label, query=query, limit=limit, skip=skip
         )
         return [datum.__dict__() for datum in data]
 
-    def resolve_get_out_edge_vertices(self, info: ResolveInfo,
+    def resolve_get_out_edges_and_vertices(self, info: ResolveInfo,
                                       id: str = None, label: str = None, query: str = None,
                                       limit: int = default_pagination_size, skip: int = 0):
-        data = info.context['request'].app.state.gremlin_client.vertex.read_out_edge_vertices(
+        data = info.context['request'].app.state.gremlin_client.vertex.read_out_edges_and_vertices(
             id, label=label, query=query, limit=limit, skip=skip
         )
         return [datum.__dict__() for datum in data]
