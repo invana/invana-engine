@@ -1,4 +1,4 @@
-from graphene import ObjectType, String
+from graphene import ObjectType, String, Int
 from ..utils import get_host, get_client_info
 
 
@@ -15,3 +15,9 @@ class GremlinClientInfo(ObjectType):
 
     def resolve_ip_address(self, info):
         return get_client_info()['ip_address']
+
+
+class LabelStats(ObjectType):
+    label = String()
+    count = Int()
+

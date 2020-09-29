@@ -1,5 +1,6 @@
 from .edge import Edge
 from .vertex import Vertex
+from .management import ManagementOps
 from .core.serializer import GremlinResponseSerializer
 from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection
@@ -47,6 +48,7 @@ class GremlinClient:
                                              transport_factory=transport_factory)
         self.vertex = Vertex(gremlin_client=self.gremlin_client)
         self.edge = Edge(gremlin_client=self.gremlin_client)
+        self.management = ManagementOps(gremlin_client=self.gremlin_client)
 
     def close(self):
         self.gremlin_client.connection.close()
