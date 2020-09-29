@@ -7,33 +7,37 @@ logger = logging.getLogger(__name__)
 
 class Edge(CRUDOperationsBase):
 
-    def get_or_create(self, label=None, query=None):
+    def get_or_create(self, label=None, namespace=None, query=None):
         """
 
         :param label:
+        :param namespace:
         :param query: {"id": 123213 }
         :return:
         """
 
-        edges = self.read_many(label=label, query=query)
+        edges = self.read_many(label=label, namespace=namespace, query=query)
         if edges.__len__() > 0:
             return edges[0]
         else:
-            return self.create(label=label, properties=query)
+            return self.create(label=label, namespace=namespace, properties=query)
 
-    def create(self, label=None, properties=None, inv=None, outv=None):
+    def create(self, label=None, namespace=None, properties=None, inv=None, outv=None):
         """
 
         :param label:
+        :param namespace:
         :param properties:
         :param inv: str or VertexElement
         :param outv: str or VertexElement
         :return:
         """
-        logger.debug("Creating Edge with label {label} and properties {properties}".format(
+        logger.debug("Creating Edge with label {label}, namespace {namespace} and properties {properties}".format(
             label=label,
+            namespace=namespace,
             properties=properties)
         )
+        label = self.get_namespaced_label(label=label, namespace=namespace)
         properties = {} if properties is None else properties
         inv_vtx_instance = self.filter_vertex(inv)
         outv_vtx_instance = self.filter_vertex(outv)
@@ -68,11 +72,10 @@ class Edge(CRUDOperationsBase):
             pass
         return None
 
-    def _read_many(self, label=None, query=None, limit=10, skip=0):
-        filtered_data = self.filter_edge(label=label, query=query)
+    def _read_many(self, label=None, namespace=None, query=None, limit=10, skip=0):
+        filtered_data = self.filter_edge(label=label, namespace=namespace, query=query)
         cleaned_data = []
         for _ in filtered_data.elementMap().toList():
-        # for _ in filtered_data.toList():
             cleaned_data.append(EdgeElement(_, serializer=self.serializer))
         return cleaned_data
 
@@ -80,7 +83,7 @@ class Edge(CRUDOperationsBase):
         logger.debug("Deleting the edge with edge_id:{edge_id}".format(edge_id=edge_id))
         self.drop(self.filter_edge(edge_id=edge_id))
 
-    def _delete_many(self, label=None, query=None):
-        logger.debug("Deleting the vertex with label:{label},"
-                     " query:{query}".format(label=label, query=query))
-        self.drop(self.filter_edge(label=label, query=query))
+    def _delete_many(self, label=None, namespace=None, query=None):
+        logger.debug("Deleting the edges with label:{label} namespace:{namespace},"
+                     " query:{query}".format(label=label, query=query, namespace=namespace))
+        self.drop(self.filter_edge(label=label, namespace=namespace, query=query))

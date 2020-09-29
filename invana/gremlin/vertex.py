@@ -7,16 +7,18 @@ logger = logging.getLogger(__name__)
 
 class Vertex(CRUDOperationsBase):
 
-    def create(self, label=None, properties=None, **kwargs):
+    def create(self, label=None, namespace=None, properties=None, **kwargs):
         """
 
         :param label:
+        :param namespace:
         :param properties:
         :param kwargs: not used
         :return:
         """
-        logger.debug("Creating vertex with label {label} "
-                     "and properties {properties}".format(label=label, properties=properties))
+        logger.debug("Creating vertex with label {label} namespace {namespace}"
+                     "and properties {properties}".format(label=label, namespace=namespace, properties=properties))
+        label = self.get_namespaced_label(label=label, namespace=namespace)
 
         if properties is None:
             raise Exception("Vertex cannot be created with out  properties")
@@ -26,18 +28,19 @@ class Vertex(CRUDOperationsBase):
         _vtx = _.elementMap().next()
         return VertexElement(_vtx, serializer=self.serializer)
 
-    def get_or_create(self, label=None, properties=None):
+    def get_or_create(self, label=None, namespace=None, properties=None):
         """
 
         :param label:
+        :param namespace:
         :param properties:
         :return:
         """
-        vertices = self.read_many(label=label, query=properties)
+        vertices = self.read_many(label=label, namespace=namespace, query=properties)
         if vertices.__len__() > 0:
             return VertexElement(vertices[0], serializer=self.serializer)
         else:
-            return self.create(label=label, properties=properties)
+            return self.create(label=label, namespace=namespace, properties=properties)
 
     def update(self, vertex_id, properties=None):
         """
@@ -74,9 +77,10 @@ class Vertex(CRUDOperationsBase):
             pass
         return None
 
-    def _read_many(self, label=None, query=None, limit=10, skip=0):
-        logger.debug("Updating vertex with label {label} and kwargs {query}".format(label=label, query=query))
-        filtered_data = self.filter_vertex(label=label, query=query, limit=limit, skip=skip)
+    def _read_many(self, label=None, namespace=None, query=None, limit=10, skip=0):
+        logger.debug("Updating vertex with label:{label} namespace:{namespace} and kwargs {query}".format(
+            label=label, namespace=namespace, query=query))
+        filtered_data = self.filter_vertex(label=label, namespace=namespace, query=query, limit=limit, skip=skip)
         cleaned_data = []
         for _ in filtered_data.elementMap().toList():
             cleaned_data.append(
@@ -88,30 +92,33 @@ class Vertex(CRUDOperationsBase):
         logger.debug("Deleting the vertex with vertex_id:{vertex_id}".format(vertex_id=vertex_id))
         self.drop(self.filter_vertex(vertex_id=vertex_id))
 
-    def _delete_many(self, label=None, query=None):
-        logger.debug("Deleting the vertex with label:{label},"
-                     " query:{query}".format(label=label, query=query))
-        self.drop(self.filter_vertex(label=label, query=query))
+    def _delete_many(self, label=None, namespace=None, query=None):
+        logger.debug("Deleting the vertex with label:{label}, namespace:{namespace}"
+                     " query:{query}".format(label=label, namespace=namespace, query=query))
+        self.drop(self.filter_vertex(label=label, namespace=namespace, query=query))
 
-    def read_in_edges_and_vertices(self, vertex_id, label=None, query=None, limit=None, skip=None):
+    def read_in_edges_and_vertices(self, vertex_id, label=None, namespace=None, query=None, limit=None, skip=None):
         # TODO - fix the performance, filter queries are made twice
-        vtx = self.filter_vertex(vertex_id=vertex_id, label=label, query=query, limit=limit, skip=skip)
+        vtx = self.filter_vertex(vertex_id=vertex_id, label=label, namespace=namespace,
+                                 query=query, limit=limit, skip=skip)
         cleaned_data = []
         for _ in vtx.inE().dedup().elementMap().toList():
             cleaned_data.append(EdgeElement(_, serializer=self.serializer))
-        vtx = self.filter_vertex(vertex_id=vertex_id, label=label, query=query, limit=limit, skip=skip)
-
+        vtx = self.filter_vertex(vertex_id=vertex_id, label=label, namespace=namespace,
+                                 query=query, limit=limit, skip=skip)
         for _ in vtx.inE().otherV().dedup().elementMap().toList():
             cleaned_data.append(VertexElement(_, serializer=self.serializer))
         return cleaned_data
 
-    def read_out_edges_and_vertices(self, vertex_id, label=None, query=None, limit=None, skip=None):
+    def read_out_edges_and_vertices(self, vertex_id, label=None, namespace=None, query=None, limit=None, skip=None):
         # TODO - fix the performance, filter queries are made twice
-        vtx = self.filter_vertex(vertex_id=vertex_id, label=label, query=query, limit=limit, skip=skip)
+        vtx = self.filter_vertex(vertex_id=vertex_id, label=label, namespace=namespace,
+                                 query=query, limit=limit, skip=skip)
         cleaned_data = []
         for _ in vtx.outE().dedup().elementMap().toList():
             cleaned_data.append(EdgeElement(_, serializer=self.serializer))
-        vtx = self.filter_vertex(vertex_id=vertex_id, label=label, query=query, limit=limit, skip=skip)
+        vtx = self.filter_vertex(vertex_id=vertex_id, label=label, namespace=namespace,
+                                 query=query, limit=limit, skip=skip)
         for _ in vtx.outE().otherV().dedup().elementMap().toList():
             cleaned_data.append(VertexElement(_, serializer=self.serializer))
         return cleaned_data
