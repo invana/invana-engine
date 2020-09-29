@@ -1,7 +1,7 @@
 from gremlin_python.structure.graph import Vertex, Edge
 
 
-class GremlinResponseSerializer:
+class GraphSONV3Reader:
 
     def get_element_id(self, _id):
         if type(_id) is dict:
