@@ -75,8 +75,7 @@ class GremlinRawQuerySchema:
     raw_query = Field(List(GrapheneEdgeType), gremlin=String())
 
     def resolve_raw_query(self, info: ResolveInfo, gremlin: str) -> any:
-        data = info.context['request'].app.state.gremlin_client.execute_query(gremlin)
-        return data
+        return info.context['request'].app.state.gremlin_client.execute_query(gremlin)
 
 
 class GremlinQuery(ObjectType, ManagementQuerySchema, GremlinRawQuerySchema, GremlinEdgeQuerySchema,

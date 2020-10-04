@@ -4,6 +4,7 @@ from gremlin_python.structure.graph import Vertex, Edge
 class GraphSONV3Reader:
 
     def get_element_id(self, _id):
+        print("====_id", _id)
         if type(_id) is dict:
             _id = _id["@value"]
         if type(_id) is dict:
@@ -15,9 +16,9 @@ class GraphSONV3Reader:
     def serialize_element_dict(self, elem):
         cleaned_data = {"properties": {}}
         if "Direction.IN" in elem.keys():
-            cleaned_data['type'] = "edge"
+            cleaned_data['type'] = "g:Edge"
         else:
-            cleaned_data['type'] = "vertex"
+            cleaned_data['type'] = "g:Vertex"
         for k, v in elem.items():
             if str(k) == "T.id":
                 cleaned_data['id'] = self.get_element_id(v)
@@ -41,7 +42,7 @@ class GraphSONV3Reader:
         return {
             "id": vertex.id,
             "label": vertex.label,
-            "type": "vertex",
+            "type": "g:Vertex",
             "properties": {}
         }
 
@@ -49,7 +50,7 @@ class GraphSONV3Reader:
         return {
             "id": edge.id,
             "label": edge.label,
-            "type": "edge",
+            "type": "g:Edge",
             "inV": edge.inV.id,
             "inVLabel": edge.inV.label,
             "outV": edge.outV.id,

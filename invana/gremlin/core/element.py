@@ -48,7 +48,7 @@ class SerializedElement:
 
 
 class VertexElement(SerializedElement):
-    type = "vertex"
+    type = "g:Vertex"
 
     def assign_data(self, serialized_data):
         self.assign_id_label_properties(serialized_data['id'], serialized_data['label'],
@@ -56,7 +56,7 @@ class VertexElement(SerializedElement):
 
 
 class EdgeElement(SerializedElement):
-    type = "edge"
+    type = "g:Edge"
     in_v = None
     in_v_label = None
     out_v = None

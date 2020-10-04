@@ -1,8 +1,7 @@
-from graphene import Scalar, ObjectType, String
+from graphene import Scalar, ObjectType, String, ID
 
 
-class GenericJSONField(Scalar):
-    ''' convert the Json String into Json '''
+class AnyField(Scalar):
 
     @staticmethod
     def serialize(dt):
@@ -18,17 +17,17 @@ class GenericJSONField(Scalar):
 
 
 class GrapheneVertexType(ObjectType):
-    id = String()
+    id = AnyField()
     type = String()
     label = String()
-    properties = GenericJSONField()
+    properties = AnyField()
 
 
 class GrapheneEdgeType(ObjectType):
-    id = String()
+    id = AnyField()
     type = String()
     label = String()
-    properties = GenericJSONField()
+    properties = AnyField()
     in_v = String()
     out_v = String()
     in_v_label = String()
