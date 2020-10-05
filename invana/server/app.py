@@ -10,8 +10,6 @@ from .schemas.mutation import GremlinMutation
 from graphene import Schema
 from .views import homepage_view
 from ..gremlin import GremlinClient
-from starlette.staticfiles import StaticFiles
-from .settings import STATIC_FOLDER_PATH
 import os
 import time
 
@@ -26,7 +24,6 @@ routes = [
     Route('/graphql', GraphQLApp(
         schema=Schema(query=GremlinQuery, mutation=GremlinMutation),
     )),
-    Mount('/static', StaticFiles(directory=STATIC_FOLDER_PATH), name='static')
 
 ]
 
