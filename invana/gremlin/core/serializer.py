@@ -47,7 +47,7 @@ class GraphSONV3Reader:
 
     def serialize_edge_element(self, edge):
         return {
-            "id": edge.id,
+            "id": self.get_element_id(edge.id),
             "label": edge.label,
             "type": "g:Edge",
             "inV": edge.inV.id,
