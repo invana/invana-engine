@@ -4,7 +4,6 @@ from gremlin_python.structure.graph import Vertex, Edge
 class GraphSONV3Reader:
 
     def get_element_id(self, _id):
-        print("====_id", _id)
         if type(_id) is dict:
             _id = _id["@value"]
         if type(_id) is dict:
