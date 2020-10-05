@@ -34,7 +34,6 @@ class GraphSONV3Reader:
                 cleaned_data['properties'][k] = v[0] if type(v) is list else v
         if cleaned_data['properties'].keys().__len__() == 0:
             del cleaned_data['properties']
-
         return cleaned_data
 
     def serialize_vertex_element(self, vertex):
