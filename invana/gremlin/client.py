@@ -1,7 +1,7 @@
 from .edge import Edge
 from .vertex import Vertex
 from .management import ManagementOps
-from serializers.graphson_v3 import GraphSONV3Reader
+from .serializers.graphson_v3 import GraphSONV3Reader
 from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection
 from gremlin_python.driver.protocol import GremlinServerWSProtocol, GremlinServerError
