@@ -3,7 +3,8 @@ from gremlin_python.structure.graph import Vertex, Edge
 
 class GraphSONV3Reader:
 
-    def get_element_id(self, _id):
+    @staticmethod
+    def get_element_id(_id):
         if type(_id) is dict:
             _id = _id["@value"]
         if type(_id) is dict:
@@ -36,7 +37,8 @@ class GraphSONV3Reader:
             del cleaned_data['properties']
         return cleaned_data
 
-    def serialize_vertex_element(self, vertex):
+    @staticmethod
+    def serialize_vertex_element(vertex):
         return {
             "id": vertex.id,
             "label": vertex.label,
@@ -49,10 +51,10 @@ class GraphSONV3Reader:
             "id": self.get_element_id(edge.id),
             "label": edge.label,
             "type": "g:Edge",
-            "inV": edge.inV.id,
-            "inVLabel": edge.inV.label,
-            "outV": edge.outV.id,
-            "outVLabel": edge.outV.label,
+            "in_v": edge.inV.id,
+            "in_v_label": edge.inV.label,
+            "out_v": edge.outV.id,
+            "out_v_label": edge.outV.label,
             "properties": {}
         }
 

@@ -1,13 +1,11 @@
 from .edge import Edge
 from .vertex import Vertex
 from .management import ManagementOps
-from .core.serializer import GraphSONV3Reader
+from serializers.graphson_v3 import GraphSONV3Reader
 from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection
-from gremlin_python.driver.serializer import GraphSONMessageSerializer
-from gremlin_python.structure.io import graphsonV3d0
 from gremlin_python.driver.protocol import GremlinServerWSProtocol, GremlinServerError
-from gremlin_python.driver import serializer, request
+from gremlin_python.driver import request
 from gremlin_python.driver.resultset import ResultSet
 
 import base64
