@@ -52,7 +52,7 @@ class VertexElement(SerializedElement):
 
     def assign_data(self, serialized_data):
         self.assign_id_label_properties(serialized_data['id'], serialized_data['label'],
-                                        serialized_data.get('properties'))
+                                        serialized_data.get('properties', {}))
 
 
 class EdgeElement(SerializedElement):
@@ -64,7 +64,7 @@ class EdgeElement(SerializedElement):
 
     def assign_data(self, serialized_data):
         self.assign_id_label_properties(serialized_data['id'], serialized_data['label'],
-                                        serialized_data.get('properties'),
+                                        serialized_data.get('properties', {}),
                                         )
         self.in_v = serialized_data['inV']
         self.in_v_label = serialized_data['inVLabel']
