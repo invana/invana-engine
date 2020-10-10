@@ -1,16 +1,17 @@
-from graphene import ObjectType, String, Field, JSONString, ResolveInfo, Int, NonNull, List
-from ..types.element import GrapheneVertexType, GrapheneEdgeType
+from graphene import ObjectType, String, Field, JSONString, ResolveInfo, Int,  List
+from ..types.element import GrapheneVertexType, GrapheneEdgeType, AnyField
 from ..types.gremlin import LabelStats
 from .client import GenericClientInfoSchema
+from typing import Any
 
 default_pagination_size = 10
 
 
 class ManagementQuerySchema:
-    get_label_stats = Field(List(LabelStats), namespace=String())
+    get_vertices_label_stats = Field(List(LabelStats), namespace=String())
 
-    def resolve_get_label_stats(self, info: ResolveInfo, namespace: str = None):
-        data = info.context['request'].app.state.gremlin_client.management.get_label_stats(namespace=namespace)
+    def resolve_get_vertices_label_stats(self, info: ResolveInfo, namespace: str = None):
+        data = info.context['request'].app.state.gremlin_client.management.get_vertices_label_stats(namespace=namespace)
         return data
 
 
@@ -18,10 +19,10 @@ class GremlinVertexQuerySchema:
     get_vertex_by_id = Field(GrapheneVertexType, id=String(required=True))
     filter_vertex = Field(List(GrapheneVertexType), label=String(), namespace=String(), query=JSONString(),
                           limit=Int(default_value=default_pagination_size), skip=Int())
-    get_in_edges_and_vertices = Field(List(GrapheneVertexType), id=String(required=True),
+    get_in_edges_and_vertices = Field(List(GrapheneVertexType), id=AnyField(required=True),
                                       label=String(), namespace=String(), query=JSONString(),
                                       limit=Int(default_value=default_pagination_size), skip=Int())
-    get_out_edges_and_vertices = Field(List(GrapheneVertexType), id=String(required=True),
+    get_out_edges_and_vertices = Field(List(GrapheneVertexType), id=AnyField(required=True),
                                        label=String(), namespace=String(), query=JSONString(),
                                        limit=Int(default_value=default_pagination_size), skip=Int())
 
@@ -37,7 +38,7 @@ class GremlinVertexQuerySchema:
         return [datum.__dict__() for datum in data]
 
     def resolve_get_in_edges_and_vertices(self, info: ResolveInfo,
-                                          id: str = None, label: str = None, namespace: str = None,
+                                          id: Any = None, label: str = None, namespace: str = None,
                                           query: str = None,
                                           limit: int = default_pagination_size, skip: int = 0):
         data = info.context['request'].app.state.gremlin_client.vertex.read_in_edges_and_vertices(
@@ -46,7 +47,7 @@ class GremlinVertexQuerySchema:
         return [datum.__dict__() for datum in data]
 
     def resolve_get_out_edges_and_vertices(self, info: ResolveInfo,
-                                           id: str = None, label: str = None, namespace: str = None, query: str = None,
+                                           id: Any = None, label: str = None, namespace: str = None, query: str = None,
                                            limit: int = default_pagination_size, skip: int = 0):
         data = info.context['request'].app.state.gremlin_client.vertex.read_out_edges_and_vertices(
             id, label=label, namespace=namespace, query=query, limit=limit, skip=skip

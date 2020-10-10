@@ -1,11 +1,21 @@
-from graphene import Scalar, ObjectType, String, ID
-
+from graphene import Scalar, ObjectType, String, ID, DateTime
+import datetime
 
 class AnyField(Scalar):
 
+
     @staticmethod
     def serialize(dt):
-        return dt
+        if isinstance(dt, dict):
+            transformed_data = {}
+            for key, v in dt.items():
+                if isinstance(v, datetime.datetime):
+                    transformed_data[key] =  v.isoformat()
+                else:
+                    transformed_data[key] = v
+            return transformed_data
+        else:
+            return dt
 
     @staticmethod
     def parse_literal(node):

@@ -3,7 +3,7 @@ from .base import GremlinOperationBase, CRUDOperationsBase
 
 class ManagementOps(GremlinOperationBase):
 
-    def get_label_stats(self, label: str = None, namespace: str = None, limit: int = None, order: str = None):
+    def get_vertices_label_stats(self, label: str = None, namespace: str = None, limit: int = None, order: str = None):
         stats = self.gremlin_client.g.V().label().groupCount().next()
         label_stats = []
         for label, count in stats.items():
