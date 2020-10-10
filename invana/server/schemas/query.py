@@ -1,5 +1,5 @@
 from graphene import ObjectType, String, Field, JSONString, ResolveInfo, Int,  List
-from ..types.element import GrapheneVertexType, GrapheneEdgeType, AnyField
+from ..types.element import GrapheneVertexType, GrapheneEdgeType, AnyField, GrapheneVertexOrEdgeType
 from ..types.gremlin import LabelStats
 from .client import GenericClientInfoSchema
 from typing import Any
@@ -19,10 +19,10 @@ class GremlinVertexQuerySchema:
     get_vertex_by_id = Field(GrapheneVertexType, id=String(required=True))
     filter_vertex = Field(List(GrapheneVertexType), label=String(), namespace=String(), query=JSONString(),
                           limit=Int(default_value=default_pagination_size), skip=Int())
-    get_in_edges_and_vertices = Field(List(GrapheneVertexType), id=AnyField(required=True),
+    get_in_edges_and_vertices = Field(List(GrapheneVertexOrEdgeType), id=AnyField(required=True),
                                       label=String(), namespace=String(), query=JSONString(),
                                       limit=Int(default_value=default_pagination_size), skip=Int())
-    get_out_edges_and_vertices = Field(List(GrapheneVertexType), id=AnyField(required=True),
+    get_out_edges_and_vertices = Field(List(GrapheneVertexOrEdgeType), id=AnyField(required=True),
                                        label=String(), namespace=String(), query=JSONString(),
                                        limit=Int(default_value=default_pagination_size), skip=Int())
 
