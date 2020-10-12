@@ -78,8 +78,8 @@ class Vertex(CRUDOperationsBase):
         return None
 
     def _read_many(self, label=None, namespace=None, query=None, limit=10, skip=0):
-        logger.debug("Updating vertex with label:{label} namespace:{namespace} and kwargs {query}".format(
-            label=label, namespace=namespace, query=query))
+        logger.debug("Reading vertices with label:{label}; namespace:{namespace}; query: {query}; limit: {limit}"
+                     "; skip: {skip}".format(label=label, namespace=namespace, query=query, limit=limit, skip=skip))
         filtered_data = self.filter_vertex(label=label, namespace=namespace, query=query, limit=limit, skip=skip)
         cleaned_data = []
         for _ in filtered_data.elementMap().toList():
@@ -122,5 +122,3 @@ class Vertex(CRUDOperationsBase):
         for _ in vtx.outE().otherV().dedup().elementMap().toList():
             cleaned_data.append(VertexElement(_, serializer=self.serializer))
         return cleaned_data
-
-

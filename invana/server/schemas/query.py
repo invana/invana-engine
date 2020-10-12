@@ -1,4 +1,4 @@
-from graphene import ObjectType, String, Field, JSONString, ResolveInfo, Int,  List
+from graphene import ObjectType, String, Field, JSONString, ResolveInfo, Int, List
 from ..types.element import GrapheneVertexType, GrapheneEdgeType, AnyField, GrapheneVertexOrEdgeType
 from ..types.gremlin import LabelStats
 from .client import GenericClientInfoSchema
@@ -9,9 +9,14 @@ default_pagination_size = 10
 
 class ManagementQuerySchema:
     get_vertices_label_stats = Field(List(LabelStats), namespace=String())
+    get_edges_label_stats = Field(List(LabelStats), namespace=String())
 
     def resolve_get_vertices_label_stats(self, info: ResolveInfo, namespace: str = None):
         data = info.context['request'].app.state.gremlin_client.management.get_vertices_label_stats(namespace=namespace)
+        return data
+
+    def resolve_get_edges_label_stats(self, info: ResolveInfo, namespace: str = None):
+        data = info.context['request'].app.state.gremlin_client.management.get_edges_label_stats(namespace=namespace)
         return data
 
 
