@@ -36,25 +36,11 @@ class GrapheneVertexType(ObjectType):
 
 
 class GrapheneEdgeType(GrapheneVertexType):
-    # id = AnyField()
-    # type = String()
-    # label = String()
-    # properties = AnyField()
-    in_v = String()
-    out_v = String()
+    in_v = AnyField()
+    out_v = AnyField()
     in_v_label = String()
     out_v_label = String()
 
 
 class GrapheneVertexOrEdgeType(GrapheneEdgeType):
     pass
-    # id = AnyField()
-    # type = String()
-    # label = String()
-    # properties = AnyField()
-    # in_v = String()
-    # out_v = String()
-    # in_v_label = String()
-    # out_v_label = String()
-
-
