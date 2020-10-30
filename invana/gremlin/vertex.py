@@ -1,6 +1,7 @@
 from .base import CRUDOperationsBase
 import logging
 from .core.element import VertexElement, EdgeElement
+from ..server.utils import get_unique_items
 
 logger = logging.getLogger(__name__)
 
@@ -122,3 +123,21 @@ class Vertex(CRUDOperationsBase):
         for _ in vtx.outE().otherV().dedup().elementMap().toList():
             cleaned_data.append(VertexElement(_, serializer=self.serializer))
         return cleaned_data
+
+    def get_neighbor_edges_and_vertices(self, vertex_id=None, label=None, namespace=None, query=None, limit=None,
+                                        skip=None):
+        cleaned_data = []
+        vertices = self.filter_vertex(vertex_id=vertex_id, label=label, namespace=namespace,
+                                 query=query, limit=limit, skip=skip)
+        for _ in vertices.dedup().elementMap().toList():
+            cleaned_data.append(VertexElement(_, serializer=self.serializer))
+
+        # TODO - fix the performance, filter queries are made twice (damn! now increased to 5 times)
+        in_edges_and_vertices = self.read_in_edges_and_vertices(vertex_id=vertex_id, label=label, namespace=namespace,
+                                                               query=query, limit=limit, skip=skip)
+        cleaned_data.extend(in_edges_and_vertices)
+        out_edges_and_vertices = self.read_out_edges_and_vertices(vertex_id=vertex_id, label=label, namespace=namespace,
+                                                               query=query, limit=limit, skip=skip)
+        cleaned_data.extend(out_edges_and_vertices)
+        unique_elements = get_unique_items(cleaned_data)
+        return unique_elements
