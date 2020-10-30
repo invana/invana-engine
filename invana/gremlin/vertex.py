@@ -39,7 +39,8 @@ class Vertex(CRUDOperationsBase):
         """
         vertices = self.read_many(label=label, namespace=namespace, query=properties)
         if vertices.__len__() > 0:
-            return VertexElement(vertices[0], serializer=self.serializer)
+            # return VertexElement(vertices[0], serializer=self.serializer)
+            return vertices[0]
         else:
             return self.create(label=label, namespace=namespace, properties=properties)
 
@@ -128,16 +129,16 @@ class Vertex(CRUDOperationsBase):
                                         skip=None):
         cleaned_data = []
         vertices = self.filter_vertex(vertex_id=vertex_id, label=label, namespace=namespace,
-                                 query=query, limit=limit, skip=skip)
+                                      query=query, limit=limit, skip=skip)
         for _ in vertices.dedup().elementMap().toList():
             cleaned_data.append(VertexElement(_, serializer=self.serializer))
 
         # TODO - fix the performance, filter queries are made twice (damn! now increased to 5 times)
         in_edges_and_vertices = self.read_in_edges_and_vertices(vertex_id=vertex_id, label=label, namespace=namespace,
-                                                               query=query, limit=limit, skip=skip)
+                                                                query=query, limit=limit, skip=skip)
         cleaned_data.extend(in_edges_and_vertices)
         out_edges_and_vertices = self.read_out_edges_and_vertices(vertex_id=vertex_id, label=label, namespace=namespace,
-                                                               query=query, limit=limit, skip=skip)
+                                                                  query=query, limit=limit, skip=skip)
         cleaned_data.extend(out_edges_and_vertices)
         unique_elements = get_unique_items(cleaned_data)
         return unique_elements

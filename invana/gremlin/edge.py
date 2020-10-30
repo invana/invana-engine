@@ -7,20 +7,20 @@ logger = logging.getLogger(__name__)
 
 class Edge(CRUDOperationsBase):
 
-    def get_or_create(self, label=None, namespace=None, query=None):
+    def get_or_create(self, label=None, namespace=None, properties=None):
         """
 
         :param label:
         :param namespace:
-        :param query: {"id": 123213 }
+        :param properties: {"id": 123213 }
         :return:
         """
 
-        edges = self.read_many(label=label, namespace=namespace, query=query)
+        edges = self.read_many(label=label, namespace=namespace, query=properties)
         if edges.__len__() > 0:
             return edges[0]
         else:
-            return self.create(label=label, namespace=namespace, properties=query)
+            return self.create(label=label, namespace=namespace, properties=properties)
 
     def create(self, label=None, namespace=None, properties=None, inv=None, outv=None):
         """

@@ -10,9 +10,8 @@ class GremlinVertexMutationSchema:
     remove_vertices = String(label=String(), namespace=String(), query=JSONString())
 
     def resolve_create_vertex(self, info: ResolveInfo, label: str, namespace: str, properties: str):
-        data = info.context['request'].app.state.gremlin_client.vertex.create(label=label,
-                                                                              namespace=namespace,
-                                                                              properties=properties)
+        data = info.context['request'].app.state.gremlin_client.vertex.create(
+            label=label, namespace=namespace, properties=properties)
         return data.__dict__() if data else None
 
     def resolve_update_vertex_by_id(self, info: ResolveInfo, id: str, properties: str):
@@ -27,6 +26,7 @@ class GremlinVertexMutationSchema:
         info.context['request'].app.state.gremlin_client.vertex.delete_many(label=label,
                                                                             namespace=namespace, query=query)
         return None
+
 
 
 class GremlinEdgeMutationSchema:
@@ -57,6 +57,7 @@ class GremlinEdgeMutationSchema:
         info.context['request'].app.state.gremlin_client.edge.delete_many(label=label,
                                                                           namespace=namespace, query=query)
         return None
+
 
 
 class GremlinMutation(ObjectType, GremlinEdgeMutationSchema, GremlinVertexMutationSchema):

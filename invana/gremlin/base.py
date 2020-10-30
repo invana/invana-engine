@@ -107,7 +107,7 @@ class CRUDOperationsBase(GremlinOperationBase, metaclass=abc.ABCMeta):
         return self._delete_many(label=label, namespace=namespace, query=query)
 
     @abc.abstractmethod
-    def get_or_create(self, label=None, namespace=None, query=None):
+    def get_or_create(self, label=None, namespace=None, properties=None):
         pass
 
     @staticmethod
