@@ -1,11 +1,11 @@
 from graphene import ObjectType, String, Field, JSONString, ResolveInfo, Int, NonNull, List
-from ..types.element import GrapheneVertexType, GrapheneEdgeType
+from ..types.element import GrapheneVertexType, GrapheneEdgeType, AnyField
 
 
 class GremlinVertexMutationSchema:
     create_vertex = Field(GrapheneVertexType, label=String(required=True), namespace=String(),
                           properties=JSONString(required=True))
-    update_vertex_by_id = Field(GrapheneVertexType, id=String(required=True), properties=JSONString(required=True))
+    update_vertex_by_id = Field(GrapheneVertexType, id=AnyField(required=True), properties=JSONString(required=True))
     remove_vertex_by_id = String(id=String(required=True))
     remove_vertices = String(label=String(), namespace=String(), query=JSONString())
 
@@ -36,7 +36,7 @@ class GremlinEdgeMutationSchema:
                         label=String(required=True),
                         name=String(),
                         properties=JSONString())
-    update_edge_by_id = Field(GrapheneEdgeType, id=String(required=True), properties=JSONString(required=True))
+    update_edge_by_id = Field(GrapheneEdgeType, id=AnyField(required=True), properties=JSONString(required=True))
     remove_edge_by_id = String(id=String(required=True))
     remove_edges = String(label=String(), namespace=String(), query=JSONString())
 
