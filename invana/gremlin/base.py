@@ -45,13 +45,15 @@ class CRUDOperationsBase(GremlinOperationBase, metaclass=abc.ABCMeta):
             _.range(skip, skip + limit)
         return _
 
-    def filter_edge(self, edge_id=None, label=None, namespace=None, query=None):
+    def filter_edge(self, edge_id=None, label=None, namespace=None, query=None, limit=None, skip=None):
         """
 
         :param edge_id:
         :param label:
         :param namespace:
         :param query:
+        :param limit:
+        :param skip:
         :return:
         """
         label = self.get_namespaced_label(label=label, namespace=namespace)
@@ -61,6 +63,9 @@ class CRUDOperationsBase(GremlinOperationBase, metaclass=abc.ABCMeta):
             _.hasLabel(label)
         for k, v in query.items():
             _.has(k, v)
+        if limit is not None and skip is not None:  # TODO - pagination fixes needed
+            _.range(skip, skip + limit)
+
         return _
 
     @abc.abstractmethod

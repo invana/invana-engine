@@ -83,6 +83,8 @@ class GremlinEdgeQuerySchema:
     get_edge_by_id = Field(GrapheneEdgeType, id=String(required=True))
     filter_edge = Field(List(GrapheneEdgeType), label=String(), query=JSONString(),
                         limit=Int(default_value=default_pagination_size), skip=Int())
+    filter_edge_and_get_neighbor_vertices = Field(List(GrapheneEdgeType), label=String(), query=JSONString(),
+                                                  limit=Int(default_value=default_pagination_size), skip=Int())
     get_or_create_edge = Field(GrapheneEdgeType, label=String(), namespace=String(), properties=JSONString())
 
     def resolve_get_edge_by_id(self, info: ResolveInfo, id: str):
@@ -94,6 +96,17 @@ class GremlinEdgeQuerySchema:
         data = info.context['request'].app.state.gremlin_client.edge.read_many(
             label=label, namespace=namespace, query=query, limit=limit, skip=skip
         )
+        return [datum.__dict__() for datum in data]
+
+    def resolve_filter_edge_and_get_neighbor_vertices(self, info: ResolveInfo, label: str = None,
+                                                      namespace: str = None, query: str = None,
+                                                      limit: int = default_pagination_size, skip: int = 0):
+
+        data = info.context['request'].app.state.gremlin_client.edge.filter_edge_and_get_neighbor_vertices(
+            label=label, namespace=namespace, query=query, limit=limit, skip=skip
+        )
+
+        #
         return [datum.__dict__() for datum in data]
 
     def resolve_get_or_create_edge(self, info: ResolveInfo, label: str = None, namespace: str = None,
