@@ -38,6 +38,7 @@ class Vertex(CRUDOperationsBase):
         :return:
         """
         vertices = self.read_many(label=label, namespace=namespace, query=properties)
+        print("vertices", vertices)
         if vertices.__len__() > 0:
             # return VertexElement(vertices[0], serializer=self.serializer)
             return vertices[0]

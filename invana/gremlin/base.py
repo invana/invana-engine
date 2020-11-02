@@ -36,13 +36,13 @@ class CRUDOperationsBase(GremlinOperationBase, metaclass=abc.ABCMeta):
         label = self.get_namespaced_label(label=label, namespace=namespace)
         query = {} if query is None else query
         _ = self.gremlin_client.g.V(vertex_id) if vertex_id else self.gremlin_client.g.V()
-        if limit is not None and skip is not None:  # TODO - pagination fixes needed
-            _.range(skip, skip + limit)
         if label:
             _.hasLabel(label)
         if query:
             for k, v in query.items():
                 _.has(k, v)
+        if limit is not None and skip is not None:  # TODO - pagination fixes needed
+            _.range(skip, skip + limit)
         return _
 
     def filter_edge(self, edge_id=None, label=None, namespace=None, query=None):
