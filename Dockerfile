@@ -5,10 +5,8 @@ FROM python:3.7
 MAINTAINER Ravi RT Merugu <rrmerugu@gmail.com>
 ENV PYTHONUNBUFFERED 1
 
-ARG build_env
-ARG gremlin_server_url
-ENV BUILD_ENV ${build_env}
-ENV GREMLIN_SERVER_URL ${gremlin_server_url}
+ARG GREMLIN_SERVER_URL
+ENV GREMLIN_SERVER_URL ${GREMLIN_SERVER_URL}
 
 # create webapp folder in the container
 RUN [ -d /webapp ] || mkdir /webapp;
