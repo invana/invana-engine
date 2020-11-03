@@ -1,5 +1,5 @@
 from .base import CRUDOperationsBase
-from .core.element import EdgeElement
+from .core.element import EdgeElement, VertexElement
 import logging
 
 logger = logging.getLogger(__name__)
@@ -7,20 +7,20 @@ logger = logging.getLogger(__name__)
 
 class Edge(CRUDOperationsBase):
 
-    def get_or_create(self, label=None, namespace=None, query=None):
+    def get_or_create(self, label=None, namespace=None, properties=None):
         """
 
         :param label:
         :param namespace:
-        :param query: {"id": 123213 }
+        :param properties: {"id": 123213 }
         :return:
         """
 
-        edges = self.read_many(label=label, namespace=namespace, query=query)
+        edges = self.read_many(label=label, namespace=namespace, query=properties)
         if edges.__len__() > 0:
             return edges[0]
         else:
-            return self.create(label=label, namespace=namespace, properties=query)
+            return self.create(label=label, namespace=namespace, properties=properties)
 
     def create(self, label=None, namespace=None, properties=None, inv=None, outv=None):
         """
@@ -73,11 +73,30 @@ class Edge(CRUDOperationsBase):
         return None
 
     def _read_many(self, label=None, namespace=None, query=None, limit=10, skip=0):
-        filtered_data = self.filter_edge(label=label, namespace=namespace, query=query)
+        filtered_data = self.filter_edge(label=label, namespace=namespace, query=query, limit=limit, skip=skip)
         cleaned_data = []
         for _ in filtered_data.elementMap().toList():
             cleaned_data.append(EdgeElement(_, serializer=self.serializer))
         return cleaned_data
+
+    def filter_edge_and_get_neighbor_vertices(self, vertex_id=None, label=None, namespace=None, query=None, limit=None,
+                                        skip=None):
+
+        cleaned_edges_data = self._read_many(label=label, namespace=namespace,query=query, limit=limit, skip=skip)
+        filtered_edges = self.filter_edge(label=label, namespace=namespace, query=query, limit=limit, skip=skip)
+
+        vertices_data = []
+        for _ in filtered_edges.inV().dedup().elementMap().toList():
+            vertices_data.append(VertexElement(_, serializer=self.serializer))
+
+        filtered_edges = self.filter_edge(label=label, namespace=namespace, query=query, limit=limit, skip=skip)
+
+        for _ in filtered_edges.outV().dedup().elementMap().toList():
+            vertices_data.append(VertexElement(_, serializer=self.serializer))
+        vertices_data = list(set(vertices_data))
+
+        return cleaned_edges_data + vertices_data
+
 
     def _delete_one(self, edge_id):
         logger.debug("Deleting the edge with edge_id:{edge_id}".format(edge_id=edge_id))

@@ -36,22 +36,24 @@ class CRUDOperationsBase(GremlinOperationBase, metaclass=abc.ABCMeta):
         label = self.get_namespaced_label(label=label, namespace=namespace)
         query = {} if query is None else query
         _ = self.gremlin_client.g.V(vertex_id) if vertex_id else self.gremlin_client.g.V()
-        if limit is not None and skip is not None:  # TODO - pagination fixes needed
-            _.range(skip, skip + limit)
         if label:
             _.hasLabel(label)
         if query:
             for k, v in query.items():
                 _.has(k, v)
+        if limit is not None and skip is not None:  # TODO - pagination fixes needed
+            _.range(skip, skip + limit)
         return _
 
-    def filter_edge(self, edge_id=None, label=None, namespace=None, query=None):
+    def filter_edge(self, edge_id=None, label=None, namespace=None, query=None, limit=None, skip=None):
         """
 
         :param edge_id:
         :param label:
         :param namespace:
         :param query:
+        :param limit:
+        :param skip:
         :return:
         """
         label = self.get_namespaced_label(label=label, namespace=namespace)
@@ -61,6 +63,9 @@ class CRUDOperationsBase(GremlinOperationBase, metaclass=abc.ABCMeta):
             _.hasLabel(label)
         for k, v in query.items():
             _.has(k, v)
+        if limit is not None and skip is not None:  # TODO - pagination fixes needed
+            _.range(skip, skip + limit)
+
         return _
 
     @abc.abstractmethod
@@ -107,7 +112,7 @@ class CRUDOperationsBase(GremlinOperationBase, metaclass=abc.ABCMeta):
         return self._delete_many(label=label, namespace=namespace, query=query)
 
     @abc.abstractmethod
-    def get_or_create(self, label=None, namespace=None, query=None):
+    def get_or_create(self, label=None, namespace=None, properties=None):
         pass
 
     @staticmethod
