@@ -12,12 +12,11 @@ GraphQL API for Apache TinkerPop supported graph databases.
 ## How to run using docker
 
 ```shell script.
-docker run -p 5000:5000 -d --name invana-engine invanalabs/invana-engine \
- -e GREMLIN_SERVER_URL=ws://localhost:8182/gremlin
+docker run -p 8000:8000 -d  -e GREMLIN_SERVER_URL=ws://xx.xx.xx.xx:8182/gremlin --name invana-engine invanalabs/invana-engine 
 ```
 
 This will start invana-engine service at 5000 port. GraphQL API can be 
-accessed at `http://localhost:5000/graphql`
+accessed at `http://localhost:8000/graphql`
 
 ## Supported Graph Databases
 
