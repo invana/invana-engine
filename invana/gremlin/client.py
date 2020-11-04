@@ -58,11 +58,14 @@ class _GremlinClient:
     client.execute_query("g.V().limit(1).toList()")
     """
 
-    def __init__(self, gremlin_server_url, serializer=None, transport_factory=None):
+    def __init__(self, gremlin_server_url, gremlin_server_username=None,
+                 gremlin_server_password=None, serializer=None, transport_factory=None):
         if gremlin_server_url is None:
             raise Exception("Invalid gremlin_server_url. default: ws://127.0.0.1:8182/gremlin")
         self.connection = DriverRemoteConnection(
             gremlin_server_url, 'g',
+            username=gremlin_server_username,
+            password=gremlin_server_password,
             transport_factory=transport_factory
         )
         self.g = traversal().withRemote(self.connection)
@@ -85,10 +88,13 @@ class GremlinClient:
     graph_client = GremlinClient(gremlin_server_url="ws://127.0.0.1:8182/gremlin")
     """
 
-    def __init__(self, gremlin_server_url, serializer=None, transport_factory=None):
+    def __init__(self, gremlin_server_url, gremlin_server_username=None,
+                 gremlin_server_password=None, serializer=None, transport_factory=None):
         serializer = serializer or GraphSONV3Reader()
         self.gremlin_server_url = gremlin_server_url
         self.gremlin_client = _GremlinClient(gremlin_server_url=gremlin_server_url,
+                                             gremlin_server_username=gremlin_server_username,
+                                             gremlin_server_password=gremlin_server_password,
                                              serializer=serializer,
                                              transport_factory=transport_factory)
         self.vertex = Vertex(gremlin_client=self.gremlin_client)

@@ -14,6 +14,8 @@ import os
 import time
 
 gremlin_server_url = os.environ.get("GREMLIN_SERVER_URL")
+gremlin_server_username = os.environ.get("GREMLIN_SERVER_USERNAME")
+gremlin_server_password = os.environ.get("GREMLIN_SERVER_PASSWORD")
 shall_debug = os.environ.get("DEBUG", True)
 
 if gremlin_server_url is None:
@@ -35,7 +37,10 @@ middleware = [
 app = Starlette(routes=routes, middleware=middleware, debug=shall_debug)
 
 time.sleep(1)
-gremlin_client = GremlinClient(gremlin_server_url=gremlin_server_url)
+gremlin_client = GremlinClient(gremlin_server_url=gremlin_server_url,
+                               gremlin_server_username = gremlin_server_username,
+                               gremlin_server_password= gremlin_server_password
+                               )
 app.state.gremlin_client = gremlin_client
 print(".................................................")
 print("Starting invana-engine server")

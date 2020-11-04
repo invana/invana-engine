@@ -14,16 +14,24 @@ GraphQL API for Apache TinkerPop supported graph databases.
 ```shell script.
 docker run -p 8000:8000 -d  -e GREMLIN_SERVER_URL=ws://xx.xx.xx.xx:8182/gremlin --name invana-engine invanalabs/invana-engine 
 ```
-
 This will start invana-engine service at 5000 port. GraphQL API can be 
 accessed at `http://localhost:8000/graphql`
+
+## Docker environment variables
+Following environment variables are supported and optional variables can be 
+used to authenticate gremlin server connection.
+
+- **GREMLIN_SERVER_URL**: http or ws gremlin url. ex: ws://xx.xx.xx.xx:8182/gremlin or http://xx.xx.xx.xx:8182/gremlin
+- **GREMLIN_SERVER_USERNAME**(optional): gremlin username. ex: myusername
+- **GREMLIN_SERVER_PASSWORD**(optional): gremlin password. ex: mypassword
+
 
 ## Supported Graph Databases
 
 [x] janusgraph 
 
 Invana Engine uses gremlin at the core, so in theory any database that supports 
-Apache TinkerPop's Gremlin 3.4.x shall work. Id resolution, needs to be fixed to 
+Apache TinkerPop's Gremlin 3.4.x shall work. Vertex/Edge Id resolution, needs to be fixed to 
 add any new database support.
 
 ## License 
