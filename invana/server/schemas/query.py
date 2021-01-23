@@ -8,41 +8,44 @@ from typing import Any
 default_pagination_size = 10
 
 
-class ManagementQuerySchema:
+class StatsManagement:
     get_vertices_label_stats = Field(List(LabelStats), namespace=String())
     get_edges_label_stats = Field(List(LabelStats), namespace=String())
     get_vertex_label_stats = Field(LabelStats, label=String())
     get_edge_label_stats = Field(LabelStats, label=String())
+
+    def resolve_get_vertices_label_stats(self, info: ResolveInfo, namespace: str = None):
+        data = info.context['request'].app.state.gremlin_client.stats.get_vertices_label_stats(namespace=namespace)
+        return data
+
+    def resolve_get_edges_label_stats(self, info: ResolveInfo, namespace: str = None):
+        data = info.context['request'].app.state.gremlin_client.stats.get_edges_label_stats(namespace=namespace)
+        return data
+
+    def resolve_get_vertex_label_stats(self, info: ResolveInfo, label: str = None) -> any:
+        return info.context['request'].app.state.gremlin_client.stats.get_vertex_label_stats(label)
+
+    def resolve_get_edge_label_stats(self, info: ResolveInfo, label: str = None) -> any:
+        return info.context['request'].app.state.gremlin_client.stats.get_edge_label_stats(label)
+
+
+class SchemaManagement:
     get_vertex_label_schema = Field(ElementSchemaType, label=String())
     get_all_vertices_schema = Field(List(ElementSchemaType))
     get_edge_label_schema = Field(ElementSchemaType, label=String())
     get_all_edges_schema = Field(List(ElementSchemaType))
 
-    def resolve_get_vertices_label_stats(self, info: ResolveInfo, namespace: str = None):
-        data = info.context['request'].app.state.gremlin_client.management.get_vertices_label_stats(namespace=namespace)
-        return data
-
-    def resolve_get_edges_label_stats(self, info: ResolveInfo, namespace: str = None):
-        data = info.context['request'].app.state.gremlin_client.management.get_edges_label_stats(namespace=namespace)
-        return data
-
-    def resolve_get_vertex_label_stats(self, info: ResolveInfo, label: str = None) -> any:
-        return info.context['request'].app.state.gremlin_client.management.get_vertex_label_stats(label)
-
-    def resolve_get_edge_label_stats(self, info: ResolveInfo, label: str = None) -> any:
-        return info.context['request'].app.state.gremlin_client.management.get_edge_label_stats(label)
-
     def resolve_get_vertex_label_schema(self, info: ResolveInfo, label: str = None) -> any:
-        return info.context['request'].app.state.gremlin_client.management.get_vertex_label_schema(label)
+        return info.context['request'].app.state.gremlin_client.schema.get_vertex_label_schema(label)
 
     def resolve_get_all_vertices_schema(self, info: ResolveInfo, ) -> any:
-        return info.context['request'].app.state.gremlin_client.management.get_all_vertices_schema()
+        return info.context['request'].app.state.gremlin_client.schema.get_all_vertices_schema()
 
     def resolve_get_edge_label_schema(self, info: ResolveInfo, label: str = None) -> any:
-        return info.context['request'].app.state.gremlin_client.management.get_edge_label_schema(label)
+        return info.context['request'].app.state.gremlin_client.schema.get_edge_label_schema(label)
 
     def resolve_get_all_edges_schema(self, info: ResolveInfo, ) -> any:
-        return info.context['request'].app.state.gremlin_client.management.get_all_edges_schema()
+        return info.context['request'].app.state.gremlin_client.schema.get_all_edges_schema()
 
 
 class GremlinVertexQuerySchema:
@@ -148,7 +151,8 @@ class GremlinRawQuerySchema:
 
 
 class GremlinQuery(ObjectType,
-                   ManagementQuerySchema,
+                   StatsManagement,
+                   SchemaManagement,
                    GremlinRawQuerySchema,
                    GremlinEdgeQuerySchema,
                    GremlinVertexQuerySchema,
