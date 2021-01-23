@@ -10,6 +10,8 @@ default_pagination_size = 10
 class ManagementQuerySchema:
     get_vertices_label_stats = Field(List(LabelStats), namespace=String())
     get_edges_label_stats = Field(List(LabelStats), namespace=String())
+    get_vertex_label_stats = Field(LabelStats, label=String())
+    get_edge_label_stats = Field(LabelStats, label=String())
 
     def resolve_get_vertices_label_stats(self, info: ResolveInfo, namespace: str = None):
         data = info.context['request'].app.state.gremlin_client.management.get_vertices_label_stats(namespace=namespace)
@@ -19,6 +21,12 @@ class ManagementQuerySchema:
         data = info.context['request'].app.state.gremlin_client.management.get_edges_label_stats(namespace=namespace)
         return data
 
+
+    def resolve_get_vertex_label_stats(self, info: ResolveInfo, label: str = None) -> any:
+        return info.context['request'].app.state.gremlin_client.management.get_vertex_label_stats(label)
+
+    def resolve_get_edge_label_stats(self, info: ResolveInfo, label: str = None) -> any:
+        return info.context['request'].app.state.gremlin_client.management.get_edge_label_stats(label)
 
 class GremlinVertexQuerySchema:
     get_vertex_by_id = Field(GrapheneVertexType, id=String(required=True))
@@ -101,7 +109,6 @@ class GremlinEdgeQuerySchema:
     def resolve_filter_edge_and_get_neighbor_vertices(self, info: ResolveInfo, label: str = None,
                                                       namespace: str = None, query: str = None,
                                                       limit: int = default_pagination_size, skip: int = 0):
-
         data = info.context['request'].app.state.gremlin_client.edge.filter_edge_and_get_neighbor_vertices(
             label=label, namespace=namespace, query=query, limit=limit, skip=skip
         )
@@ -123,6 +130,13 @@ class GremlinRawQuerySchema:
         return info.context['request'].app.state.gremlin_client.execute_query(gremlin)
 
 
-class GremlinQuery(ObjectType, ManagementQuerySchema, GremlinRawQuerySchema, GremlinEdgeQuerySchema,
-                   GremlinVertexQuerySchema, GenericClientInfoSchema):
+
+class GremlinQuery(ObjectType,
+                   ManagementQuerySchema,
+                   GremlinRawQuerySchema,
+                   GremlinEdgeQuerySchema,
+                   GremlinVertexQuerySchema,
+                   GenericClientInfoSchema,
+                   # GremlinManagementQuerySchema
+                   ):
     pass
