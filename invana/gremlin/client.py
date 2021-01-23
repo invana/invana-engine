@@ -71,14 +71,17 @@ class _GremlinClient:
         self.g = traversal().withRemote(self.connection)
         self.serializer = serializer
 
-    def execute_query(self, raw_query):
+    def execute_query(self, raw_query, serialize_elements=True):
         """
 
         :param raw_query: Gremlin query in plain string.
+        :param serialize_elements: this will convert data GraphSON data into JSON
         :return:
         """
         result = self.connection._client.submit(raw_query).all().result()
-        return self.serializer.serialize_data(result)
+        if serialize_elements is True:
+            return self.serializer.serialize_data(result)
+        return result
 
 
 class GremlinClient:
@@ -111,10 +114,11 @@ class GremlinClient:
         """
         return self.gremlin_client.g.V().drop().iterate()
 
-    def execute_query(self, raw_query):
+    def execute_query(self, raw_query,  serialize_elements=True):
         """
 
         :param raw_query: Gremlin query in plain string.
+        :param serialize_elements: this will convert data GraphSON data into JSON
         :return:
         """
-        return self.gremlin_client.execute_query(raw_query)
+        return self.gremlin_client.execute_query(raw_query,  serialize_elements=serialize_elements)

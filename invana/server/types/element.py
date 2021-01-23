@@ -1,4 +1,4 @@
-from graphene import Scalar, ObjectType, String, ID, DateTime
+from graphene import Scalar, ObjectType, String, ID, DateTime, List
 import datetime
 
 
@@ -44,3 +44,8 @@ class GrapheneEdgeType(GrapheneVertexType):
 
 class GrapheneVertexOrEdgeType(GrapheneEdgeType):
     pass
+
+
+class ElementSchemaType(ObjectType):
+    label = String()
+    propertyKeys = AnyField()
