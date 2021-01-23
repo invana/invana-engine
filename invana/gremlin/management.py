@@ -53,6 +53,7 @@ class ManagementOps(GremlinOperationBase):
         return schema_data
 
     def get_vertex_label_schema(self, label: str, namespace: str = None):
+        # TODO - fix performance
         _ = self.gremlin_client.execute_query(
             "g.V().group().by(label).by(properties().label().dedup().fold())",
             serialize_elements=False
@@ -76,6 +77,7 @@ class ManagementOps(GremlinOperationBase):
         return schema_data
 
     def get_edge_label_schema(self, label: str, namespace: str = None):
+        # TODO - fix performance
         _ = self.gremlin_client.execute_query(
             "g.E().group().by(label).by(properties().label().dedup().fold())",
             serialize_elements=False
