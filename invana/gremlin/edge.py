@@ -79,7 +79,7 @@ class Edge(CRUDOperationsBase):
             cleaned_data.append(EdgeElement(_, serializer=self.serializer))
         return cleaned_data
 
-    def filter_edge_and_get_neighbor_vertices(self, vertex_id=None, label=None, namespace=None, query=None, limit=None,
+    def filter_edge_and_get_neighbor_vertices(self, edge_id=None, label=None, namespace=None, query=None, limit=None,
                                         skip=None):
 
         cleaned_edges_data = self._read_many(label=label, namespace=namespace,query=query, limit=limit, skip=skip)

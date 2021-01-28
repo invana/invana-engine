@@ -104,7 +104,7 @@ class GremlinVertexQuerySchema:
     get_out_edges_and_vertices = Field(List(GrapheneVertexOrEdgeType), id=AnyField(required=True),
                                        label=String(), namespace=String(), query=JSONString(),
                                        limit=Int(default_value=default_pagination_size), skip=Int())
-    get_neighbor_edges_and_vertices = Field(List(GrapheneVertexOrEdgeType), id=AnyField(),
+    filter_vertex_and_neighbor_edges_and_vertices = Field(List(GrapheneVertexOrEdgeType), id=AnyField(),
                                             label=String(), namespace=String(), query=JSONString(),
                                             limit=Int(default_value=default_pagination_size), skip=Int())
     get_or_create_vertex = Field(GrapheneVertexType, label=String(), namespace=String(), properties=JSONString())
@@ -137,11 +137,11 @@ class GremlinVertexQuerySchema:
         )
         return [datum.__dict__() for datum in data]
 
-    def resolve_get_neighbor_edges_and_vertices(self, info: ResolveInfo,
+    def resolve_filter_vertex_and_neighbor_edges_and_vertices(self, info: ResolveInfo,
                                                 id: Any = None, label: str = None, namespace: str = None,
                                                 query: str = None,
                                                 limit: int = default_pagination_size, skip: int = 0):
-        data = info.context['request'].app.state.gremlin_client.vertex.get_neighbor_edges_and_vertices(
+        data = info.context['request'].app.state.gremlin_client.vertex.filter_vertex_and_neighbor_edges_and_vertices(
             vertex_id=id, label=label, namespace=namespace, query=query, limit=limit, skip=skip
         )
         return [datum.__dict__() for datum in data]

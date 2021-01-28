@@ -126,7 +126,7 @@ class Vertex(CRUDOperationsBase):
             cleaned_data.append(VertexElement(_, serializer=self.serializer))
         return cleaned_data
 
-    def get_neighbor_edges_and_vertices(self, vertex_id=None, label=None, namespace=None, query=None, limit=None,
+    def filter_vertex_and_neighbor_edges_and_vertices(self, vertex_id=None, label=None, namespace=None, query=None, limit=None,
                                         skip=None):
         cleaned_data = []
         vertices = self.filter_vertex(vertex_id=vertex_id, label=label, namespace=namespace,
