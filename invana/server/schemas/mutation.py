@@ -6,7 +6,7 @@ class GremlinVertexMutationSchema:
     create_vertex = Field(GrapheneVertexType, label=String(required=True), namespace=String(),
                           properties=JSONString(required=True))
     update_vertex_by_id = Field(GrapheneVertexType, id=AnyField(required=True), properties=JSONString(required=True))
-    remove_vertex_by_id = String(id=String(required=True))
+    remove_vertex_by_id = String(id=AnyField(required=True))
     remove_vertices = String(label=String(), namespace=String(), query=JSONString())
 
     def resolve_create_vertex(self, info: ResolveInfo, label: str, namespace: str, properties: str):
@@ -37,7 +37,7 @@ class GremlinEdgeMutationSchema:
                         name=String(),
                         properties=JSONString())
     update_edge_by_id = Field(GrapheneEdgeType, id=AnyField(required=True), properties=JSONString(required=True))
-    remove_edge_by_id = String(id=String(required=True))
+    remove_edge_by_id = String(id=AnyField(required=True))
     remove_edges = String(label=String(), namespace=String(), query=JSONString())
 
     def resolve_create_edge(self, info: ResolveInfo, label: str, namespace: str, properties: str, inv: str, outv: str):

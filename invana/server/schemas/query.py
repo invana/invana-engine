@@ -1,6 +1,6 @@
 from graphene import ObjectType, String, Field, JSONString, ResolveInfo, Int, List
 from ..types.element import GrapheneVertexType, GrapheneEdgeType, AnyField, \
-    GrapheneVertexOrEdgeType, ElementSchemaType
+    GrapheneVertexOrEdgeType, ElementSchemaType, StatusType
 from ..types.gremlin import LabelStats
 from .client import GenericClientInfoSchema
 from typing import Any
@@ -35,6 +35,21 @@ class SchemaManagement:
     get_edge_label_schema = Field(ElementSchemaType, label=String())
     get_all_edges_schema = Field(List(ElementSchemaType))
 
+    create_vertex_label_schema = Field(StatusType, label=String())
+    create_vertex_property_schema = Field(StatusType,
+                                          label=String(),
+                                          property_key=String(),
+                                          data_type=String(),
+                                          cardinality=String(),
+                                          )
+    create_edge_label_schema = Field(StatusType, label=String(), multiplicity=String())
+    create_edge_property_schema = Field(StatusType,
+                                        label=String(),
+                                        property_key=String(),
+                                        data_type=String(),
+                                        cardinality=String(),
+                                        )
+
     def resolve_get_vertex_label_schema(self, info: ResolveInfo, label: str = None) -> any:
         return info.context['request'].app.state.gremlin_client.schema.get_vertex_label_schema(label)
 
@@ -46,6 +61,37 @@ class SchemaManagement:
 
     def resolve_get_all_edges_schema(self, info: ResolveInfo, ) -> any:
         return info.context['request'].app.state.gremlin_client.schema.get_all_edges_schema()
+
+    def resolve_create_vertex_label_schema(self, info: ResolveInfo, label: str) -> any:
+        return info.context['request'].app.state.gremlin_client.schema.create_vertex_label_schema(label)
+
+    def resolve_create_vertex_property_schema(self, info: ResolveInfo,
+                                              label: str,
+                                              property_key: str,
+                                              data_type: str,
+                                              cardinality: str = None,
+                                              ) -> any:
+        return info.context['request'].app.state.gremlin_client.schema.create_vertex_property_schema(
+            label=label,
+            property_key=property_key, data_type=data_type, cardinality=cardinality
+        )
+
+    def resolve_create_edge_label_schema(self, info: ResolveInfo, label: str, multiplicity: str = None) -> any:
+        return info.context['request'].app.state.gremlin_client.schema.create_edge_label_schema(
+            label, multiplicity=multiplicity)
+
+    def resolve_create_edge_property_schema(self, info: ResolveInfo,
+                                              label: str,
+                                              property_key: str,
+                                              data_type: str,
+                                              cardinality: str = None,
+                                              ) -> any:
+        return info.context['request'].app.state.gremlin_client.schema.create_edge_property_schema(
+            label=label,
+            property_key=property_key,
+            data_type=data_type,
+            cardinality=cardinality
+        )
 
 
 class GremlinVertexQuerySchema:

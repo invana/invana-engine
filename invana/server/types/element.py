@@ -1,4 +1,4 @@
-from graphene import Scalar, ObjectType, String, ID, DateTime, List
+from graphene import Scalar, ObjectType, String, ID, DateTime, List, Boolean
 import datetime
 
 
@@ -49,3 +49,8 @@ class GrapheneVertexOrEdgeType(GrapheneEdgeType):
 class ElementSchemaType(ObjectType):
     label = String()
     propertyKeys = AnyField()
+
+
+class StatusType(ObjectType):
+    status = Boolean()
+    message = String()
