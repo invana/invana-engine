@@ -1,6 +1,7 @@
 from .base import GremlinOperationBase, CRUDOperationsBase
 from gremlin_python.process.strategies import *
 from gremlin_python.process.traversal import Order
+from invana.server.settings import MANAGEMENT_VERTEX_NAME
 
 
 class StatsOps(GremlinOperationBase):
@@ -9,11 +10,13 @@ class StatsOps(GremlinOperationBase):
         stats = self.gremlin_client.g.V().label().groupCount().next()
         label_stats = []
         for label, count in stats.items():
-            if namespace:
-                if "{}/".format(namespace) in label:
+            if label != MANAGEMENT_VERTEX_NAME:
+
+                if namespace:
+                    if "{}/".format(namespace) in label:
+                        label_stats.append({"label": label, "count": count})
+                else:
                     label_stats.append({"label": label, "count": count})
-            else:
-                label_stats.append({"label": label, "count": count})
 
         return label_stats
 
