@@ -39,7 +39,7 @@ docker run -p 8200:8200 -d  -e GREMLIN_SERVER_URL=ws://xx.xx.xx.xx:8182/gremlin 
 ```shell
 pip install invana-engine
 or
-pip install -e git+https://github.com/invanalabs/invana-engine.git@develop#egg=invana
+pip install -e git+https://github.com/invanalabs/invana-engine.git@develop#egg=invana_engine
 
 invana-engine-start # this will start invana-engine server.
 
