@@ -1,7 +1,7 @@
 import uvicorn
 from invana.server.app import app
 import logging
-from settings import server_port, shall_debug
+from invana.settings import server_port, shall_debug
 
 if shall_debug is False:
     logging.getLogger('asyncio').setLevel(logging.ERROR)
