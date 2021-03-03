@@ -21,6 +21,9 @@ setup(
         'aiofiles==0.6.0'
     ],
     entry_points={
+        'console_scripts': [
+            'invana-engine-start = invana.start_server.start_server',
+        ]
     },
     python_requires='>=3.6',
     classifiers=[
