@@ -23,7 +23,8 @@ print(f"Using GREMLIN_SERVER_URL {gremlin_server_url}")
 print(".................................................")
 
 if gremlin_server_url is None:
-    raise Exception("GREMLIN_SERVER_URL environment variable not set. Please fix it.")
+    print("ERROR: GREMLIN_SERVER_URL environment variable not set. Please fix it .")
+    exit()
 
 routes = [
     Route('/', endpoint=homepage_view),
