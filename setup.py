@@ -4,10 +4,10 @@ from setuptools import setup, find_packages
 
 setup(
     name='invana-engine',
-    version='0.0.0',
+    version='0.0.1',
     description='GraphQL API and Insights engine for Apache TinkerPop supported graph databases.',
     author='Ravi Raja Merugu',
-    author_email='ravi@invana_engine.io',
+    author_email='ravi@invana.io',
     url='https://github.com/invanalabs/invana-engine',
     packages=find_packages(
         exclude=("dist", "docs", "tests", "scripts", "experiments")
@@ -22,7 +22,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'invana_engine-engine-start = invana_engine.server_start:server_start',
+            'invana-engine-start = invana_engine.server_start:server_start',
         ]
     },
     python_requires='>=3.6',
