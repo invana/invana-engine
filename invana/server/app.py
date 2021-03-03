@@ -17,6 +17,10 @@ gremlin_server_url = os.environ.get("GREMLIN_SERVER_URL")
 gremlin_server_username = os.environ.get("GREMLIN_SERVER_USERNAME")
 gremlin_server_password = os.environ.get("GREMLIN_SERVER_PASSWORD")
 shall_debug = os.environ.get("DEBUG", True)
+print(".................................................")
+print("Starting invana-engine server")
+print(f"Using GREMLIN_SERVER_URL {gremlin_server_url}")
+print(".................................................")
 
 if gremlin_server_url is None:
     raise Exception("GREMLIN_SERVER_URL environment variable not set. Please fix it.")
@@ -38,11 +42,7 @@ app = Starlette(routes=routes, middleware=middleware, debug=shall_debug)
 
 time.sleep(1)
 gremlin_client = GremlinClient(gremlin_server_url=gremlin_server_url,
-                               gremlin_server_username = gremlin_server_username,
-                               gremlin_server_password= gremlin_server_password
+                               gremlin_server_username=gremlin_server_username,
+                               gremlin_server_password=gremlin_server_password
                                )
 app.state.gremlin_client = gremlin_client
-print(".................................................")
-print("Starting invana-engine server")
-print(f"Using GREMLIN_SERVER_URL {gremlin_server_url}")
-print(".................................................")
