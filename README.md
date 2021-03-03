@@ -18,6 +18,7 @@ used to authenticate gremlin server connection.
 - **GREMLIN_SERVER_URL**: http or ws gremlin url. ex: ws://xx.xx.xx.xx:8182/gremlin or http://xx.xx.xx.xx:8182/gremlin
 - **GREMLIN_SERVER_USERNAME**(optional): gremlin username. ex: myusername
 - **GREMLIN_SERVER_PASSWORD**(optional): gremlin password. ex: mypassword
+- **SERVER_PORT**(optional): defaults to 8200.
 
 ```shell
 #example usage :
@@ -31,7 +32,7 @@ export GREMLIN_SERVER_URL=ws://xx.xx.xx.xx:8182/gremlin
 ### Using Docker
 
 ```shell script.
-docker run -p 8000:8000 -d  -e GREMLIN_SERVER_URL=ws://xx.xx.xx.xx:8182/gremlin --name invana-engine invanalabs/invana-engine 
+docker run -p 8200:8200 -d  -e GREMLIN_SERVER_URL=ws://xx.xx.xx.xx:8182/gremlin --name invana-engine invanalabs/invana-engine 
 ```
 
 ### using standalone python
@@ -45,7 +46,7 @@ invana-engine-start # this will start invana-engine server.
 ```
 
 This will start invana-engine service at 5000 port. GraphQL API can be 
-accessed at `http://localhost:8000/graphql`
+accessed at `http://localhost:8200/graphql`
 
 
 

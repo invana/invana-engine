@@ -16,7 +16,7 @@ RUN pip install --upgrade pip
 RUN pip install pipenv
 RUN pipenv install --system --deploy --ignore-pipfile
 RUN pip install -r prod-requirements.txt
-EXPOSE 8000
+EXPOSE 8200
 # fire it up ...
-# CMD uvicorn invana.start_server:app --port 8000 --host 0.0.0.0 # development
-CMD gunicorn -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000  invana.start_server:app
+# CMD uvicorn invana.start_server:app --port 8200 --host 0.0.0.0 # development
+CMD gunicorn -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8200  invana.start_server:app

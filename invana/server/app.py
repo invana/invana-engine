@@ -12,11 +12,8 @@ from .views import homepage_view
 from ..gremlin import GremlinClient
 import os
 import time
+from ..settings import gremlin_server_url, gremlin_server_password, gremlin_server_username, shall_debug
 
-gremlin_server_url = os.environ.get("GREMLIN_SERVER_URL")
-gremlin_server_username = os.environ.get("GREMLIN_SERVER_USERNAME")
-gremlin_server_password = os.environ.get("GREMLIN_SERVER_PASSWORD")
-shall_debug = os.environ.get("DEBUG", True)
 print(".................................................")
 print("Starting invana-engine server")
 print(f"Using GREMLIN_SERVER_URL {gremlin_server_url}")
@@ -31,17 +28,14 @@ routes = [
     Route('/', endpoint=homepage_view),
     Route('/graphql', GraphQLApp(
         schema=Schema(query=GremlinQuery, mutation=GremlinMutation),
-    )),
-
+    ))
 ]
 
 middleware = [
-    Middleware(CORSMiddleware, allow_origins=['*'],
-               allow_methods=["GET", "POST", "PUT", "DELETE"])
+    Middleware(CORSMiddleware, allow_origins=['*'], allow_methods=["GET", "POST", "PUT", "DELETE"])
 ]
 
 app = Starlette(routes=routes, middleware=middleware, debug=shall_debug)
-
 time.sleep(1)
 gremlin_client = GremlinClient(gremlin_server_url=gremlin_server_url,
                                gremlin_server_username=gremlin_server_username,
