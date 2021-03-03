@@ -1,7 +1,7 @@
 import pytest
 from .sample_payloads.vertex import CREATE_VERTICES_SAMPLES
-from invana.gremlin.core.element import VertexElement
-from invana.gremlin.core.exceptions import InvalidQueryArguments
+from invana_engine.gremlin.core.element import VertexElement
+from invana_engine.gremlin.core.exceptions import InvalidQueryArguments
 import os
 
 TEST_GRAPH_HOST = os.environ.get("TESTING_HOST")
@@ -11,7 +11,7 @@ class TestVertices:
 
     @pytest.fixture
     def graph_client(self):
-        from invana.gremlin import GremlinClient
+        from invana_engine.gremlin import GremlinClient
         return GremlinClient(f"{TEST_GRAPH_HOST}/gremlin")
 
     def test_create_vertex(self, graph_client):

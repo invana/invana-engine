@@ -1,4 +1,4 @@
-from invana.server.schemas.query import Gremlin
+from invana_engine.server.schemas.query import Gremlin
 from graphene import Schema
 import json
 import os

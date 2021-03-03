@@ -17,7 +17,7 @@ jobs:
         - pipenv install
         - pipenv install --dev
       script:
-        - pytest --cov=invana tests/
+        - pytest --cov=invana_engine tests/
       before_script:
         - docker pull janusgraph/janusgraph
         - docker run  --name janusgraph -it -d -p 8182:8182 janusgraph/janusgraph
@@ -31,12 +31,12 @@ jobs:
     - stage: build and push docker image
       script:
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-        - docker build -t invanalabs/invana-engine .
+        - docker build -t invanalabs/invana_engine-engine .
         - if  [ -z "$TRAVIS_TAG" ]; then DOCKER_TAG=sha-`echo "$TRAVIS_COMMIT" | cut -c1-7`;  else DOCKER_TAG=$TRAVIS_TAG; fi
-        - docker tag invanalabs/invana-engine invanalabs/invana-engine:"$DOCKER_TAG"
-        - docker tag invanalabs/invana-engine invanalabs/invana-engine:latest
-        - docker push invanalabs/invana-engine:"$DOCKER_TAG"
-        - docker push invanalabs/invana-engine:latest
+        - docker tag invanalabs/invana_engine-engine invanalabs/invana_engine-engine:"$DOCKER_TAG"
+        - docker tag invanalabs/invana_engine-engine invanalabs/invana_engine-engine:latest
+        - docker push invanalabs/invana_engine-engine:"$DOCKER_TAG"
+        - docker push invanalabs/invana_engine-engine:latest
 
 stages:
   - name: build and push docker image

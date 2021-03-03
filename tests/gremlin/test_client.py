@@ -9,7 +9,7 @@ class TestGremlinClientClient:
 
     @pytest.fixture
     def graph_client(self):
-        from invana.gremlin import GremlinClient
+        from invana_engine.gremlin import GremlinClient
         return GremlinClient(f"{TEST_GRAPH_HOST}/gremlin")
 
     def test_raw_query(self, graph_client):

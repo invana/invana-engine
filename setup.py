@@ -7,7 +7,7 @@ setup(
     version='0.0.0',
     description='GraphQL API and Insights engine for Apache TinkerPop supported graph databases.',
     author='Ravi Raja Merugu',
-    author_email='ravi@invana.io',
+    author_email='ravi@invana_engine.io',
     url='https://github.com/invanalabs/invana-engine',
     packages=find_packages(
         exclude=("dist", "docs", "tests", "scripts", "experiments")
@@ -22,7 +22,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'invana-engine-start = invana.server_start:server_start',
+            'invana_engine-engine-start = invana_engine.server_start:server_start',
         ]
     },
     python_requires='>=3.6',

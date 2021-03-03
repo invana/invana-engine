@@ -1,7 +1,7 @@
 from .base import GremlinOperationBase, CRUDOperationsBase
 from gremlin_python.process.strategies import *
 from gremlin_python.process.traversal import Order
-from invana.server.settings import MANAGEMENT_VERTEX_NAME
+from invana_engine.server.settings import MANAGEMENT_VERTEX_NAME
 
 
 class StatsOps(GremlinOperationBase):

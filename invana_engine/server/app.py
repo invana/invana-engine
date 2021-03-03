@@ -3,7 +3,7 @@ from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.routing import Route
 from starlette.graphql import GraphQLApp
-from invana.server.schemas.query import GremlinQuery
+from invana_engine.server.schemas.query import GremlinQuery
 from .schemas.mutation import GremlinMutation
 from graphene import Schema
 from .views import homepage_view
