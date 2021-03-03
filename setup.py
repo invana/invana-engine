@@ -22,7 +22,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'invana-engine-start = invana.server_start',
+            'invana-engine-start = invana.server_start:server_start',
         ]
     },
     python_requires='>=3.6',
