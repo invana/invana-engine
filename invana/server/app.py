@@ -1,21 +1,18 @@
 from starlette.applications import Starlette
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
-# from graphql.execution.executors.asyncio import AsyncioExecutor
-# from graphql.execution.executors.sync import SyncExecutor
-from starlette.routing import Route, Mount
+from starlette.routing import Route
 from starlette.graphql import GraphQLApp
 from invana.server.schemas.query import GremlinQuery
 from .schemas.mutation import GremlinMutation
 from graphene import Schema
 from .views import homepage_view
 from ..gremlin import GremlinClient
-import os
 import time
 from ..settings import gremlin_server_url, gremlin_server_password, gremlin_server_username, shall_debug
 
 print(".................................................")
-print("Starting invana-engine server")
+print("Starting Invana Engine server")
 print(f"Using GREMLIN_SERVER_URL {gremlin_server_url}")
 print(".................................................")
 

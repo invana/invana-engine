@@ -6,8 +6,8 @@ from invana.settings import server_port, shall_debug
 if shall_debug is False:
     logging.getLogger('asyncio').setLevel(logging.ERROR)
     logging.getLogger('uvicorn').setLevel(logging.ERROR)
-
-logging.basicConfig(level="DEBUG")
+else:
+    logging.basicConfig(level="DEBUG")
 
 
 def server_start():
