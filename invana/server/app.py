@@ -24,6 +24,7 @@ print(".................................................")
 
 if gremlin_server_url is None:
     print("ERROR: GREMLIN_SERVER_URL environment variable not set. Please fix it .")
+    print("Exiting the program now. Please refer the documentation at https://github.com/invanalabs/invana-engine")
     exit()
 
 routes = [
