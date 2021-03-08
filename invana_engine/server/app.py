@@ -7,7 +7,7 @@ from invana_engine.server.schemas.query import GremlinQuery
 from .schemas.mutation import GremlinMutation
 from graphene import Schema
 from .views import homepage_view
-from ..gremlin import GremlinClient
+from ..gremlin import InvanaEngineClient
 import time
 from ..settings import gremlin_server_url, gremlin_server_password, gremlin_server_username, shall_debug
 
@@ -34,7 +34,7 @@ middleware = [
 
 app = Starlette(routes=routes, middleware=middleware, debug=shall_debug)
 time.sleep(1)
-gremlin_client = GremlinClient(gremlin_server_url=gremlin_server_url,
+gremlin_client = InvanaEngineClient(gremlin_server_url=gremlin_server_url,
                                gremlin_server_username=gremlin_server_username,
                                gremlin_server_password=gremlin_server_password
                                )

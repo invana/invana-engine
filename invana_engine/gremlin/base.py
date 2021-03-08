@@ -7,7 +7,7 @@ class GremlinOperationBase:
     def __init__(self, gremlin_client=None):
         """
 
-        :param gremlin_client: GremlinClient instance
+        :param gremlin_client: InvanaEngineClient instance
         """
         self.gremlin_client = gremlin_client
 

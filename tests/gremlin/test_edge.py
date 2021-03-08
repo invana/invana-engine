@@ -12,13 +12,13 @@ class TestEdges:
 
     @pytest.fixture
     def graph_client(self):
-        from invana_engine.gremlin import GremlinClient
-        return GremlinClient(f"{TEST_GRAPH_HOST}/gremlin")
+        from invana_engine.gremlin import InvanaEngineClient
+        return InvanaEngineClient(f"{TEST_GRAPH_HOST}/gremlin")
 
     @pytest.fixture
     def init_data(self):
-        from invana_engine.gremlin import GremlinClient
-        graph_client = GremlinClient(f"{TEST_GRAPH_HOST}/gremlin")
+        from invana_engine.gremlin import InvanaEngineClient
+        graph_client = InvanaEngineClient(f"{TEST_GRAPH_HOST}/gremlin")
         for k, vertex_sample in CREATE_VERTICES_SAMPLES.items():
             graph_client.vertex.create(label=vertex_sample["label"], properties=vertex_sample["properties"])
         return graph_client.vertex.read_many()

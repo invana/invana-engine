@@ -4,10 +4,10 @@ https://github.com/krlawrence/graph/tree/master/sample-data
 
 """
 
-from invana_engine.gremlin.client import GremlinClient
+from invana_engine.gremlin.client import InvanaEngineClient
 import csv
 
-graph_client = GremlinClient(gremlin_server_url="ws://192.168.0.10:8182/gremlin")
+graph_client = InvanaEngineClient(gremlin_server_url="ws://192.168.0.10:8182/gremlin")
 print("Initiating import: graph_client :", graph_client)
 
 

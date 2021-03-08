@@ -1,5 +1,5 @@
-from invana_engine.gremlin import GremlinClient
+from invana_engine.gremlin import InvanaEngineClient
 
-client = GremlinClient("ws://192.168.0.10:8182/gremlin")
+client = InvanaEngineClient("ws://192.168.0.10:8182/gremlin")
 client.delete_everything()
 print("Data completely deleted!")
