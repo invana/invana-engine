@@ -3,6 +3,7 @@ MAINTAINER Ravi RT Merugu <rrmerugu@gmail.com>
 ENV PYTHONUNBUFFERED 1
 
 ARG GREMLIN_SERVER_URL
+ARG GREMLIN_SERVER_URL
 ENV GREMLIN_SERVER_URL ${GREMLIN_SERVER_URL}
 
 # create webapp folder in the container
