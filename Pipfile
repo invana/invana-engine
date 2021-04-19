@@ -13,8 +13,10 @@ gremlinpython = "==3.4.6"
 starlette = "*"
 graphene = "*"
 uvicorn = "*"
-jinja2 = "*"
+Jinja2 = "*"
 aiofiles = "*"
+uvloop = "*"
+httptools = "*"
 
 [requires]
 python_version = "3.8"

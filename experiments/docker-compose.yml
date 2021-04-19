@@ -1,0 +1,33 @@
+version: '3'
+
+volumes:
+  janusgraph-default-data:
+
+services:
+  janusgraph:
+    image: docker.io/janusgraph/janusgraph:latest
+    container_name: janusgraph-1
+    restart: always
+    #        ports:
+    #            - "8182:8182"
+    # The mounted volume only makes sense if JanusGraph is being run with the BerekeleyDB storage.
+    volumes:
+      - "janusgraph-default-data:/var/lib/janusgraph"
+
+  invanaengine:
+    image: invanalabs/invana-engine
+    container_name: invana-engine-1
+    restart: always
+    ports:
+      - "8200:8200"
+    environment:
+      - GREMLIN_SERVER_URL=ws://janusgraph:8182/gremlin
+    depends_on:
+      - "janusgraph"
+
+  invanaui:
+    image: invanalabs/invana-studio
+    container_name: invana-studio-1
+    ports:
+      - "8888:8888"
+
