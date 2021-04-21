@@ -16,6 +16,7 @@ Following environment variables are supported and optional variables can be
 used to authenticate gremlin server connection.
 
 - **GREMLIN_SERVER_URL**: http or ws gremlin url. ex: ws://xx.xx.xx.xx:8182/gremlin or http://xx.xx.xx.xx:8182/gremlin
+- **GREMLIN_TRAVERSAL_SOURCE**(optional): defaults: 'g'
 - **GREMLIN_SERVER_USERNAME**(optional): gremlin username. ex: myusername
 - **GREMLIN_SERVER_PASSWORD**(optional): gremlin password. ex: mypassword
 - **SERVER_PORT**(optional, available in standalone python mode only): invana engine server port ex: defaults to 8200

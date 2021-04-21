@@ -11,8 +11,8 @@ class TestVertices:
 
     @pytest.fixture
     def graph_client(self):
-        from invana_engine.gremlin import GremlinClient
-        return GremlinClient(f"{TEST_GRAPH_HOST}/gremlin")
+        from invana_engine.gremlin import InvanaEngineClient
+        return InvanaEngineClient(f"{TEST_GRAPH_HOST}/gremlin")
 
     def test_create_vertex(self, graph_client):
         for k, vertex_sample in CREATE_VERTICES_SAMPLES.items():
