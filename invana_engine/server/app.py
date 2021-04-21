@@ -9,11 +9,14 @@ from graphene import Schema
 from .views import homepage_view
 from ..gremlin import InvanaEngineClient
 import time
-from ..settings import gremlin_server_url, gremlin_server_password, gremlin_server_username, shall_debug
+from ..settings import gremlin_server_url, gremlin_server_password, gremlin_server_username, shall_debug, \
+    gremlin_traversal_source
 
 print(".................................................")
 print("Starting Invana Engine server")
-print(f"Using GREMLIN_SERVER_URL {gremlin_server_url}")
+print(f"Using GREMLIN_SERVER_URL: {gremlin_server_url}")
+print(f"Using GREMLIN_TRAVERSAL_SOURCE: {gremlin_traversal_source}")
+print(f"Using DEBUG: {shall_debug}")
 print(".................................................")
 
 if gremlin_server_url is None:
@@ -35,7 +38,7 @@ middleware = [
 app = Starlette(routes=routes, middleware=middleware, debug=shall_debug)
 time.sleep(1)
 gremlin_client = InvanaEngineClient(gremlin_server_url=gremlin_server_url,
-                               gremlin_server_username=gremlin_server_username,
-                               gremlin_server_password=gremlin_server_password
-                               )
+                                    gremlin_server_username=gremlin_server_username,
+                                    gremlin_server_password=gremlin_server_password,
+                                    )
 app.state.gremlin_client = gremlin_client

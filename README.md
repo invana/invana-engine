@@ -19,7 +19,7 @@ used to authenticate gremlin server connection.
 - **GREMLIN_TRAVERSAL_SOURCE**(optional): defaults: 'g'
 - **GREMLIN_SERVER_USERNAME**(optional): gremlin username. ex: myusername
 - **GREMLIN_SERVER_PASSWORD**(optional): gremlin password. ex: mypassword
-- **SERVER_PORT**(optional, available in standalone python mode only): invana engine server port ex: defaults to 8200
+- **SERVER_PORT**(optional, available in standalone python mode only): port on which invana engine server is available: defaults to 8200
 
 ## Running using Docker
 ```shell script.
