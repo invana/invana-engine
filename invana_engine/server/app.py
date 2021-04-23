@@ -7,17 +7,21 @@ from invana_engine.server.schemas.query import GremlinQuery
 from .schemas.mutation import GremlinMutation
 from graphene import Schema
 from .views import homepage_view
-from ..gremlin import InvanaEngineClient
+from invana_engine.gremlin import InvanaEngineClient
 import time
 from ..settings import gremlin_server_url, gremlin_server_password, gremlin_server_username, shall_debug, \
     gremlin_traversal_source
 
-print(".................................................")
+print(".......................................................")
 print("Starting Invana Engine server")
 print(f"Using GREMLIN_SERVER_URL: {gremlin_server_url}")
 print(f"Using GREMLIN_TRAVERSAL_SOURCE: {gremlin_traversal_source}")
+if gremlin_server_username:
+    print("Using GREMLIN_SERVER_USERNAME: ******** ")
+if gremlin_server_password:
+    print("Using GREMLIN_SERVER_PASSWORD: ******** ")
 print(f"Using DEBUG: {shall_debug}")
-print(".................................................")
+print(".......................................................")
 
 if gremlin_server_url is None:
     print("ERROR: GREMLIN_SERVER_URL environment variable not set. Please fix it .")
