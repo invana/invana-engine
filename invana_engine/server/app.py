@@ -1,12 +1,12 @@
 from starlette.applications import Starlette
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
-from starlette.routing import Route
+from starlette.routing import Route, WebSocketRoute
 from starlette.graphql import GraphQLApp
 from invana_engine.server.schemas.query import GremlinQuery
 from .schemas.mutation import GremlinMutation
 from graphene import Schema
-from .views import homepage_view
+from .views import HomePageView, GremlinQueryView
 from invana_engine.gremlin import InvanaEngineClient
 import time
 from ..settings import gremlin_server_url, gremlin_server_password, gremlin_server_username, shall_debug, \
@@ -29,7 +29,9 @@ if gremlin_server_url is None:
     exit()
 
 routes = [
-    Route('/', endpoint=homepage_view),
+    Route('/', HomePageView),
+    # Route('/gremlin', endpoint=query_gremlin, methods=['POST']),
+    WebSocketRoute('/gremlin', GremlinQueryView),
     Route('/graphql', GraphQLApp(
         schema=Schema(query=GremlinQuery, mutation=GremlinMutation),
     ))
@@ -41,8 +43,9 @@ middleware = [
 
 app = Starlette(routes=routes, middleware=middleware, debug=shall_debug)
 time.sleep(1)
-gremlin_client = InvanaEngineClient(gremlin_server_url=gremlin_server_url,
-                                    gremlin_server_username=gremlin_server_username,
-                                    gremlin_server_password=gremlin_server_password,
-                                    )
+gremlin_client = InvanaEngineClient(
+    gremlin_server_url=gremlin_server_url,
+    gremlin_server_username=gremlin_server_username,
+    gremlin_server_password=gremlin_server_password,
+)
 app.state.gremlin_client = gremlin_client

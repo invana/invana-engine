@@ -12,7 +12,6 @@ pytest = "*"
 gremlinpython = "==3.4.6"
 starlette = "*"
 graphene = "*"
-uvicorn = "*"
 Jinja2 = "*"
 aiofiles = "*"
 uvloop = "*"
@@ -20,3 +19,6 @@ httptools = "*"
 
 [requires]
 python_version = "3.8"
+
+[packages.uvicorn]
+extras = [ "standard",]

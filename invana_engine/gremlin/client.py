@@ -40,6 +40,7 @@ class GremlinClient:
         :param serialize_elements: this will convert data GraphSON data into JSON
         :return:
         """
+        print("======raw_query", raw_query)
         result = self.connection._client.submit(raw_query).all().result()
         if serialize_elements is True:
             return self.serializer.serialize_data(result)
