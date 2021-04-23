@@ -1,10 +1,11 @@
 from starlette.responses import JSONResponse
 from starlette.endpoints import WebSocketEndpoint, HTTPEndpoint
 import websockets
-from ..settings import gremlin_server_url, gremlin_traversal_source
+from ..settings import gremlin_server_url, gremlin_traversal_source, gremlin_server_username, gremlin_server_password
 import json
 import uuid
 import logging
+import base64
 
 
 class GremlinWebsocketHandler(object):
@@ -38,21 +39,34 @@ class GremlinQueryView(WebSocketEndpoint):
         await websocket.accept()
         await self.gremlin.connect(gremlin_server_url)
 
-    async def on_receive(self, websocket, data):
+    @staticmethod
+    async def prepare_message(gremlin_query):
         request_id = str(uuid.uuid4())
         query_message = {
-            # "requestId": {"@type": "g:UUID", "@value": str(uuid.uuid4())},
             "requestId": request_id,
-            "op": "eval",
-            "processor": "session",
             "args": {
-                "gremlin": data.get("gremlin"),
+                "gremlin": gremlin_query,
                 "bindings": {},
                 "language": "gremlin-groovy",
                 "aliases": {"g": gremlin_traversal_source},
                 "session": request_id
             }
         }
+        if gremlin_server_username or gremlin_server_password:
+            auth = b"".join([b"\x00", gremlin_server_username.encode("utf-8"),
+                             b"\x00", gremlin_server_password.encode("utf-8")])
+            query_message['op'] = "authentication"
+            query_message['processor'] = ""
+            query_message['args']['sasl'] = base64.b64encode(auth).decode()
+        else:
+            query_message['op'] = "eval"
+            query_message['processor'] = "session"
+            query_message['args']['session'] = request_id
+        return query_message
+
+    async def on_receive(self, websocket, data):
+        gremlin_query = data.get("gremlin")
+        query_message = await self.prepare_message(gremlin_query)
         query_string = json.dumps(query_message)
         await self.gremlin.send(query_string)
         while True:
