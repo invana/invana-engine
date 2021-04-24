@@ -49,8 +49,9 @@ accessed at `http://localhost:8200/graphql`
 
 ## Supported Graph Databases
 
-- [x] janusgraph 
+- [x] JanusGraph 
 - [x] Neo4j 
+
 Invana Engine uses gremlin at the core, so in theory any database that supports 
 Apache TinkerPop's Gremlin 3.4.x shall work. Vertex/Edge Id resolution, needs to be fixed to 
 add any new database support.
