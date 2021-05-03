@@ -38,22 +38,26 @@ class GraphSONV3Reader:
                 cleaned_data.update({"inV": _['id'], "inVLabel": _['label']})
             else:
                 # TODO - check if this is right.
-                if type(v) is list and v.__len__() > 0:
-                    if not isinstance(v[0], Edge) or not isinstance(v[0], Vertex):
-                        cleaned_data['properties'][k] = v[0]
-                    else:
-                        raise Exception("This element is not a element dictionary, ( may be path)")
+                if type(v) is list:
+                    if v.__len__() > 0:
+                        if not isinstance(v[0], Edge) or not isinstance(v[0], Vertex):
+                            cleaned_data['properties'][k] = v[0]
+                        else:
+                            raise Exception("This element is not a element dictionary, ( may be path)")
                 elif isinstance(v, Edge):
                     raise Exception("This element is not a element dictionary, Edge found in iter, ( may be path)")
                 elif isinstance(v, Vertex):
                     raise Exception("This element is not a element dictionary Vertex found in iter, ( may be path)")
+                else:
+                    cleaned_data['properties'][k] = v
+
         if cleaned_data['properties'].keys().__len__() == 0:
             del cleaned_data['properties']
         return cleaned_data
 
     @staticmethod
     def serialize_vertex_element(vertex):
-
+        print("=====vertex", vertex)
         return {
             "id": vertex.id,
             "label": vertex.label,
