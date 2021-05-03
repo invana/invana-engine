@@ -47,5 +47,6 @@ gremlin_client = InvanaEngineClient(
     gremlin_server_url=gremlin_server_url,
     gremlin_server_username=gremlin_server_username,
     gremlin_server_password=gremlin_server_password,
+    gremlin_traversal_source=gremlin_traversal_source
 )
 app.state.gremlin_client = gremlin_client

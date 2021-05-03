@@ -5,7 +5,7 @@ from .schema import SchemaOps
 from .serializers.graphson_v3 import GraphSONV3Reader
 from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection
-from invana_engine.settings import gremlin_traversal_source as _gremlin_traversal_source
+from invana_engine.settings import gremlin_traversal_source as default_gremlin_traversal_source
 
 
 class GremlinClient:
@@ -23,9 +23,11 @@ class GremlinClient:
                  transport_factory=None):
         if gremlin_server_url is None:
             raise Exception("Invalid gremlin_server_url. default: ws://127.0.0.1:8182/gremlin")
+        if gremlin_traversal_source is None:
+            raise Exception("Invalid gremlin_traversal_source. default: g")
         self.connection = DriverRemoteConnection(
             gremlin_server_url,
-            gremlin_traversal_source or _gremlin_traversal_source,
+            gremlin_traversal_source,
             username=gremlin_server_username,
             password=gremlin_server_password,
             transport_factory=transport_factory
@@ -62,12 +64,18 @@ class InvanaEngineClient:
                  transport_factory=None):
         serializer = serializer or GraphSONV3Reader()
         self.gremlin_server_url = gremlin_server_url
+        if gremlin_traversal_source is None:
+            gremlin_traversal_source = default_gremlin_traversal_source
+
+        print("======gremlin_traversal_source", gremlin_traversal_source)
         self.gremlin_client = GremlinClient(gremlin_server_url=gremlin_server_url,
                                             gremlin_traversal_source=gremlin_traversal_source,
                                             gremlin_server_username=gremlin_server_username,
                                             gremlin_server_password=gremlin_server_password,
                                             serializer=serializer,
                                             transport_factory=transport_factory)
+        self.gremlin_traversal_source = self.gremlin_client.connection._traversal_source
+
         self.vertex = Vertex(gremlin_client=self.gremlin_client)
         self.edge = Edge(gremlin_client=self.gremlin_client)
         self.stats = StatsOps(gremlin_client=self.gremlin_client)
