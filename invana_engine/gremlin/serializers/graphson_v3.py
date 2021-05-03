@@ -15,16 +15,31 @@ class GraphSONV3Reader:
             _id = _id.strip("#")
         return _id
 
+    @staticmethod
+    def check_element_type(_id):
+        if type(_id) is dict:
+            _id = _id["@value"]
+        if type(_id) is dict:
+            _id = _id['relationId']
+            return "edge"
+        return "vertex"
+
     def serialize_element_dict(self, elem):
         cleaned_data = {"properties": {}}
-        if "Direction.IN" in elem.keys():
-            cleaned_data['type'] = "g:Edge"
-        else:
-            cleaned_data['type'] = "g:Vertex"
+        # if "Direction.IN" in elem.keys():
+        #     cleaned_data['type'] = "g:Edge"
+        # else:
+        #     cleaned_data['type'] = "g:Vertex"
+
         for k, v in elem.items():
             if str(k) == "T.id":
                 if self.get_element_id(v):
                     cleaned_data['id'] = self.get_element_id(v)
+
+                    if self.check_element_type(v) == "edge":
+                        cleaned_data['type'] = "g:Edge"
+                    else:
+                        cleaned_data['type'] = "g:Vertex"
                 else:
                     raise Exception("This element doesnt have id, ( may be path)")
 
@@ -51,13 +66,12 @@ class GraphSONV3Reader:
                 else:
                     cleaned_data['properties'][k] = v
 
-        if cleaned_data['properties'].keys().__len__() == 0:
-            del cleaned_data['properties']
+        # if cleaned_data['properties'].keys().__len__() == 0:
+        #     del cleaned_data['properties']
         return cleaned_data
 
     @staticmethod
     def serialize_vertex_element(vertex):
-        print("=====vertex", vertex)
         return {
             "id": vertex.id,
             "label": vertex.label,
@@ -97,7 +111,8 @@ class GraphSONV3Reader:
                 return data
             else:
                 try:
-                    return self.serialize_element_dict(data)
+                    _ = self.serialize_element_dict(data)
+                    return _
                 except Exception as e:
                     logging.debug(e)
                     _serialised_data = []
@@ -116,6 +131,12 @@ class GraphSONV3Reader:
             for datum in data:
                 _ = self.serialize_data(datum)
                 _serialized_data.append(_)
+
+            # add edge inv and outv info to the edge
+            _serialized_data[1]['out_v'] = _serialized_data[0]['id']
+            _serialized_data[1]['out_v_label'] = _serialized_data[0]['label']
+            _serialized_data[1]['in_v'] = _serialized_data[2]['id']
+            _serialized_data[1]['in_v_label'] = _serialized_data[2]['label']
             return _serialized_data
         else:
             raise NotImplementedError("")

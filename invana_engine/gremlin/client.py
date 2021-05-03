@@ -53,7 +53,8 @@ class GremlinClient:
         """
         result = self.connection._client.submit(raw_query).all().result()
         if serialize_elements is True:
-            return self.make_data_unique(self.serializer.serialize_data(result))
+            _ = self.make_data_unique(self.serializer.serialize_data(result))
+            return _
         return result
 
 
