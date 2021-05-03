@@ -35,6 +35,15 @@ class GremlinClient:
         self.g = traversal().withRemote(self.connection)
         self.serializer = serializer
 
+    def make_data_unique(self, serialize_data):
+        _ids = []
+        unique_data = []
+        for serialize_datum in serialize_data:
+            if serialize_datum['id'] not in _ids:
+                _ids.append(serialize_datum['id'])
+                unique_data.append(serialize_datum)
+        return unique_data
+
     def execute_query(self, raw_query, serialize_elements=True):
         """
 
@@ -44,7 +53,7 @@ class GremlinClient:
         """
         result = self.connection._client.submit(raw_query).all().result()
         if serialize_elements is True:
-            return self.serializer.serialize_data(result)
+            return self.make_data_unique(self.serializer.serialize_data(result))
         return result
 
 
