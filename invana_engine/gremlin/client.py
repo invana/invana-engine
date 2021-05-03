@@ -66,8 +66,6 @@ class InvanaEngineClient:
         self.gremlin_server_url = gremlin_server_url
         if gremlin_traversal_source is None:
             gremlin_traversal_source = default_gremlin_traversal_source
-
-        print("======gremlin_traversal_source", gremlin_traversal_source)
         self.gremlin_client = GremlinClient(gremlin_server_url=gremlin_server_url,
                                             gremlin_traversal_source=gremlin_traversal_source,
                                             gremlin_server_username=gremlin_server_username,
