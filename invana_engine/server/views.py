@@ -72,6 +72,7 @@ class GremlinQueryView(WebSocketEndpoint):
         while True:
             try:
                 response_data = await self.gremlin.recv()
+                print(response_data)
                 await websocket.send_json(json.loads(response_data))
             except websockets.exceptions.ConnectionClosed:
                 logging.debug('Don\'t have any more messages. closed connection with gremlin server')

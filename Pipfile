@@ -16,6 +16,7 @@ Jinja2 = "*"
 aiofiles = "*"
 uvloop = "*"
 httptools = "*"
+termcolor = "*"
 
 [requires]
 python_version = "3.8"

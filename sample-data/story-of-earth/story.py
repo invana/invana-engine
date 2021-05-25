@@ -21,11 +21,6 @@ earth_data = client.vertex.create(
     properties=earth_properties
 )
 
-# earth_data = client.vertex.get_or_create(
-#     label=earth_label,
-#     properties=earth_properties
-# )
-
 print(earth_data, type(earth_data))
 
 earth_new_properties = {
@@ -41,4 +36,3 @@ print(planets_data)
 
 _ = client.vertex.read_in_edges_and_vertices(earth_data.id)
 print("------", _)
-# client.vertex.delete_many(query={"name": "Earth"})

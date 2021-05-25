@@ -10,10 +10,12 @@ from .views import HomePageView, GremlinQueryView
 from invana_engine.gremlin import InvanaEngineClient
 import time
 from ..settings import gremlin_server_url, gremlin_server_password, gremlin_server_username, shall_debug, \
-    gremlin_traversal_source
+    gremlin_traversal_source, invana_engine_version
+from termcolor import cprint
 
 print(".......................................................")
-print("Starting Invana Engine server")
+cprint(f"Invana Engine Server {invana_engine_version}", "cyan", attrs=["bold"])
+print(".......................................................")
 print(f"Using GREMLIN_SERVER_URL: {gremlin_server_url}")
 print(f"Using GREMLIN_TRAVERSAL_SOURCE: {gremlin_traversal_source}")
 if gremlin_server_username:
