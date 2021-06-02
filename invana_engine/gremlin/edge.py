@@ -39,8 +39,8 @@ class Edge(CRUDOperationsBase):
         )
         label = self.get_namespaced_label(label=label, namespace=namespace)
         properties = {} if properties is None else properties
-        inv_vtx_instance = self.filter_vertex(inv)
-        outv_vtx_instance = self.filter_vertex(outv)
+        inv_vtx_instance = self.filter_vertex(vertex_id=inv)
+        outv_vtx_instance = self.filter_vertex(vertex_id=outv)
         _ = inv_vtx_instance.addE(label) \
             .to(outv_vtx_instance)
         for property_key, property_value in properties.items():
