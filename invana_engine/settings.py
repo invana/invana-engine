@@ -8,4 +8,4 @@ gremlin_traversal_source = os.environ.get("GREMLIN_TRAVERSAL_SOURCE", "g")
 shall_debug = os.environ.get("DEBUG", False)
 server_port = os.environ.get("SERVER_PORT", 8200)
 
-invana_engine_version = "v0.0.7"
+invana_engine_version = "v0.0.11"
