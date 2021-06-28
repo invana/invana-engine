@@ -1,7 +1,7 @@
 from invana_engine.utils.chores import get_unique_items
 from .base import CRUDOperationsBase
 import logging
-from invana_engine.storages.gremlin.core.types import VertexElement, EdgeElement
+from ..core.types import VertexElement, EdgeElement
 
 logger = logging.getLogger(__name__)
 

@@ -4,6 +4,7 @@ from invana_engine.default_settings import GREMLIN_SERVER_SETTINGS as GREMLIN_SE
 from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection
 from .operations.vertex import VertexOperations
+from .operations.edge import EdgeOperations
 
 
 class GremlinClient:
@@ -28,6 +29,7 @@ class GremlinClient:
         self.connection = self.create_connection()
         self.g = traversal().withRemote(self.connection)
         self.vertex = VertexOperations(gremlin_client=self)
+        self.edge = EdgeOperations(gremlin_client=self)
 
     def create_connection(self):
         return DriverRemoteConnection(
