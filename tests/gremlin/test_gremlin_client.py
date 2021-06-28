@@ -1,6 +1,6 @@
 import pytest
 from .sample_payloads.client import CLIENT_RAW_QUERIES
-from invana_engine.storages import GremlinClient
+from invana_engine.gremlin.client import GremlinClient
 from ..settings import TEST_GRAPH_HOST
 
 
