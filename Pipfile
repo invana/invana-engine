@@ -1,25 +1,11 @@
 [[source]]
-name = "pypi"
-url = "https://pypi.org/simple"
+url = "https://pypi.python.org/simple"
 verify_ssl = true
-
-[dev-packages]
-codecov = "*"
-pytest-cov = "*"
-pytest = "*"
+name = "pypi"
 
 [packages]
-gremlinpython = "==3.4.6"
-starlette = "*"
-graphene = "*"
-Jinja2 = "*"
-aiofiles = "*"
-uvloop = "*"
-httptools = "*"
-termcolor = "*"
+
+[dev-packages]
 
 [requires]
 python_version = "3.8"
-
-[packages.uvicorn]
-extras = [ "standard",]
