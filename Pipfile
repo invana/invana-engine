@@ -7,7 +7,7 @@ name = "pypi"
 gremlinpython = "==3.5.0"
 
 [dev-packages]
-pytest = "*"
+pytest = "6.2.4"
 pytest-cov = "*"
 
 [requires]

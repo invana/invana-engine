@@ -3,6 +3,7 @@ from invana_engine.utils.chores import import_klass
 from invana_engine.default_settings import GREMLIN_SERVER_SETTINGS as GREMLIN_SERVER_DEFAULT_SETTINGS
 from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection
+from .operations.vertex import VertexOperations
 
 
 class GremlinClient:
@@ -26,6 +27,7 @@ class GremlinClient:
         # self.auth = auth
         self.connection = self.create_connection()
         self.g = traversal().withRemote(self.connection)
+        self.vertex = VertexOperations(gremlin_client=self)
 
     def create_connection(self):
         return DriverRemoteConnection(
@@ -53,5 +55,5 @@ class GremlinClient:
             return _
         return result
 
-    def close(self):
+    def close_connection(self):
         self.connection.close()
