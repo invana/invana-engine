@@ -4,8 +4,11 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+gremlinpython = "==3.5.0"
 
 [dev-packages]
+pytest = "*"
+pytest-cov = "*"
 
 [requires]
 python_version = "3.8"
