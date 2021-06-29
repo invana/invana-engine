@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 class EdgeOperations(CRUDOperationsBase):
 
-    def get_or_create(self, label=None, namespace=None, properties=None):
+    def get_or_create(self, label=None, properties=None):
         """
 
         :param label:
@@ -17,13 +17,13 @@ class EdgeOperations(CRUDOperationsBase):
         :return:
         """
 
-        edges = self.read_many(label=label, namespace=namespace, query=properties)
+        edges = self.read_many(label=label,  query=properties)
         if edges.__len__() > 0:
             return edges[0]
         else:
-            return self.create(label=label, namespace=namespace, properties=properties)
+            return self.create(label=label,  properties=properties)
 
-    def create(self, label=None, namespace=None, properties=None, inv=None, outv=None):
+    def create(self, label=None, properties=None, inv=None, outv=None):
         """
 
         :param label:
@@ -33,12 +33,12 @@ class EdgeOperations(CRUDOperationsBase):
         :param outv: str or VertexElement
         :return:
         """
-        logger.debug("Creating Edge with label {label}, namespace {namespace} and properties {properties}".format(
+        logger.debug("Creating Edge with label {label}, namespace and properties {properties}".format(
             label=label,
-            namespace=namespace,
+            
             properties=properties)
         )
-        label = self.get_namespaced_label(label=label, namespace=namespace)
+
         properties = {} if properties is None else properties
 
         _ = self.gremlin_client.g.V(inv).addE(label) \
@@ -72,24 +72,23 @@ class EdgeOperations(CRUDOperationsBase):
             pass
         return None
 
-    def _read_many(self, label=None, namespace=None, query=None, limit=10, skip=0):
-        filtered_data = self.filter_edge(label=label, namespace=namespace, query=query, limit=limit, skip=skip)
+    def _read_many(self, label=None, query=None, limit=10, skip=0):
+        filtered_data = self.filter_edge(label=label,  query=query, limit=limit, skip=skip)
         cleaned_data = []
         for _ in filtered_data.elementMap().toList():
             cleaned_data.append(EdgeElement(_, serializer=self.serializer))
         return cleaned_data
 
-    def filter_edge_and_get_neighbor_vertices(self, edge_id=None, label=None, namespace=None, query=None, limit=None,
-                                        skip=None):
-
-        cleaned_edges_data = self._read_many(label=label, namespace=namespace,query=query, limit=limit, skip=skip)
-        filtered_edges = self.filter_edge(label=label, namespace=namespace, query=query, limit=limit, skip=skip)
+    def filter_edge_and_get_neighbor_vertices(self, edge_id=None, label=None, query=None, limit=None,
+                                              skip=None):
+        cleaned_edges_data = self._read_many(label=label,  query=query, limit=limit, skip=skip)
+        filtered_edges = self.filter_edge(label=label,  query=query, limit=limit, skip=skip)
 
         vertices_data = []
         for _ in filtered_edges.inV().dedup().elementMap().toList():
             vertices_data.append(VertexElement(_, serializer=self.serializer))
 
-        filtered_edges = self.filter_edge(label=label, namespace=namespace, query=query, limit=limit, skip=skip)
+        filtered_edges = self.filter_edge(label=label,  query=query, limit=limit, skip=skip)
 
         for _ in filtered_edges.outV().dedup().elementMap().toList():
             vertices_data.append(VertexElement(_, serializer=self.serializer))
@@ -97,12 +96,11 @@ class EdgeOperations(CRUDOperationsBase):
 
         return cleaned_edges_data + vertices_data
 
-
     def _delete_one(self, edge_id):
         logger.debug("Deleting the edge with edge_id:{edge_id}".format(edge_id=edge_id))
         self.drop(self.filter_edge(edge_id=edge_id))
 
-    def _delete_many(self, label=None, namespace=None, query=None):
-        logger.debug("Deleting the edges with label:{label} namespace:{namespace},"
-                     " query:{query}".format(label=label, query=query, namespace=namespace))
-        self.drop(self.filter_edge(label=label, namespace=namespace, query=query))
+    def _delete_many(self, label=None, query=None):
+        logger.debug("Deleting the edges with label:{label} ,"
+                     " query:{query}".format(label=label, query=query, ))
+        self.drop(self.filter_edge(label=label,  query=query))

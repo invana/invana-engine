@@ -11,9 +11,9 @@ class GremlinOperationBase:
         """
         self.gremlin_client = gremlin_client
 
-    @staticmethod
-    def get_namespaced_label(label=None, namespace=None):
-        return "{}/{}".format(namespace, label) if namespace else label
+    # @staticmethod
+    # def get_namespaced_label(label=None, namespace=None):
+    #     return "{}/{}".format(namespace, label) if namespace else label
 
     @property
     def serializer(self):
@@ -22,7 +22,7 @@ class GremlinOperationBase:
 
 class CRUDOperationsBase(GremlinOperationBase, metaclass=abc.ABCMeta):
 
-    def filter_vertex(self, vertex_id=None, label=None, namespace=None, query=None, limit=None, skip=None):
+    def filter_vertex(self, vertex_id=None, label=None,  query=None, limit=None, skip=None):
         """
 
         :param vertex_id:
@@ -33,7 +33,6 @@ class CRUDOperationsBase(GremlinOperationBase, metaclass=abc.ABCMeta):
         :param skip:
         :return:
         """
-        label = self.get_namespaced_label(label=label, namespace=namespace)
         query = {} if query is None else query
         _ = self.gremlin_client.g.V(vertex_id) if vertex_id else self.gremlin_client.g.V()
         if label:
@@ -45,7 +44,7 @@ class CRUDOperationsBase(GremlinOperationBase, metaclass=abc.ABCMeta):
             _.range(skip, skip + limit)
         return _
 
-    def filter_edge(self, edge_id=None, label=None, namespace=None, query=None, limit=None, skip=None):
+    def filter_edge(self, edge_id=None, label=None, query=None, limit=None, skip=None):
         """
 
         :param edge_id:
@@ -56,7 +55,6 @@ class CRUDOperationsBase(GremlinOperationBase, metaclass=abc.ABCMeta):
         :param skip:
         :return:
         """
-        label = self.get_namespaced_label(label=label, namespace=namespace)
         query = {} if query is None else query
         _ = self.gremlin_client.g.E(edge_id) if edge_id else self.gremlin_client.g.E()
         if label:
@@ -69,7 +67,7 @@ class CRUDOperationsBase(GremlinOperationBase, metaclass=abc.ABCMeta):
         return _
 
     @abc.abstractmethod
-    def create(self, label=None, namespace=None, properties=None, **kwargs):
+    def create(self, label=None, properties=None, **kwargs):
         pass
 
     @abc.abstractmethod
@@ -84,11 +82,11 @@ class CRUDOperationsBase(GremlinOperationBase, metaclass=abc.ABCMeta):
         return self._read_one(element_id)
 
     @abc.abstractmethod
-    def _read_many(self, label=None, namespace=None, query=None, limit=None, skip=None):
+    def _read_many(self, label=None, query=None, limit=None, skip=None):
         pass
 
-    def read_many(self, label=None, namespace=None, query=None, limit=None, skip=None):
-        return self._read_many(label=label, namespace=namespace, query=query, limit=limit, skip=skip)
+    def read_many(self, label=None, query=None, limit=None, skip=None):
+        return self._read_many(label=label,  query=query, limit=limit, skip=skip)
 
     @abc.abstractmethod
     def _delete_one(self, element_id):
@@ -103,15 +101,15 @@ class CRUDOperationsBase(GremlinOperationBase, metaclass=abc.ABCMeta):
             raise InvalidQueryArguments("Both label and query arguments cannot be none")
 
     @abc.abstractmethod
-    def _delete_many(self, label=None, namespace=None, query=None):
+    def _delete_many(self, label=None, query=None):
         pass
 
-    def delete_many(self, label=None, namespace=None, query=None):
+    def delete_many(self, label=None, query=None):
         self.validate_filter_many_filters(label=label, query=query)
-        return self._delete_many(label=label, namespace=namespace, query=query)
+        return self._delete_many(label=label,  query=query)
 
     @abc.abstractmethod
-    def get_or_create(self, label=None, namespace=None, properties=None):
+    def get_or_create(self, label=None, properties=None):
         pass
 
     @staticmethod
