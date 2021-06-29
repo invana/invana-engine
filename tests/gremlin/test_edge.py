@@ -34,7 +34,6 @@ class TestEdgesOperations:
                 inv=init_data[0].id,
                 outv=init_data[1].id
             )
-            print("==========result", result)
             assert isinstance(result, EdgeElement)
         gremlin_client.close_connection()
 
