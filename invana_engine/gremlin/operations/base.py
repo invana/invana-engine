@@ -1,5 +1,6 @@
 import abc
-from ..core.exceptions import InvalidQueryArguments
+from ..core.exceptions import InvalidQueryArguments, InvalidPropertiesException
+from ..core.translator import GremlinQueryTranslator
 
 
 class GremlinOperationBase:
@@ -10,10 +11,17 @@ class GremlinOperationBase:
         :param gremlin_client: InvanaEngineClient instance
         """
         self.gremlin_client = gremlin_client
+        self.translator = GremlinQueryTranslator()
 
     # @staticmethod
     # def get_namespaced_label(label=None, namespace=None):
     #     return "{}/{}".format(namespace, label) if namespace else label
+
+    @staticmethod
+    def validate_properties(properties):
+        if not isinstance(properties, dict):
+            raise InvalidPropertiesException(
+                "properties should be passed as 'dict' type, but received '{}' type".format(type(properties)))
 
     @property
     def serializer(self):
@@ -22,27 +30,27 @@ class GremlinOperationBase:
 
 class CRUDOperationsBase(GremlinOperationBase, metaclass=abc.ABCMeta):
 
-    def filter_vertex(self, vertex_id=None, label=None,  query=None, limit=None, skip=None):
-        """
-
-        :param vertex_id:
-        :param label:
-        :param namespace:
-        :param query:
-        :param limit:
-        :param skip:
-        :return:
-        """
-        query = {} if query is None else query
-        _ = self.gremlin_client.g.V(vertex_id) if vertex_id else self.gremlin_client.g.V()
-        if label:
-            _.hasLabel(label)
-        if query:
-            for k, v in query.items():
-                _.has(k, v)
-        if limit is not None and skip is not None:  # TODO - pagination fixes needed
-            _.range(skip, skip + limit)
-        return _
+    # def filter_vertex(self, vertex_id=None, label=None, query=None, limit=None, skip=None):
+    #     """
+    #
+    #     :param vertex_id:
+    #     :param label:
+    #     :param namespace:
+    #     :param query:
+    #     :param limit:
+    #     :param skip:
+    #     :return:
+    #     """
+    #     query = {} if query is None else query
+    #     _ = self.gremlin_client.g.V(vertex_id) if vertex_id else self.gremlin_client.g.V()
+    #     if label:
+    #         _.hasLabel(label)
+    #     if query:
+    #         for k, v in query.items():
+    #             _.has(k, v)
+    #     if limit is not None and skip is not None:  # TODO - pagination fixes needed
+    #         _.range(skip, skip + limit)
+    #     return _
 
     def filter_edge(self, edge_id=None, label=None, query=None, limit=None, skip=None):
         """
@@ -66,52 +74,52 @@ class CRUDOperationsBase(GremlinOperationBase, metaclass=abc.ABCMeta):
 
         return _
 
-    @abc.abstractmethod
-    def create(self, label=None, properties=None, **kwargs):
-        pass
+    # @abc.abstractmethod
+    # def create(self, label=None, properties=None, **kwargs):
+    #     pass
+    #
+    # @abc.abstractmethod
+    # def update(self, elem_id, properties=None):
+    #     pass
+    #
+    # @abc.abstractmethod
+    # def _read_one(self, element_id):
+    #     pass
+    #
+    # def read_one(self, element_id):
+    #     return self._read_one(element_id)
 
-    @abc.abstractmethod
-    def update(self, elem_id, properties=None):
-        pass
+    # @abc.abstractmethod
+    # def _read_many(self, label=None, query=None, limit=None, skip=None):
+    #     pass
 
-    @abc.abstractmethod
-    def _read_one(self, element_id):
-        pass
+    # def read_many(self, label=None, query=None, limit=None, skip=None):
+    #     return self._read_many(label=label, query=query, limit=limit, skip=skip)
 
-    def read_one(self, element_id):
-        return self._read_one(element_id)
+    # @abc.abstractmethod
+    # def _delete_one(self, element_id):
+    #     pass
 
-    @abc.abstractmethod
-    def _read_many(self, label=None, query=None, limit=None, skip=None):
-        pass
+    # def delete_one(self, element_id):
+    #     return self._delete_one(element_id)
 
-    def read_many(self, label=None, query=None, limit=None, skip=None):
-        return self._read_many(label=label,  query=query, limit=limit, skip=skip)
+    # @staticmethod
+    # def validate_filter_many_filters(label=None, query=None):
+    #     if label is None and query is None:
+    #         raise InvalidQueryArguments("Both label and query arguments cannot be none")
 
-    @abc.abstractmethod
-    def _delete_one(self, element_id):
-        pass
+    # @abc.abstractmethod
+    # def _delete_many(self, label=None, query=None):
+    #     pass
 
-    def delete_one(self, element_id):
-        return self._delete_one(element_id)
+    # def delete_many(self, label=None, query=None):
+    #     self.validate_filter_many_filters(label=label, query=query)
+    #     return self._delete_many(label=label, query=query)
 
-    @staticmethod
-    def validate_filter_many_filters(label=None, query=None):
-        if label is None and query is None:
-            raise InvalidQueryArguments("Both label and query arguments cannot be none")
-
-    @abc.abstractmethod
-    def _delete_many(self, label=None, query=None):
-        pass
-
-    def delete_many(self, label=None, query=None):
-        self.validate_filter_many_filters(label=label, query=query)
-        return self._delete_many(label=label,  query=query)
-
-    @abc.abstractmethod
-    def get_or_create(self, label=None, properties=None):
-        pass
-
-    @staticmethod
-    def drop(_):
-        _.drop().iterate()
+    # @abc.abstractmethod
+    # def get_or_create(self, label=None, properties=None):
+    #     pass
+    # #
+    # @staticmethod
+    # def drop(_):
+    #     _.drop().iterate()

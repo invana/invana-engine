@@ -13,10 +13,6 @@ class TestGremlinClient:
 
     def test_raw_query(self, gremlin_client):
         for query_id, raw_query in CLIENT_RAW_QUERIES.items():
-            response = gremlin_client.execute_query(raw_query)
+            response = gremlin_client.search(raw_query)
             assert type(response) is list
         gremlin_client.close_connection()
-
-    # def test_drop_everything(self, gremlin_client):
-    #     response = gremlin_client.delete_everything()
-    #     # assert response is None

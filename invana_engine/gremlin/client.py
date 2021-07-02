@@ -50,11 +50,21 @@ class GremlinClient:
                 unique_data.append(serialize_datum)
         return unique_data
 
-    def execute_query(self, gremlin_query, serialize_elements=True):
-        result = self.connection._client.submit(gremlin_query).all().result()
+    def search(self, gremlin_query, serialize_elements=True):
+        print("gremlin_query======", gremlin_query)
+        try:
+            result = self.connection._client.submit(gremlin_query).all().result()
+        except Exception as e:
+            print("Failed to query gremlin server", e)
+            result = []
+
+        result_type = type(result)
         if serialize_elements is True:
             _ = self.make_data_unique(self.serializer.serialize_data(result))
-            return _
+            if isinstance(result, list):
+                return _
+            else:
+                return _[0]
         return result
 
     def close_connection(self):

@@ -3,7 +3,7 @@
 """
 
 CREATE_VERTICES_SAMPLES = {
-    "plant": {
+    "planet": {
         "label": "Planet",
         "properties": {
             "name": "Earth",

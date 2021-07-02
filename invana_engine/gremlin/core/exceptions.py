@@ -7,6 +7,10 @@ class InvalidVertexException(BaseException):
     pass
 
 
+class InvalidPropertiesException(BaseException):
+    pass
+
+
 class InvalidPayloadException(BaseException):
     pass
 
