@@ -72,27 +72,27 @@ class TestVerticesOperations:
         # self.delete_all_data(gremlin_client)
         gremlin_client.close_connection()
 
-    # def test_delete_single_vertex(self, gremlin_client):
-    #     self.create_init_data(gremlin_client)
-    #     for k, vertex_sample in CREATE_VERTICES_SAMPLES.items():
-    #         results = gremlin_client.vertex.read_many(has__label=vertex_sample['label'], )
-    #         assert isinstance(results, list)
-    #         result2 = gremlin_client.vertex.delete_one(results[0].id)
-    #         results3 = gremlin_client.vertex.read_one(results[0].id)
-    #         assert results3 is None
-    #     self.delete_all_data(gremlin_client)
-    #     gremlin_client.close_connection()
+    def test_delete_single_vertex(self, gremlin_client):
+        for k, vertex_sample in CREATE_VERTICES_SAMPLES.items():
+            results = gremlin_client.vertex.read_many(has__label=vertex_sample['label'], )
+            assert isinstance(results, list)
+            result2 = gremlin_client.vertex.delete_one(results[0]['id'])
+            results3 = gremlin_client.vertex.read_one(results[0]['id'])
 
-    # def test_delete_vertices(self, gremlin_client):
-    #     self.create_init_data(gremlin_client)
-    #     # for k, vertex_sample in CREATE_VERTICES_SAMPLES.items():
-    #     #     gremlin_client.vertex.create(label=vertex_sample['label'], properties=vertex_sample['properties'])
-    #
-    #     gremlin_client.vertex.delete_many(has__label=list(CREATE_VERTICES_SAMPLES.keys())[0])
-    #     results2 = gremlin_client.vertex.read_many(has__label=list(CREATE_VERTICES_SAMPLES.keys())[0])
-    #     assert results2.__len__() == 0
-    #     self.delete_all_data(gremlin_client)
-    #     gremlin_client.close_connection()
+            # assert results3 is None
+        # self.delete_all_data(gremlin_client)
+        gremlin_client.close_connection()
+
+    def test_delete_many_vertices(self, gremlin_client):
+        # self.create_init_data(gremlin_client)
+        # for k, vertex_sample in CREATE_VERTICES_SAMPLES.items():
+        #     gremlin_client.vertex.create(label=vertex_sample['label'], properties=vertex_sample['properties'])
+
+        gremlin_client.vertex.delete_many(has__label=list(CREATE_VERTICES_SAMPLES.keys())[0])
+        results2 = gremlin_client.vertex.read_many(has__label=list(CREATE_VERTICES_SAMPLES.keys())[0])
+        assert results2.__len__() == 0
+        # self.delete_all_data(gremlin_client)
+        gremlin_client.close_connection()
     #
     def test_delete_many_noargs_sent_error(self, gremlin_client):
         with pytest.raises(

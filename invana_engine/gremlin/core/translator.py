@@ -84,9 +84,9 @@ class GremlinQueryTranslator:
             if kwargs__list.__len__() >= 2:
                 if kwargs__list.__len__() == 2:
                     query_string += ".{0}({1}, {2})".format(kwargs__list[0],
-                                                            # self.check_if_str(
+
                                                             kwargs__list[1]
-                                                            # )
+
                                                             ,
                                                             self.check_if_str(value))
                 else:
