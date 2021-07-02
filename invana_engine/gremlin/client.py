@@ -57,8 +57,6 @@ class GremlinClient:
         except Exception as e:
             logging.error("Failed to query gremlin server with exception: {}".format(e.__str__() if e else ""))
             return None
-
-        result_type = type(result)
         if serialize_elements is True:
             _ = self.make_data_unique(self.serializer.serialize_data(result))
             if isinstance(result, list):
