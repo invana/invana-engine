@@ -22,18 +22,15 @@ class VertexOperations(CRUDOperationsBase):
         if None in [label, properties]:
             raise Exception("Vertex cannot be created with out  properties")
         self.validate_properties(properties)
-        # _ = self.gremlin_client.g.addV(label)
         query_string = "g.addV('{}')".format(label)
         query_string += self.translator.generate_gremlin_query_for_properties(**properties)
         query_string += ".next()"
-        print("create_query", query_string)
         return self.gremlin_client.search(query_string, serialize_elements=True)[0]
 
     def get_or_create(self, label=None, properties=None):
         """
 
         :param label:
-        :param namespace:
         :param properties:
         :return:
         """

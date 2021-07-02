@@ -51,11 +51,11 @@ class GremlinClient:
         return unique_data
 
     def search(self, gremlin_query, serialize_elements=True):
-        print("gremlin_query======", gremlin_query)
+        logging.info("gremlin_query======", gremlin_query)
         try:
             result = self.connection._client.submit(gremlin_query).all().result()
         except Exception as e:
-            print("Failed to query gremlin server", e)
+            logging.error("Failed to query gremlin server", e)
             result = []
 
         result_type = type(result)

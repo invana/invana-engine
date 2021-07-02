@@ -15,7 +15,7 @@ class TestVerticesOperations:
     def create_init_data(gremlin_client):
         for k, vertex_sample in CREATE_VERTICES_SAMPLES.items():
             gremlin_client.vertex.create(label=vertex_sample['label'], properties=vertex_sample['properties'])
-        # gremlin_client.close_connection()
+        gremlin_client.close_connection()
 
     @staticmethod
     def delete_all_data(gremlin_client):
@@ -28,7 +28,6 @@ class TestVerticesOperations:
             result = gremlin_client.vertex.create(
                 label=vertex_sample["label"],
                 properties=vertex_sample["properties"])
-            print("===create result", result, type(result))
             assert isinstance(result, dict)
         gremlin_client.close_connection()
 
@@ -40,19 +39,14 @@ class TestVerticesOperations:
 
     def test_read_many_vertex(self, gremlin_client):
         for k, vertex_sample in CREATE_VERTICES_SAMPLES.items():
-            print("===vertex_sample", vertex_sample)
             _ = gremlin_client.vertex.create(label=vertex_sample['label'], properties=vertex_sample['properties'])
-            print("====+++_created", _)
 
         for k, vertex_sample in CREATE_VERTICES_SAMPLES.items():
-            # props = vertex_sample['properties']
-            # print("properties", props)
             search_kwargs = {
                 'has__label': vertex_sample['label'],
                 # 'has__label': "Planet",
                 # "has__{}".format(list(props.keys())[0]): list(props.values())[0]
             }
-            print("===search_kwargs", search_kwargs)
             results = gremlin_client.vertex.read_many(**search_kwargs)
             assert isinstance(results, list)
             assert isinstance(results[0], dict)
@@ -65,7 +59,6 @@ class TestVerticesOperations:
             result = gremlin_client.vertex.read_many(has__label=vertex_sample['label'])
             assert isinstance(result, list)
             result2 = gremlin_client.vertex.update_one(result[0]['id'], properties={"new_field": "yeah!"})
-            print("=====result2", result2)
             assert isinstance(result2, dict)
         gremlin_client.close_connection()
 

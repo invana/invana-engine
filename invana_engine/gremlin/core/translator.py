@@ -58,7 +58,6 @@ class GremlinQueryTranslator:
             if k.startswith("has__") or k.startswith("pagination__"):
                 valid_search_kwargs = True
                 break
-        print("valid_search_kwargs", valid_search_kwargs)
         if valid_search_kwargs is False:
             raise InvalidQueryArguments(
                 "Either has__** or pagination__** search kwargs should be used with filter many type queries")
