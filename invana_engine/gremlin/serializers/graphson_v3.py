@@ -138,5 +138,9 @@ class GraphSONV3Reader:
             _serialized_data[1]['in_v'] = _serialized_data[2]['id']
             _serialized_data[1]['in_v_label'] = _serialized_data[2]['label']
             return _serialized_data
+        elif isinstance(data, int):
+            return data
+        elif isinstance(data, str):
+            return data
         else:
             raise NotImplementedError("")

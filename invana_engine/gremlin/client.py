@@ -45,12 +45,15 @@ class GremlinClient:
         _ids = []
         unique_data = []
         for serialize_datum in serialize_data:
-            if serialize_datum['id'] not in _ids:
-                _ids.append(serialize_datum['id'])
+            if type(serialize_datum) is dict and serialize_datum.get("id"):
+                if serialize_datum['id'] not in _ids:
+                    _ids.append(serialize_datum['id'])
+                    unique_data.append(serialize_datum)
+            else:
                 unique_data.append(serialize_datum)
         return unique_data
 
-    def search(self, gremlin_query, serialize_elements=True):
+    def query(self, gremlin_query, serialize_elements=True):
         logging.info("gremlin_query======", gremlin_query)
         try:
             result = self.connection._client.submit(gremlin_query).all().result()
@@ -59,6 +62,7 @@ class GremlinClient:
             return None
         if serialize_elements is True:
             _ = self.make_data_unique(self.serializer.serialize_data(result))
+            # _ = self.serializer.serialize_data(result)
             if isinstance(result, list):
                 return _
             else:

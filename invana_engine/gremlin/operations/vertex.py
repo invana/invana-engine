@@ -25,7 +25,7 @@ class VertexOperations(CRUDOperationsBase):
         query_string = "g.addV('{}')".format(label)
         query_string += self.translator.generate_gremlin_query_for_properties(**properties)
         query_string += ".next()"
-        return self.gremlin_client.search(query_string, serialize_elements=True)[0]
+        return self.gremlin_client.query(query_string, serialize_elements=True)[0]
 
     def get_or_create(self, label=None, properties=None):
         """
@@ -55,7 +55,7 @@ class VertexOperations(CRUDOperationsBase):
             raise InvalidQueryArguments("vertex_id should be sent for updating one vertex")
         query_string = self.translator.process_search_kwargs(has__id=vertex_id, element_type="V")
         query_string += self.translator.generate_gremlin_query_for_properties(**properties)
-        return self.gremlin_client.search(query_string, serialize_elements=True)[0]
+        return self.gremlin_client.query(query_string, serialize_elements=True)[0]
 
     def update_many(self, properties=None, **search_kwargs):
         """
@@ -68,31 +68,31 @@ class VertexOperations(CRUDOperationsBase):
         properties = {} if properties is None else properties
         query_string = self.translator.process_search_kwargs(element_type="V", **search_kwargs)
         query_string += self.translator.generate_gremlin_query_for_properties(**properties)
-        return self.gremlin_client.search(query_string + ".valueMap(true).toList()", serialize_elements=True)
+        return self.gremlin_client.query(query_string + ".valueMap(true).toList()", serialize_elements=True)
 
     def read_many(self, **search_kwargs):
         self.translator.validate_search_kwargs(**search_kwargs)
         query_string = self.translator.process_search_kwargs(element_type="V", **search_kwargs)
-        return self.gremlin_client.search(query_string + ".valueMap(true).toList()", serialize_elements=True)
+        return self.gremlin_client.query(query_string + ".valueMap(true).toList()", serialize_elements=True)
 
     def read_one(self, vertex_id):
         if vertex_id is None:
             raise InvalidQueryArguments("vertex_id should be sent for reading one vertex")
         query_string = self.translator.process_search_kwargs(has__id=vertex_id, element_type="V")
-        return self.gremlin_client.search(query_string + ".valueMap(true).next()", serialize_elements=True)
+        return self.gremlin_client.query(query_string + ".valueMap(true).next()", serialize_elements=True)
 
     def delete_one(self, vertex_id):
         logger.debug("Deleting the vertex with vertex_id:{vertex_id}".format(vertex_id=vertex_id))
         if vertex_id is None:
             raise InvalidQueryArguments("vertex_id should be sent for deleting one vertex")
         query_string = self.translator.process_search_kwargs(has__id=vertex_id, element_type="V")
-        return self.gremlin_client.search(query_string + ".drop()")
+        return self.gremlin_client.query(query_string + ".drop()")
 
     def delete_many(self, **search_kwargs):
         logger.debug("Deleting the vertex with search_kwargs:  {}".format(json.dumps(search_kwargs)))
         self.translator.validate_search_kwargs(**search_kwargs)
         query_string = self.translator.process_search_kwargs(element_type="V", **search_kwargs)
-        return self.gremlin_client.search(query_string + ".drop()")
+        return self.gremlin_client.query(query_string + ".drop()")
 
     # def read_in_edges_and_vertices(self, vertex_id, label=None,  query=None, limit=None, skip=None):
     #     # TODO - fix the performance, filter queries are made twice
