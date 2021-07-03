@@ -55,10 +55,12 @@ class GremlinClient:
 
     def query(self, gremlin_query, serialize_elements=True):
         logging.info("gremlin_query======", gremlin_query)
+        print("gremlin_query======", gremlin_query)
         try:
             result = self.connection._client.submit(gremlin_query).all().result()
         except Exception as e:
             logging.error("Failed to query gremlin server with exception: {}".format(e.__str__() if e else ""))
+            print("Failed to query gremlin server with exception: {}".format(e.__str__() if e else ""))
             return None
         if serialize_elements is True:
             _ = self.make_data_unique(self.serializer.serialize_data(result))

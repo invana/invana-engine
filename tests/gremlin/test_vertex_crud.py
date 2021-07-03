@@ -19,7 +19,7 @@ class TestVerticesOperations:
 
     @staticmethod
     def delete_all_data(gremlin_client):
-        gremlin_client.search("g.V().drop()")
+        gremlin_client.query("g.V().drop()")
         gremlin_client.close_connection()
 
     def test_create_vertex(self, gremlin_client):

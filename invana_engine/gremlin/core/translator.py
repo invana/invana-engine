@@ -10,6 +10,7 @@ class GremlinQueryTranslator:
                                'notStartingWith', 'notContaining', 'notEndingWith']
     filter_key_starting_words_list = ['has']
     pagination_key_starting_words_list = ["pagination"]
+    special_properties = ["id", "label"]
 
     """
     USAGE: example usage.
@@ -74,6 +75,11 @@ class GremlinQueryTranslator:
                     pagination_kwargs[kwarg_key] = value
         return {"filter_kwargs": filter_kwargs, "pagination_kwargs": pagination_kwargs}
 
+    def check_if_property_or_special_props(self, s):
+        if s in self.special_properties:
+            return s
+        return '"{}"'.format(s)
+
     def process_search_kwargs(self, element_type=None, **search_kwargs):
         if element_type not in ["V", "E"]:
             raise Exception("invalid element_type provided, valid values are : 'V', 'E'", )
@@ -84,17 +90,14 @@ class GremlinQueryTranslator:
             if kwargs__list.__len__() >= 2:
                 if kwargs__list.__len__() == 2:
                     query_string += ".{0}({1}, {2})".format(kwargs__list[0],
-
-                                                            kwargs__list[1]
-
-                                                            ,
+                                                            self.check_if_property_or_special_props(kwargs__list[1]),
                                                             self.check_if_str(value))
                 else:
                     if kwargs__list[2] not in self.allowed_predicates_list:
                         raise Exception("{} not allowed in search_kwargs. Only {} are allowed".format(
                             kwargs__list[2], self.allowed_predicates_list))
                     query_string += ".{0}({1}, {2}({3}))".format(kwargs__list[0],
-                                                                 kwargs__list[1],
+                                                                 self.check_if_property_or_special_props(kwargs__list[1]),
                                                                  kwargs__list[2],
                                                                  self.check_if_str(value))
         for kwarg_key, value in cleaned_kwargs['pagination_kwargs'].items():
