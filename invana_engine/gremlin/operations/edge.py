@@ -1,7 +1,5 @@
 from core.exceptions import InvalidQueryArguments
 from .base import CRUDOperationsBase
-from ..core.types import EdgeElement, VertexElement
-from gremlin_python.process.graph_traversal import __
 import logging
 import json
 
@@ -75,8 +73,7 @@ class EdgeOperations(CRUDOperationsBase):
     def read_many(self, _from, _to, **search_kwargs):
         self.translator.validate_search_kwargs(**search_kwargs)
         _filters_string = self.translator.process_search_kwargs(element_type="E", **search_kwargs).lstrip("g.E().")
-        query_string = """
-g.V({_from}).outE('{label}').{_filters_string}.where(inV().hasId({_to}))        
+        query_string = """g.V({_from}).outE('{label}').{_filters_string}.where(inV().hasId({_to}))        
         """.format(_from=_from, _to=_to, label=search_kwargs['has__label'], _filters_string=_filters_string)
         _ = self.gremlin_client.query(query_string + ".valueMap(true).toList()", serialize_elements=True)
         return _
@@ -89,11 +86,6 @@ g.V({_from}).outE('{label}').{_filters_string}.where(inV().hasId({_to}))
         if _.__len__() > 0:
             return _[0]
         return None
-
-    # def read_one_using_from_and_to(self,  **search_kwargs):
-    #     query_string = self.translator.process_search_kwargs(element_type="E", **search_kwargs)
-    #     query_string += ".from(V({_from})).to(V({_to}))".format(_to=_to, _from=_from)
-    #     return self.gremlin_client.query(query_string + ".valueMap(true).toList()", serialize_elements=True)
 
     def delete_one(self, edge_id):
         logger.debug("Deleting the edge with edge_id:{edge_id}".format(edge_id=edge_id))
