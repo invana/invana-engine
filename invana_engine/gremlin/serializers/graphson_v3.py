@@ -25,6 +25,7 @@ class GraphSONV3Reader:
         return "vertex"
 
     def serialize_element_dict(self, elem):
+        # print("====elem", elem)
         cleaned_data = {"properties": {}}
         # if "Direction.IN" in elem.keys():
         #     cleaned_data['type'] = "g:Edge"
@@ -80,7 +81,7 @@ class GraphSONV3Reader:
         }
 
     def serialize_edge_element(self, edge):
-
+        print("===edge", edge)
         _ = {
             "id": self.get_element_id(edge.id),
             "label": edge.label,

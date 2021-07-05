@@ -30,6 +30,15 @@ class TestVerticesOperations:
             assert isinstance(result, dict)
         gremlin_client.close_connection()
 
+    def test_get_or_create_vertex(self, gremlin_client):
+        for k, vertex_sample in CREATE_VERTICES_SAMPLES.items():
+            result = gremlin_client.vertex.get_or_create(
+                label=vertex_sample["label"],
+                properties=vertex_sample["properties"])
+            assert isinstance(result, dict)
+
+        gremlin_client.close_connection()
+
     def test_read_one_noargs_sent_error(self, gremlin_client):
         with pytest.raises(TypeError,
                            match=r"missing 1 required positional argument: 'vertex_id'"):

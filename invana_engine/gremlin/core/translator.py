@@ -97,7 +97,8 @@ class GremlinQueryTranslator:
                         raise Exception("{} not allowed in search_kwargs. Only {} are allowed".format(
                             kwargs__list[2], self.allowed_predicates_list))
                     query_string += ".{0}({1}, {2}({3}))".format(kwargs__list[0],
-                                                                 self.check_if_property_or_special_props(kwargs__list[1]),
+                                                                 self.check_if_property_or_special_props(
+                                                                     kwargs__list[1]),
                                                                  kwargs__list[2],
                                                                  self.check_if_str(value))
         for kwarg_key, value in cleaned_kwargs['pagination_kwargs'].items():
@@ -122,6 +123,17 @@ class GremlinQueryTranslator:
         for k, v in property_kwargs.items():
             query_string += ".property({k},{v})".format(k=self.check_if_str(k), v=self.check_if_str(v))
         return query_string
+
+    @staticmethod
+    def convert_properties_to_query(**properties):
+        """
+        :param properties: key, value pairs of properties
+        :return:
+        """
+        query_kwargs = {}
+        for k, v in properties.items():
+            query_kwargs["has__{0}".format(k)] = v
+        return query_kwargs
 
     @staticmethod
     def check_if_str(s):

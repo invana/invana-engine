@@ -1,5 +1,4 @@
 import pytest
-from invana_engine.gremlin.core.exceptions import InvalidQueryArguments
 from .sample_payloads.schema import SCHEMA_SAMPLE_DATA
 from ..settings import TEST_GRAPH_HOST
 
@@ -19,7 +18,6 @@ class TestVerticesOperations:
 
     def test_vertex_label_schema(self, gremlin_client):
         self.create_init_data(gremlin_client)
-
-        response = gremlin_client.schema.get_vertex_label_schema("Teacher")
-        print(response)
+        response = gremlin_client.schema.get_vertex_schema("Teacher")
+        assert response['propertyKeys'].__len__() == 3
         gremlin_client.close_connection()

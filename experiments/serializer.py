@@ -5,5 +5,4 @@ connection = DriverRemoteConnection("ws://localhost:8182/gremlin", "g")
 g = traversal().withRemote(connection)
 
 result = g.V().valueMap(True).limit(1).next()
-print("=====result", type(result), result)
 connection.close()

@@ -1,106 +1,126 @@
+from core.exceptions import InvalidQueryArguments
 from .base import CRUDOperationsBase
 from ..core.types import EdgeElement, VertexElement
 from gremlin_python.process.graph_traversal import __
 import logging
+import json
 
 logger = logging.getLogger(__name__)
 
 
 class EdgeOperations(CRUDOperationsBase):
 
-    def get_or_create(self, label=None, properties=None):
+    def create(self, label, properties, _from, _to):
         """
 
         :param label:
-        :param namespace:
-        :param properties: {"id": 123213 }
+        :param properties: dict or
+        :param _to: str or int
+        :param _from: str or int
         :return:
         """
+        logger.debug("Creating edge with label {label} with _to {_to}, _from {_from} and"
+                     " properties {properties}".format(label=label, properties=properties,
+                                                       _from=_from, _to=_to))
+        if None in [label, properties, _from, _to]:
+            raise Exception("all params label, properties, _from, _to are required ")
+        self.validate_properties(properties)
+        query_string = "g.addE('{label}').from(V({_from})).to(V({_to}))".format(_to=_to, label=label, _from=_from)
+        query_string += self.translator.generate_gremlin_query_for_properties(**properties)
+        query_string += ".valueMap(true).toList()"
+        return self.gremlin_client.query(query_string, serialize_elements=True)[0]
 
-        edges = self.read_many(label=label,  query=properties)
-        if edges.__len__() > 0:
-            return edges[0]
-        else:
-            return self.create(label=label,  properties=properties)
-
-    def create(self, label=None, properties=None, inv=None, outv=None):
+    def get_or_create(self, label, properties, _from, _to):
         """
 
         :param label:
-        :param namespace:
         :param properties:
-        :param inv: str or VertexElement
-        :param outv: str or VertexElement
+        :param _from:
+        :param _to:
         :return:
         """
-        logger.debug("Creating Edge with label {label}, namespace and properties {properties}".format(
-            label=label,
-            
-            properties=properties)
-        )
+        if None in [properties, label, _from, _to]:
+            raise Exception("all params label, properties, _from, _to are required ")
+        self.validate_properties(properties)
+        search_kwargs = {"has__label": label}
+        search_kwargs.update(self.translator.convert_properties_to_query(**properties))
+        edges = self.read_many(_from, _to, **search_kwargs)
+        if edges and edges.__len__() > 0:
+            return edges[0]
+        return self.create(label, properties, _from, _to)
 
+    def update_one(self, edge_id, properties=None):
+        logger.debug("Updating edge {edge_id} with properties {properties}".format(edge_id=edge_id,
+                                                                                   properties=properties, ))
         properties = {} if properties is None else properties
+        if edge_id is None:
+            raise InvalidQueryArguments("edge_id should be passed for updating one edge")
+        query_string = self.translator.process_search_kwargs(has__id=edge_id, element_type="E")
+        query_string += self.translator.generate_gremlin_query_for_properties(**properties)
+        return self.gremlin_client.query(query_string, serialize_elements=True)[0]
 
-        _ = self.gremlin_client.g.V(inv).addE(label) \
-            .to(__.V(outv))
-        for property_key, property_value in properties.items():
-            _.property(property_key, property_value)
-        edg = _.elementMap().next()
-        return EdgeElement(edg, serializer=self.serializer)
-
-    def update(self, edg_id, properties=None):
-        logger.debug("Updating vertex  {edg_id} with properties {properties}".format(edg_id=edg_id,
-                                                                                     properties=properties, ))
-        edge = self.filter_edge(edge_id=edg_id)
+    def update_many(self, properties=None, **search_kwargs):
+        """
+        :param properties: properties key value pairs to be updated
+        :param search_kwargs: search query kwargs to work with invana_engine.gremlin.core.translator.GremlinQueryTranslator
+        :return:
+        """
+        logger.debug("Updating edges with search_kwargs{search_kwargs} with properties {properties}".format(
+            search_kwargs=search_kwargs, properties=properties))
         properties = {} if properties is None else properties
-        if edge:
-            for k, v in properties.items():
-                edge.property(k, v)
-            _edge = edge.elementMap().next()
-            return EdgeElement(_edge, serializer=self.serializer)
+        query_string = self.translator.process_search_kwargs(element_type="E", **search_kwargs)
+        query_string += self.translator.generate_gremlin_query_for_properties(**properties)
+        return self.gremlin_client.query(query_string + ".valueMap(true).toList()", serialize_elements=True)
+
+    def read_many(self, _from, _to, **search_kwargs):
+        self.translator.validate_search_kwargs(**search_kwargs)
+        _filters_string = self.translator.process_search_kwargs(element_type="E", **search_kwargs).lstrip("g.E().")
+        query_string = """
+g.V({_from}).outE('{label}').{_filters_string}.where(inV().hasId({_to}))        
+        """.format(_from=_from, _to=_to, label=search_kwargs['has__label'], _filters_string=_filters_string)
+        _ = self.gremlin_client.query(query_string + ".valueMap(true).toList()", serialize_elements=True)
+        return _
+
+    def read_one(self, edge_id):
+        if edge_id is None:
+            raise InvalidQueryArguments("edge_id should be sent for reading one edge")
+        query_string = self.translator.process_search_kwargs(has__id=edge_id, element_type="E")
+        _ = self.gremlin_client.query(query_string + ".valueMap(true).toList()", serialize_elements=True)
+        if _.__len__() > 0:
+            return _[0]
         return None
 
-    def _read_one(self, edge_id):
-        logger.debug("Finding edge with id {edge_id}".format(
-            edge_id=edge_id))
-        filtered_data = self.filter_edge(edge_id=edge_id)
-        try:
-            _ = filtered_data.elementMap().next()
-            if _:
-                return EdgeElement(_, serializer=self.serializer)
-        except Exception as e:
-            pass
-        return None
+    # def read_one_using_from_and_to(self,  **search_kwargs):
+    #     query_string = self.translator.process_search_kwargs(element_type="E", **search_kwargs)
+    #     query_string += ".from(V({_from})).to(V({_to}))".format(_to=_to, _from=_from)
+    #     return self.gremlin_client.query(query_string + ".valueMap(true).toList()", serialize_elements=True)
 
-    def _read_many(self, label=None, query=None, limit=10, skip=0):
-        filtered_data = self.filter_edge(label=label,  query=query, limit=limit, skip=skip)
-        cleaned_data = []
-        for _ in filtered_data.elementMap().toList():
-            cleaned_data.append(EdgeElement(_, serializer=self.serializer))
-        return cleaned_data
-
-    def filter_edge_and_get_neighbor_vertices(self, edge_id=None, label=None, query=None, limit=None,
-                                              skip=None):
-        cleaned_edges_data = self._read_many(label=label,  query=query, limit=limit, skip=skip)
-        filtered_edges = self.filter_edge(label=label,  query=query, limit=limit, skip=skip)
-
-        vertices_data = []
-        for _ in filtered_edges.inV().dedup().elementMap().toList():
-            vertices_data.append(VertexElement(_, serializer=self.serializer))
-
-        filtered_edges = self.filter_edge(label=label,  query=query, limit=limit, skip=skip)
-
-        for _ in filtered_edges.outV().dedup().elementMap().toList():
-            vertices_data.append(VertexElement(_, serializer=self.serializer))
-        vertices_data = list(set(vertices_data))
-
-        return cleaned_edges_data + vertices_data
-
-    def _delete_one(self, edge_id):
+    def delete_one(self, edge_id):
         logger.debug("Deleting the edge with edge_id:{edge_id}".format(edge_id=edge_id))
-        self.drop(self.filter_edge(edge_id=edge_id))
+        if edge_id is None:
+            raise InvalidQueryArguments("edge_id should be sent for deleting one edge")
+        query_string = self.translator.process_search_kwargs(has__id=edge_id, element_type="E")
+        return self.gremlin_client.query(query_string + ".drop()")
 
-    def _delete_many(self, label=None, query=None):
-        logger.debug("Deleting the edges with label:{label} ,"
-                     " query:{query}".format(label=label, query=query, ))
-        self.drop(self.filter_edge(label=label,  query=query))
+    def delete_many(self, **search_kwargs):
+        logger.debug("Deleting the edge with search_kwargs:  {}".format(json.dumps(search_kwargs)))
+        self.translator.validate_search_kwargs(**search_kwargs)
+        query_string = self.translator.process_search_kwargs(element_type="E", **search_kwargs)
+        return self.gremlin_client.query(query_string + ".drop()")
+
+    # def filter_edge_and_get_neighbor_vertices(self, edge_id=None, label=None, query=None, limit=None,
+    #                                           skip=None):
+    #     cleaned_edges_data = self._read_many(label=label, query=query, limit=limit, skip=skip)
+    #     filtered_edges = self.filter_edge(label=label, query=query, limit=limit, skip=skip)
+    #
+    #     vertices_data = []
+    #     for _ in filtered_edges.inV().dedup().elementMap().toList():
+    #         vertices_data.append(VertexElement(_, serializer=self.serializer))
+    #
+    #     filtered_edges = self.filter_edge(label=label, query=query, limit=limit, skip=skip)
+    #
+    #     for _ in filtered_edges.outV().dedup().elementMap().toList():
+    #         vertices_data.append(VertexElement(_, serializer=self.serializer))
+    #     vertices_data = list(set(vertices_data))
+    #
+    #     return cleaned_edges_data + vertices_data

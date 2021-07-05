@@ -8,23 +8,20 @@ logger = logging.getLogger(__name__)
 
 class VertexOperations(CRUDOperationsBase):
 
-    def create(self, label=None, properties=None, **kwargs):
+    def create(self, label=None, properties=None):
         """
-
         :param label:
-        :param namespace:
         :param properties:
-        :param kwargs: not used
         :return:
         """
         logger.debug(
             "Creating vertex with label {label} and properties {properties}".format(label=label, properties=properties))
         if None in [label, properties]:
-            raise Exception("Vertex cannot be created with out  properties")
+            raise Exception("Vertex cannot be created with out label and properties")
         self.validate_properties(properties)
         query_string = "g.addV('{}')".format(label)
         query_string += self.translator.generate_gremlin_query_for_properties(**properties)
-        query_string += ".next()"
+        query_string += ".toList()"
         return self.gremlin_client.query(query_string, serialize_elements=True)[0]
 
     def get_or_create(self, label=None, properties=None):
@@ -34,10 +31,12 @@ class VertexOperations(CRUDOperationsBase):
         :param properties:
         :return:
         """
-        if properties is None:
-            raise Exception("Vertex get_or_create methods expects properties data")
+        if None in [properties, label]:
+            raise Exception("Vertex get_or_create methods expects label and properties data")
         self.validate_properties(properties)
-        vertices = self.read_many(label=label, query=properties)
+        search_kwargs = {"has__label": label}
+        search_kwargs.update(self.translator.convert_properties_to_query(**properties))
+        vertices = self.read_many(**search_kwargs)
         if vertices.__len__() > 0:
             return vertices[0]
         return self.create(label=label, properties=properties)
@@ -77,9 +76,12 @@ class VertexOperations(CRUDOperationsBase):
 
     def read_one(self, vertex_id):
         if vertex_id is None:
-            raise InvalidQueryArguments("vertex_id should be sent for reading one vertex")
+            raise InvalidQueryArguments("vertex_id should be passed for reading one vertex")
         query_string = self.translator.process_search_kwargs(has__id=vertex_id, element_type="V")
-        return self.gremlin_client.query(query_string + ".valueMap(true).next()", serialize_elements=True)
+        _ = self.gremlin_client.query(query_string + ".valueMap(true).toList()", serialize_elements=True)
+        if _.__len__() > 0:
+            return _[0]
+        return None
 
     def delete_one(self, vertex_id):
         logger.debug("Deleting the vertex with vertex_id:{vertex_id}".format(vertex_id=vertex_id))
