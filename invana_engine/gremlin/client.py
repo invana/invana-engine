@@ -6,6 +6,7 @@ from gremlin_python.driver.driver_remote_connection import DriverRemoteConnectio
 from .operations.vertex import VertexOperations
 from .operations.edge import EdgeOperations
 from .operations.schema import GraphSchemaOperations
+from .operations.stats import GraphStatsOperations
 
 
 class GremlinClient:
@@ -32,6 +33,7 @@ class GremlinClient:
         self.vertex = VertexOperations(gremlin_client=self)
         self.edge = EdgeOperations(gremlin_client=self)
         self.schema = GraphSchemaOperations(gremlin_client=self)
+        self.stats = GraphStatsOperations(gremlin_client=self)
 
     def create_connection(self):
         return DriverRemoteConnection(
