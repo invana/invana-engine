@@ -10,7 +10,34 @@ logger = logging.getLogger(__name__)
 class GraphSchemaOperations(CRUDOperationsBase):
 
     def get_graph_schema(self):
-        return self.gremlin_client.query("mgmt = graph.openManagement(); mgmt.printSchema()")
+        # TODO - can add more information from the print schema data like indexes etc to current output
+        result = self.gremlin_client.query("mgmt = graph.openManagement(); mgmt.printSchema()")
+        schema = {
+            "vertex_labels": [],
+            "edge_labels": [],
+            "property_labels": [],
+        }
+        data_type = None
+        __count = 0
+        for line in result[0].split("\n"):
+            if line.startswith("-------"):
+                __count += 1
+                continue
+            if data_type == "vertices" and __count == 2:
+                schema['vertex_labels'].append(line.split("|")[0].strip())
+            elif data_type == "edges" and __count == 4:
+                schema['edge_labels'].append(line.split("|")[0].strip())
+            elif data_type == "properties" and __count == 6:
+                schema['property_labels'].append(line.split("|")[0].strip())
+
+            if line.startswith("Vertex Label Name"):
+                data_type = "vertices"
+            elif line.startswith("Edge Label Name"):
+                data_type = "edges"
+            elif line.startswith("Property Key Name"):
+                data_type = "properties"
+
+        return schema
 
     def get_all_vertices_schema(self):
         # TODO - fix performance, this query needs full scan of the graph
