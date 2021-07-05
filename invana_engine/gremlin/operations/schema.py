@@ -9,15 +9,46 @@ logger = logging.getLogger(__name__)
 
 class GraphSchemaOperations(CRUDOperationsBase):
 
-    def get_vertex_label_schema(self, label):
-        return self.gremlin_client.query(
-            "mgmt = graph.openManagement(); Orchestra = mgmt.getVertexLabel('{}')".format(label))
-
     def get_graph_schema(self):
         return self.gremlin_client.query("mgmt = graph.openManagement(); mgmt.printSchema()")
 
-    def create_vertex_schema(self, label_name):
-        return self.gremlin_client.query("mgmt = graph.openManagement(); mgmt.printSchema()")
+    def get_all_vertices_schema(self):
+        # TODO - fix performance, this query needs full scan of the graph
+        _ = self.gremlin_client.query(
+            "g.V().group().by(label).by(properties().label().dedup().fold())",
+            serialize_elements=False
+        )
+        schema_data = []
+        for schema in _:
+            for k, v in schema.items():
+                schema_data.append({"label": k, "propertyKeys": v})
+        return schema_data
+
+    def get_all_edges_schema(self):
+        # TODO - fix performance, this query needs full scan of the graph
+        _ = self.gremlin_client.query(
+            "g.E().group().by(label).by(properties().label().dedup().fold())",
+            serialize_elements=False
+        )
+        schema_data = []
+        for schema in _:
+            for k, v in schema.items():
+                schema_data.append({"label": k, "propertyKeys": v})
+        return schema_data
+
+    def get_vertex_schema(self, label):
+        schema_data = self.get_all_vertices_schema()
+        for label_schema in schema_data:
+            if label_schema['label'] == label:
+                return label_schema
+        return
+
+    def get_edge_schema(self, label):
+        schema_data = self.get_all_vertices_schema()
+        for label_schema in schema_data:
+            if label_schema['label'] == label:
+                return label_schema
+        return
 
     def get_graph_features(self):
         _ = self.gremlin_client.query("graph.features()")[0]
