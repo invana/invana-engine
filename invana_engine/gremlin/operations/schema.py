@@ -12,6 +12,7 @@ class GraphSchemaOperations(CRUDOperationsBase):
     def get_graph_schema(self):
         # TODO - can add more information from the print schema data like indexes etc to current output
         result = self.gremlin_client.query("mgmt = graph.openManagement(); mgmt.printSchema()")
+        print(result[0])
         return self.process_graph_schema_string(result[0])
 
     def get_all_vertices_schema(self):

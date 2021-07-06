@@ -1,4 +1,4 @@
-from core.exceptions import InvalidQueryArguments
+from ..core.exceptions import InvalidQueryArguments
 from .base import CRUDOperationsBase
 import logging
 import json
@@ -54,7 +54,13 @@ class EdgeOperations(CRUDOperationsBase):
         if edge_id is None:
             raise InvalidQueryArguments("edge_id should be passed for updating one edge")
         query_string = self.translator.process_search_kwargs(has__id=edge_id, element_type="E")
+        # query_string = "g.E('{}')".format(edge_id)
         query_string += self.translator.generate_gremlin_query_for_properties(**properties)
+
+        # query_string_ = self.translator.process_search_kwargs(has__id=edge_id, element_type="E")
+
+        # query_string += ";g.V('{}').valueMap(true).toList()".format(edge_id)
+        query_string += ".valueMap(true).toList()"
         return self.gremlin_client.query(query_string, serialize_elements=True)[0]
 
     def update_many(self, properties=None, **search_kwargs):
@@ -70,11 +76,22 @@ class EdgeOperations(CRUDOperationsBase):
         query_string += self.translator.generate_gremlin_query_for_properties(**properties)
         return self.gremlin_client.query(query_string + ".valueMap(true).toList()", serialize_elements=True)
 
-    def read_many(self, _from, _to, **search_kwargs):
+    def read_many(self, _from=None, _to=None, **search_kwargs):
         self.translator.validate_search_kwargs(**search_kwargs)
         _filters_string = self.translator.process_search_kwargs(element_type="E", **search_kwargs).lstrip("g.E().")
-        query_string = """g.V({_from}).outE('{label}').{_filters_string}.where(inV().hasId({_to}))        
-        """.format(_from=_from, _to=_to, label=search_kwargs['has__label'], _filters_string=_filters_string)
+        if _from and _to:
+            query_string = """g.V({_from}).outE().{_filters_string}.where(inV().hasId({_to}))        
+            """.format(_from=_from, _to=_to, _filters_string=_filters_string)
+        elif _from and not _to:
+            query_string = """g.V({_from}).outE().{_filters_string}       
+            """.format(_from=_from, _to=_to, _filters_string=_filters_string)
+        elif not _from and _to:
+            query_string = """g.V({_to}).inE().{_filters_string}       
+            """.format(_from=_from, _to=_to, _filters_string=_filters_string)
+        else:
+            query_string = """g.E().{_filters_string}       
+            """.format(_from=_from, _to=_to, _filters_string=_filters_string)
+
         _ = self.gremlin_client.query(query_string + ".valueMap(true).toList()", serialize_elements=True)
         return _
 
@@ -82,7 +99,8 @@ class EdgeOperations(CRUDOperationsBase):
         if edge_id is None:
             raise InvalidQueryArguments("edge_id should be sent for reading one edge")
         query_string = self.translator.process_search_kwargs(has__id=edge_id, element_type="E")
-        _ = self.gremlin_client.query(query_string + ".valueMap(true).toList()", serialize_elements=True)
+        query_string += ".valueMap(true).toList()"
+        _ = self.gremlin_client.query(query_string, serialize_elements=True)
         if _.__len__() > 0:
             return _[0]
         return None
@@ -92,13 +110,15 @@ class EdgeOperations(CRUDOperationsBase):
         if edge_id is None:
             raise InvalidQueryArguments("edge_id should be sent for deleting one edge")
         query_string = self.translator.process_search_kwargs(has__id=edge_id, element_type="E")
-        return self.gremlin_client.query(query_string + ".drop()")
+        self.gremlin_client.query(query_string + ".drop()")
+        return None
 
     def delete_many(self, **search_kwargs):
         logger.debug("Deleting the edge with search_kwargs:  {}".format(json.dumps(search_kwargs)))
         self.translator.validate_search_kwargs(**search_kwargs)
         query_string = self.translator.process_search_kwargs(element_type="E", **search_kwargs)
-        return self.gremlin_client.query(query_string + ".drop()")
+        self.gremlin_client.query(query_string + ".drop()")
+        return None
 
     # def filter_edge_and_get_neighbor_vertices(self, edge_id=None, label=None, query=None, limit=None,
     #                                           skip=None):

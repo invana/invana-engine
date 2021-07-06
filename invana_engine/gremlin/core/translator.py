@@ -83,7 +83,16 @@ class GremlinQueryTranslator:
     def process_search_kwargs(self, element_type=None, **search_kwargs):
         if element_type not in ["V", "E"]:
             raise Exception("invalid element_type provided, valid values are : 'V', 'E'", )
+
         query_string = "g.{element_type}()".format(element_type=element_type)
+
+        if element_type == "E" and "has__id" in search_kwargs:
+            """
+            This will fix the g.E().hasId("xyz") or g.E().has(id, "xyz") not working  issue 
+            """
+            query_string = "g.E({})".format(self.check_if_str(search_kwargs['has__id']))
+            del search_kwargs['has__id']
+
         cleaned_kwargs = self.separate_filters_and_pagination_kwargs(**search_kwargs)
         for kwarg_key, value in cleaned_kwargs['filter_kwargs'].items():
             kwargs__list = kwarg_key.split("__")
