@@ -13,13 +13,19 @@ class SchemaReadOperations(CRUDOperationsBase):
 
     def get_all_vertices_schema(self):
         # TODO - fix performance, this query needs full scan of the graph
-        _ = self.gremlin_client.query("g.V().group().by(label).by(properties().label().dedup().fold())",
-                                      serialize_elements=False)
-        schema_data = []
-        for schema in _:
-            for k, v in schema.items():
-                schema_data.append({"label": k, "propertyKeys": v})
-        return schema_data
+
+        schema = self.get_graph_schema()
+
+        schema_dict = {}
+        for label in schema['vertex_labels']:
+            schema_dict[label] = self.get_vertex_schema(label)
+        # _ = self.gremlin_client.query("g.V().group().by(label).by(properties().label().dedup().fold())",
+        #                               serialize_elements=False)
+        # schema_data = []
+        # for schema in _:
+        #     for k, v in schema.items():
+        #         schema_data.append({"label": k, "propertyKeys": v})
+        return schema_dict
 
     def get_all_edges_schema(self):
         # TODO - fix performance, this query needs full scan of the graph
@@ -32,18 +38,16 @@ class SchemaReadOperations(CRUDOperationsBase):
         return schema_data
 
     def get_vertex_schema(self, label):
-        schema_data = self.get_all_vertices_schema()
-        for label_schema in schema_data:
-            if label_schema['label'] == label:
-                return label_schema
-        return
+        return self.gremlin_client.query(
+            "g.V().hasLabel('{label}').propertyMap().select(Column.keys).next();".format(label=label),
+            serialize_elements=False
+        ) or []
 
     def get_edge_schema(self, label):
-        schema_data = self.get_all_edges_schema()
-        for label_schema in schema_data:
-            if label_schema['label'] == label:
-                return label_schema
-        return
+        return self.gremlin_client.query(
+            "g.E().hasLabel('{label}').propertyMap().select(Column.keys).next();".format(label=label),
+            serialize_elements=False
+        ) or []
 
 
 class SchemaCreateUpdateOperations(CRUDOperationsBase):
@@ -133,6 +137,33 @@ class SchemaCreateUpdateOperations(CRUDOperationsBase):
         :return:
         """
         return self.create_schema("vertex", label, **properties_schema)
+
+    def update_property_name(self, old_name, new_name):
+        query_string = """
+mgmt = graph.openManagement()
+{old_name} = mgmt.getPropertyKey('{old_name}')
+mgmt.changeName({old_name}, '{new_name}')
+mgmt.commit()        
+        """.format(old_name=old_name, new_name=new_name)
+        return self.gremlin_client.query(query_string, serialize_elements=False)
+
+    def update_vertex_label(self, old_name, new_name):
+        query_string = """
+mgmt = graph.openManagement()
+{old_name} = mgmt.getVertexLabel('{old_name}')
+mgmt.changeName({old_name}, '{new_name}')
+mgmt.commit()        
+        """.format(old_name=old_name, new_name=new_name)
+        return self.gremlin_client.query(query_string, serialize_elements=False)
+
+    def update_edge_label(self, old_name, new_name):
+        query_string = """
+mgmt = graph.openManagement()
+{old_name} = mgmt.getEdgeLabel('{old_name}')
+mgmt.changeName({old_name}, '{new_name}')
+mgmt.commit()        
+        """.format(old_name=old_name, new_name=new_name)
+        return self.gremlin_client.query(query_string, serialize_elements=False)
 
 
 class SchemaOperations(SchemaReadOperations, SchemaCreateUpdateOperations):

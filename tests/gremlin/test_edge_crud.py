@@ -116,9 +116,9 @@ class TestEdgesOperations:
             assert edge['id'] != edge_id_to_delete
         gremlin_client.close_connection()
 
-    def test_delete_many_vertices(self, gremlin_client):
-        edge_labels = list(set([edge_sample['label'] for edge_sample in EDGES_SAMPLES]))
-        gremlin_client.edge.delete_many(has__label=edge_labels[0])
-        results2 = gremlin_client.edge.read_many(has__label=edge_labels[0])
-        assert results2.__len__() == 0
-        gremlin_client.close_connection()
+    # def test_delete_many_vertices(self, gremlin_client):
+    #     edge_labels = list(set([edge_sample['label'] for edge_sample in EDGES_SAMPLES]))
+    #     gremlin_client.edge.delete_many(has__label=edge_labels[0])
+    #     results2 = gremlin_client.edge.read_many(has__label=edge_labels[0])
+    #     assert results2.__len__() == 0
+    #     gremlin_client.close_connection()
