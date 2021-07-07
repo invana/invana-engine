@@ -41,3 +41,19 @@ class TestVerticesOperations:
         response = gremlin_client.schema.get_edge_schema("has_satellite")
         assert response.__len__() == 1
         gremlin_client.close_connection()
+
+    def test_get_all_edges_schema(self, gremlin_client):
+        self.create_init_data(gremlin_client)
+        response = gremlin_client.schema.get_all_edges_schema()
+        assert isinstance(response, dict)
+        assert "has_satellite" in list(response.keys())
+        assert response['has_satellite'].__len__() == 1
+        gremlin_client.close_connection()
+
+    def test_get_all_vertices_schema(self, gremlin_client):
+        self.create_init_data(gremlin_client)
+        response = gremlin_client.schema.get_all_vertices_schema()
+        assert isinstance(response, dict)
+        assert "Planet" in list(response.keys())
+        assert response['Planet'].__len__() == 3
+        gremlin_client.close_connection()

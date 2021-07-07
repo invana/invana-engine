@@ -28,14 +28,24 @@ class SchemaReadOperations(CRUDOperationsBase):
         return schema_dict
 
     def get_all_edges_schema(self):
+        """
+
+        :return:
+        """
         # TODO - fix performance, this query needs full scan of the graph
-        _ = self.gremlin_client.query("g.E().group().by(label).by(properties().label().dedup().fold())",
-                                      serialize_elements=False)
-        schema_data = []
-        for schema in _:
-            for k, v in schema.items():
-                schema_data.append({"label": k, "propertyKeys": v})
-        return schema_data
+        # _ = self.gremlin_client.query("g.E().group().by(label).by(properties().label().dedup().fold())",
+        #                               serialize_elements=False)
+        schema = self.get_graph_schema()
+        schema_dict = {}
+        for label in schema['edge_labels']:
+            schema_dict[label] = self.get_edge_schema(label)
+
+        # schema_data = []
+        # for schema in _:
+        #     for k, v in schema.items():
+        #         schema_data.append({"label": k, "propertyKeys": v})
+        # return schema_data
+        return schema_dict
 
     def get_vertex_schema(self, label):
         return self.gremlin_client.query(
