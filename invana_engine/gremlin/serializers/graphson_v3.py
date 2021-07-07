@@ -144,4 +144,5 @@ class GraphSONV3Reader:
         elif isinstance(data, str):
             return data
         else:
+            print("data", data)
             raise NotImplementedError("")

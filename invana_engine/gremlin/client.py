@@ -5,8 +5,9 @@ from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection
 from .operations.vertex import VertexOperations
 from .operations.edge import EdgeOperations
-from .operations.schema import GraphSchemaOperations
+from .operations.schema import SchemaOperations
 from .operations.stats import GraphStatsOperations
+import ast
 
 
 class GremlinClient:
@@ -32,7 +33,7 @@ class GremlinClient:
         self.g = traversal().withRemote(self.connection)
         self.vertex = VertexOperations(gremlin_client=self)
         self.edge = EdgeOperations(gremlin_client=self)
-        self.schema = GraphSchemaOperations(gremlin_client=self)
+        self.schema = SchemaOperations(gremlin_client=self)
         self.stats = GraphStatsOperations(gremlin_client=self)
 
     def create_connection(self):
@@ -73,6 +74,23 @@ class GremlinClient:
                 return _
             else:
                 return _[0]
+        return result
+
+    def get_graph_features(self):
+        _ = self.query("graph.features()")[0]
+        result = {}
+        this_feature_name = None
+        _ = _.replace("FEATURES", "")
+        for feature_section in _.split("> "):
+            for feature_section_item in feature_section.split("\n"):
+                if feature_section_item:
+                    if not feature_section_item.startswith(">--"):
+                        this_feature_name = feature_section_item.strip()
+                        result[this_feature_name] = {}
+                    else:
+                        feature_name = feature_section_item.split(":")[0].lstrip(">--").rstrip()
+                        feature_status = feature_section_item.split(":")[1].strip()
+                        result[this_feature_name][feature_name] = ast.literal_eval(feature_status.capitalize())
         return result
 
     def close_connection(self):

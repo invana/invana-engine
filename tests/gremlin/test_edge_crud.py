@@ -10,7 +10,8 @@ class TestEdgesOperations:
         from invana_engine.gremlin.client import GremlinClient
         return GremlinClient(f"{TEST_GRAPH_HOST}/gremlin")
 
-    def drop_all_data(self, gremlin_client):
+    @staticmethod
+    def drop_all_data(gremlin_client):
         gremlin_client.query("g.V().drop()")
 
     @pytest.fixture

@@ -31,7 +31,7 @@ VERTICES_SAMPLES = [
         "label": "Satellite",
         "properties": {
             "name": "Moon",
-            "mass_in_kgs": int(73476730900000000000000)
+            "mass_in_kgs": float(73476730900000000000000)
         }
     },
     {
