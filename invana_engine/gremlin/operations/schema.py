@@ -118,12 +118,16 @@ class SchemaCreateUpdateOperations(CRUDOperationsBase):
 
     def create_edge_label_with_schema(self, label, **properties_schema):
         """
-
-        property types : https://docs.janusgraph.org/basics/schema/#property-key-data-type
+        USAGE:
+        create_edge_label_with_schema("Planet",
+                        name={"data_type": "Long", "cardinality": "SINGLE"}
+                        )
 
         :param label: vertex label name . example: Planet
         :param properties_schema: properties . example **{"name": {"data_type": "Long", "cardinality": "SINGLE"}}
         :return:
+
+        property types : https://docs.janusgraph.org/basics/schema/#property-key-data-type
         """
         return self.create_schema("edge", label, **properties_schema)
 

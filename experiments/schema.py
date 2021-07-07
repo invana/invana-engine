@@ -2,11 +2,11 @@ from invana_engine.gremlin.client import GremlinClient
 
 gremlin_client = GremlinClient("ws://192.168.0.10:8182/gremlin")
 
-results = gremlin_client.schema.update_vertex_label("PlanetNew", "PlanetNew2")
-print("results", results)
-
-results = gremlin_client.schema.update_edge_label("has_satellite", "has_satellite2")
-print("results", results)
+# results = gremlin_client.schema.update_vertex_label("PlanetNew", "PlanetNew2")
+# print("results", results)
+#
+# results = gremlin_client.schema.update_edge_label("has_satellite", "has_satellite2")
+# print("results", results)
 
 # results = gremlin_client.schema.get_graph_schema()
 # print("results", results)
@@ -14,12 +14,7 @@ print("results", results)
 
 # results = gremlin_client.schema.get_all_vertices_schema()
 # print("results", results)
-"""
-mgmt = graph.openManagement()
-planet = mgmt.getVertexLabel('Planet')
-mgmt.changeName(planet, 'PlanetNew')
-mgmt.commit()
-"""
+
 
 #
 # results2 = gremlin_client.query(
@@ -34,12 +29,13 @@ mgmt.commit()
 # print("==results2", results2)
 
 # exit()
-# results = gremlin_client.schema.create_vertex_label_with_schema(
-#     "my_vertex_6",
-#     name6={"data_type": "String", "cardinality_type": "SINGLE"},
-#     age6={"data_type": "Integer", "cardinality_type": "SINGLE"},
-# )
-# print("results", results)
+results = gremlin_client.schema.create_vertex_label_with_schema(
+    "Planet",
+    name={"data_type": "String", "cardinality_type": "SINGLE"},
+    mass_in_kgs={"data_type": "Double", "cardinality_type": "SINGLE"},
+    radius_in_kms={"data_type": "Integer", "cardinality_type": "SINGLE"},
+)
+print("results", results)
 #
 # results = gremlin_client.schema.create_edge_label_with_schema(
 #     "my_edge_5",

@@ -33,11 +33,11 @@ class TestVerticesOperations:
     def test_vertex_label_schema(self, gremlin_client):
         self.create_init_data(gremlin_client)
         response = gremlin_client.schema.get_vertex_schema("Planet")
-        assert response['propertyKeys'].__len__() == 2
+        assert response.__len__() == 3
         gremlin_client.close_connection()
 
     def test_edge_label_schema(self, gremlin_client):
         self.create_init_data(gremlin_client)
         response = gremlin_client.schema.get_edge_schema("has_satellite")
-        assert response['propertyKeys'].__len__() == 1
+        assert response.__len__() == 1
         gremlin_client.close_connection()
