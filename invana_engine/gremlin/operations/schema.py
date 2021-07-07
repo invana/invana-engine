@@ -12,19 +12,11 @@ class SchemaReadOperations(CRUDOperationsBase):
         return self.process_graph_schema_string(result[0])
 
     def get_all_vertices_schema(self):
-        # TODO - fix performance, this query needs full scan of the graph
-
+        # TODO - validate performance
         schema = self.get_graph_schema()
-
         schema_dict = {}
         for label in schema['vertex_labels']:
             schema_dict[label] = self.get_vertex_schema(label)
-        # _ = self.gremlin_client.query("g.V().group().by(label).by(properties().label().dedup().fold())",
-        #                               serialize_elements=False)
-        # schema_data = []
-        # for schema in _:
-        #     for k, v in schema.items():
-        #         schema_data.append({"label": k, "propertyKeys": v})
         return schema_dict
 
     def get_all_edges_schema(self):
@@ -32,19 +24,11 @@ class SchemaReadOperations(CRUDOperationsBase):
 
         :return:
         """
-        # TODO - fix performance, this query needs full scan of the graph
-        # _ = self.gremlin_client.query("g.E().group().by(label).by(properties().label().dedup().fold())",
-        #                               serialize_elements=False)
+        # TODO - validate performance
         schema = self.get_graph_schema()
         schema_dict = {}
         for label in schema['edge_labels']:
             schema_dict[label] = self.get_edge_schema(label)
-
-        # schema_data = []
-        # for schema in _:
-        #     for k, v in schema.items():
-        #         schema_data.append({"label": k, "propertyKeys": v})
-        # return schema_data
         return schema_dict
 
     def get_vertex_schema(self, label):
