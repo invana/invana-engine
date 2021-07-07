@@ -1,8 +1,5 @@
 from .base import CRUDOperationsBase
 import logging
-import json
-from ..core.exceptions import InvalidQueryArguments
-import ast
 
 logger = logging.getLogger(__name__)
 
