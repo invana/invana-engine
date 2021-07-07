@@ -57,3 +57,21 @@ class TestVerticesOperations:
         assert "Planet" in list(response.keys())
         assert response['Planet'].__len__() == 3
         gremlin_client.close_connection()
+
+    def test_validate_data_type(self, gremlin_client):
+        with pytest.raises(Exception):
+            gremlin_client.schema.validate_data_type("Long53", "myprop")
+
+        assert gremlin_client.schema.validate_data_type("String", "myprop") is None
+        assert gremlin_client.schema.validate_data_type("Long", "myprop") is None
+        assert gremlin_client.schema.validate_data_type("Integer", "myprop") is None
+        gremlin_client.close_connection()
+
+    def test_validate_cardinality_type(self, gremlin_client):
+        with pytest.raises(Exception):
+            gremlin_client.schema.validate_cardinality_type("SINGLE2", "myprop")
+        assert gremlin_client.schema.validate_cardinality_type("SINGLE", "myprop") is None
+        assert gremlin_client.schema.validate_cardinality_type("SET", "myprop") is None
+        assert gremlin_client.schema.validate_cardinality_type("LIST", "myprop") is None
+
+        gremlin_client.close_connection()
