@@ -7,6 +7,7 @@ from .operations.vertex import VertexOperations
 from .operations.edge import EdgeOperations
 from .operations.schema import SchemaOperations
 from .operations.stats import GraphStatsOperations
+# from .operations.indexes import GraphIndexOperations
 import ast
 
 
@@ -35,6 +36,7 @@ class GremlinClient:
         self.edge = EdgeOperations(gremlin_client=self)
         self.schema = SchemaOperations(gremlin_client=self)
         self.stats = GraphStatsOperations(gremlin_client=self)
+        # self.indexes = GraphIndexOperations(gremlin_client=self)
 
     def create_connection(self):
         return DriverRemoteConnection(
