@@ -54,7 +54,7 @@ class VertexOperations(CRUDOperationsBase):
         search_kwargs = {"has__label": label}
         search_kwargs.update(self.translator.convert_properties_to_query(**properties))
         vertices = self.read_many(**search_kwargs)
-        if vertices.__len__() > 0:
+        if isinstance(vertices, list) and vertices.__len__() > 0:
             return vertices[0]
         return self.create(label=label, properties=properties)
 
