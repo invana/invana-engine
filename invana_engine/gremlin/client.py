@@ -53,8 +53,6 @@ class GremlinClient:
         self.schema = SchemaOperations(gremlin_client=self)
         self.stats = GraphStatsOperations(gremlin_client=self)
 
-        # self.indexes = GraphIndexOperations(gremlin_client=self)
-
     @staticmethod
     def validate_auth_type(auth):
         if isinstance(auth, BasicAuth) and isinstance(auth, TokenAuth):
