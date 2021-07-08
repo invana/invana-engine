@@ -37,7 +37,9 @@ class VertexOperations(CRUDOperationsBase):
         query_string = "g.addV('{}')".format(label)
         query_string += self.translator.generate_gremlin_query_for_properties(**properties)
         query_string += ".toList()"
-        return self.gremlin_client.query(query_string, serialize_elements=True)[0]
+
+        _ = self.gremlin_client.query(query_string, serialize_elements=True)
+        return _[0] if _ else None
 
     def get_or_create(self, label=None, properties=None):
         """

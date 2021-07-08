@@ -23,12 +23,13 @@ from .operations.edge import EdgeOperations
 from .operations.schema import SchemaOperations
 from .operations.stats import GraphStatsOperations
 # from .operations.indexes import GraphIndexOperations
+from invana_engine.auth import BasicAuth, TokenAuth
 import ast
 
 
 class GremlinClient:
 
-    def __init__(self, server_url, traversal_source=None, serializer_class=None):
+    def __init__(self, server_url, traversal_source=None, serializer_class=None, auth=None):
         if server_url is None:
             server_url = GREMLIN_SERVER_DEFAULT_SETTINGS['gremlin_url']
             logging.info("No server_url provided by user. using default value '{}'".format(server_url))
@@ -40,26 +41,35 @@ class GremlinClient:
             logging.info("No serializer_class provided by user. using default serializer class '{}'".format(
                 serializer_class_str))
             serializer_class = import_klass(serializer_class_str)
+        if auth is not None:
+            self.validate_auth_type(auth)
 
         self.server_url = server_url
         self.traversal_source = traversal_source
         self.serializer = serializer_class()
-        # self.auth = auth
+        self.auth = auth
         self.connection = self.create_connection()
         self.g = traversal().withRemote(self.connection)
         self.vertex = VertexOperations(gremlin_client=self)
         self.edge = EdgeOperations(gremlin_client=self)
         self.schema = SchemaOperations(gremlin_client=self)
         self.stats = GraphStatsOperations(gremlin_client=self)
+
         # self.indexes = GraphIndexOperations(gremlin_client=self)
 
+    @staticmethod
+    def validate_auth_type(auth):
+        if isinstance(auth, BasicAuth) and isinstance(auth, TokenAuth):
+            raise Exception("auth should be of BasicAuth or TokenAuth type")
+
     def create_connection(self):
+        driver_extra_params = {}
+        if self.auth:
+            driver_extra_params = self.auth.get_driver_params()
         return DriverRemoteConnection(
             self.server_url,
             self.traversal_source,
-            # username=gremlin_server_username,
-            # password=gremlin_server_password,
-            # transport_factory=transport_factory
+            **driver_extra_params
         )
 
     @staticmethod

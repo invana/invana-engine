@@ -12,7 +12,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-
 from invana_engine.gremlin.client import GremlinClient
 import os
 import json
@@ -20,8 +19,8 @@ import json
 
 class StoryOfStarsGraph:
 
-    def __init__(self, gremlin_server_url):
-        self.gremlin_client = GremlinClient(gremlin_server_url)
+    def __init__(self, gremlin_server_url, auth=None):
+        self.gremlin_client = GremlinClient(gremlin_server_url, auth=auth)
 
     def create_vertices(self, vertices):
         for vertex_sample in vertices:
