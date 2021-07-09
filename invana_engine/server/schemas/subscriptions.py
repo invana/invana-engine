@@ -12,10 +12,21 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-import logging
+from graphene import ObjectType, String, Field, JSONString, ResolveInfo, Int, List
+import asyncio
+from invana_engine.server.types.element import GrapheneVertexType
 
-logging.basicConfig(
-    level=logging.INFO,
-    # format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[logging.StreamHandler()]
-)
+
+class SubscriptionSchema(ObjectType):
+    name = Field(GrapheneVertexType, name=String())
+
+    async def subscribe_name(root, info, name=None):
+        yield {
+            "id": "12123",
+            "type": "vertex",
+            "label": "Person",
+            "properties": {
+                "name": name
+            }
+        }
+        # return "Name is {}".format(name)

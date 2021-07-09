@@ -12,10 +12,22 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
+import uvicorn
+from invana_engine.server.app import app
 import logging
+from invana_engine.default_settings import GRAPHQL_SERVER_SETTINGS, __DEBUG__
 
-logging.basicConfig(
-    level=logging.INFO,
-    # format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[logging.StreamHandler()]
-)
+if __DEBUG__ is False:
+    logging.getLogger('asyncio').setLevel(logging.ERROR)
+    logging.getLogger('uvicorn').setLevel(logging.ERROR)
+else:
+    logging.basicConfig(level="DEBUG")
+
+
+def server_start():
+    uvicorn.run(app, host="0.0.0.0", port=GRAPHQL_SERVER_SETTINGS['server_port'])
+
+
+if __name__ == "__main__":
+    server_start()
+

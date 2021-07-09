@@ -27,10 +27,10 @@ import ast
 
 class GremlinClient:
 
-    def __init__(self, server_url, traversal_source=None, serializer_class=None, auth=None):
-        if server_url is None:
-            server_url = GREMLIN_SERVER_DEFAULT_SETTINGS['gremlin_url']
-            logging.info("No server_url provided by user. using default value '{}'".format(server_url))
+    def __init__(self, gremlin_server_url, traversal_source=None, serializer_class=None, auth=None):
+        if gremlin_server_url is None:
+            gremlin_server_url = GREMLIN_SERVER_DEFAULT_SETTINGS['gremlin_url']
+            logging.info("No gremlin_server_url provided by user. using default value '{}'".format(gremlin_server_url))
         if traversal_source is None:
             traversal_source = GREMLIN_SERVER_DEFAULT_SETTINGS['traversal_source']
             logging.info("No traversal_source provided by user. using default value '{}'".format(traversal_source))
@@ -42,7 +42,7 @@ class GremlinClient:
         if auth is not None:
             self.validate_auth_type(auth)
 
-        self.server_url = server_url
+        self.gremlin_server_url = gremlin_server_url
         self.traversal_source = traversal_source
         self.serializer = serializer_class()
         self.auth = auth
@@ -63,7 +63,7 @@ class GremlinClient:
         if self.auth:
             driver_extra_params = self.auth.get_driver_params()
         return DriverRemoteConnection(
-            self.server_url,
+            self.gremlin_server_url,
             self.traversal_source,
             **driver_extra_params
         )

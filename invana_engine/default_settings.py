@@ -12,10 +12,20 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
+import os
 
 GREMLIN_SERVER_SETTINGS = {
-    "server_url": "ws://localhost:8182/gremlin",
-    "traversal_source": "g",
-    "serializer_class": "invana_engine.gremlin.serializers.graphson_v3.GraphSONV3Reader"
+    "gremlin_server_url": os.environ.get("GREMLIN_SERVER_URL", "ws://192.168.0.10:8182/gremlin"),
+    "traversal_source": os.environ.get("GREMLIN_TRAVERSAL_SOURCE", "g"),
+    "serializer_class": "invana_engine.gremlin.serializers.graphson_v3.GraphSONV3Reader",
+    "gremlin_server_username": os.environ.get("GRAPHQL_USERNAME"),
+    "gremlin_server_password": os.environ.get("GRAPHQL_PASSWORD"),
 }
+
+GRAPHQL_SERVER_SETTINGS = {
+    "server_port": int(os.environ.get("SERVER_PORT", 8200))
+}
+
+__DEBUG__ = os.environ.get("DEBUG", True)
+
 __VERSION__ = "0.0.12"

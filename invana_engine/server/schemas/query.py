@@ -12,10 +12,17 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-import logging
+from graphene import ObjectType, String, Field, JSONString, ResolveInfo, Int, List
+from ..types.element import GrapheneVertexType
 
-logging.basicConfig(
-    level=logging.INFO,
-    # format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[logging.StreamHandler()]
-)
+
+class VertexSchema:
+    get_or_create_vertex = Field(GrapheneVertexType, label=String(), properties=JSONString())
+
+    def resolve_get_or_create_vertex(self, info: ResolveInfo, label: str = None, properties: str = None):
+        return info.context['request'].app.state.gremlin_client.vertex.get_or_create(
+            label=label, properties=properties)
+
+
+class QuerySchema(ObjectType, VertexSchema):
+    pass

@@ -12,10 +12,5 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-import logging
-
-logging.basicConfig(
-    level=logging.INFO,
-    # format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[logging.StreamHandler()]
-)
+from .query import QuerySchema
+from .subscriptions import SubscriptionSchema
