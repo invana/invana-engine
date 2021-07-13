@@ -13,8 +13,7 @@
 #  limitations under the License.
 #
 
-from starlette.responses import JSONResponse
-from starlette.endpoints import WebSocketEndpoint, HTTPEndpoint
+from starlette.endpoints import WebSocketEndpoint
 import websockets
 from invana_engine.default_settings import GREMLIN_SERVER_SETTINGS
 import json
@@ -37,12 +36,6 @@ class GremlinWebsocketHandler(object):
 
     async def close(self):
         await self.conn.close()
-
-
-class HomePageView(HTTPEndpoint):
-
-    async def get(self, request):
-        return JSONResponse({'message': 'Hello world! go to /graphql'})
 
 
 class GremlinQueryView(WebSocketEndpoint):
@@ -87,7 +80,6 @@ class GremlinQueryView(WebSocketEndpoint):
         while True:
             try:
                 response_data = await self.gremlin.recv()
-                print(response_data)
                 await websocket.send_json(json.loads(response_data))
             except websockets.exceptions.ConnectionClosed:
                 logging.debug('Don\'t have any more messages. closed connection with gremlin server')

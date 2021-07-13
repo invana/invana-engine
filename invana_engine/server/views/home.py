@@ -12,5 +12,11 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-from .query import QuerySchema
-from .subscriptions import SubscriptionSchema
+from starlette.responses import JSONResponse
+from starlette.endpoints import HTTPEndpoint
+
+
+class HomePageView(HTTPEndpoint):
+
+    async def get(self, request):
+        return JSONResponse({'message': 'Hello world! go to /graphql'})

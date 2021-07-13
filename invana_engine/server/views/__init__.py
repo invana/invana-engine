@@ -12,21 +12,5 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-from graphene import ObjectType, String, Field, JSONString, ResolveInfo, Int, List
-import asyncio
-from invana_engine.server.types.element import GrapheneVertexType
-
-
-class SubscriptionSchema(ObjectType):
-    name = Field(GrapheneVertexType, name=String())
-
-    async def subscribe_name(root, info, name=None):
-        yield {
-            "id": "12123",
-            "type": "vertex",
-            "label": "Person",
-            "properties": {
-                "name": name
-            }
-        }
-        # return "Name is {}".format(name)
+from .gremlin import GremlinQueryView
+from .home import HomePageView

@@ -1,0 +1,21 @@
+scalar Date
+scalar JSON
+
+type Vertex {
+    id: ID
+    label: String
+    properties: JSON
+}
+
+type Query {
+    readVertices: [Vertex]
+}
+
+
+type Mutation {
+    createVertex(label: String, properties: JSON): Boolean
+}
+
+type Subscription {
+    vertices: Vertex
+}
