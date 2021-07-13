@@ -7,9 +7,9 @@ name = "pypi"
 gremlinpython = "==3.5.0"
 starlette = "*"
 aiohttp = "*"
-starlette-graphene3 = "*"
 broadcaster = "*"
 websockets = "*"
+asyncio-redis = "*"
 
 [dev-packages]
 pytest = "6.2.4"
@@ -17,6 +17,3 @@ pytest-cov = "*"
 
 [requires]
 python_version = "3.8"
-
-[packages.cbf33be]
-path = "git+http://github.com/mirumee/ariadne.git@master"

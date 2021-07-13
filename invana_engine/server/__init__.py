@@ -12,8 +12,3 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-from ariadne import MutationType, SubscriptionType, QueryType
-
-mutation_type = MutationType()
-subscription_type = SubscriptionType()
-query_type = QueryType()

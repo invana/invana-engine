@@ -24,7 +24,8 @@ from invana_engine.server.views import HomePageView, GremlinQueryView
 from invana_engine.gremlin import GremlinClient
 import time
 from termcolor import cprint
-from invana_engine.server import mutation_type, subscription_type, query_type
+from invana_engine.server.pubsub import pubsub
+from invana_engine.server.resolvers import mutation_type, subscription_type, query_type
 import os
 
 print(".......................................................")
@@ -67,7 +68,7 @@ def get_context(request):
     #         "user": request.scope.get("user_token"),
     #     }
 
-    return {"request": request, "gremlin_client": gremlin_client}
+    return {"request": request, "gremlin_client": gremlin_client, "pubsub": pubsub}
 
 
 routes = [
@@ -80,4 +81,9 @@ middlewares = [
     Middleware(CORSMiddleware, allow_origins=['*'], allow_methods=["GET", "POST", "PUT", "DELETE"])
 ]
 
-app = Starlette(routes=routes, middleware=middlewares, debug=__DEBUG__)
+app = Starlette(
+    routes=routes, middleware=middlewares,
+    debug=__DEBUG__,
+    on_startup=[pubsub.connect],
+    on_shutdown=[pubsub.disconnect],
+)

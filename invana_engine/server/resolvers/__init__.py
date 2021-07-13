@@ -11,14 +11,13 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-from invana_engine.server import mutation_type
-from invana_engine.server.pubsub import pubsub
-import json
+from ariadne import MutationType, SubscriptionType, QueryType
+from .vertex import VertexOps
 
+mutation_type = MutationType()
+subscription_type = SubscriptionType()
+query_type = QueryType()
 
-@mutation_type.field("createVertex")
-async def resolve_create_vertex(info, **message):
-    print("=====create vertex info", info)
-    print("=====create vertex message", message)
-    # await pubsub.publish(channel="chatroom", message=json.dumps(message))
-    return True
+vertex_ops = VertexOps()
+
+mutation_type.set_field("createVertex", vertex_ops.resolve_create_vertex)

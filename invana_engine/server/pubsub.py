@@ -13,4 +13,4 @@
 #   limitations under the License.
 from broadcaster import Broadcast
 
-pubsub = Broadcast("redis://localhost:6379")
+pubsub = Broadcast("redis://192.168.0.10:6379")
