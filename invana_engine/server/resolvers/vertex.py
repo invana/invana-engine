@@ -34,5 +34,6 @@ class VertexOps:
         properties = json.loads(properties)
         gremlin_client = info.context['gremlin_client']
         _ = gremlin_client.vertex.create(label=label, properties=properties)
-        print("====", _)
+        print("==== result of create is ", _)
+        # gremlin_client.close_connection()
         return True

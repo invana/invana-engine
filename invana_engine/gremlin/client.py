@@ -22,6 +22,7 @@ from .operations.edge import EdgeOperations
 from .operations.schema import SchemaOperations
 from .operations.stats import GraphStatsOperations
 from invana_engine.auth import BasicAuth, TokenAuth
+from invana_engine.gremlin.transporter import AiohttpTransport
 import ast
 
 logger = logging.getLogger(__name__)
@@ -67,6 +68,7 @@ class GremlinClient:
         return DriverRemoteConnection(
             self.gremlin_server_url,
             self.traversal_source,
+            transport_factory=lambda: AiohttpTransport(),
             **driver_extra_params
         )
 
