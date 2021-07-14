@@ -90,6 +90,7 @@ class GremlinClient:
         try:
             result = self.connection._client.submit(gremlin_query).all().result()
         except Exception as e:
+            print(e)
             logger.error("Failed to query gremlin server with exception: {}".format(e.__str__() if e else ""))
             return None
         if serialize_elements is True:

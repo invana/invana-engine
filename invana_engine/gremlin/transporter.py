@@ -17,7 +17,7 @@ import asyncio
 
 
 class AiohttpTransport(_AiohttpTransport):
-    nest_asyncio_applied = True
+    nest_asyncio_applied = False
 
     # Default heartbeat of 5.0 seconds.
     def __init__(self, call_from_event_loop=None, read_timeout=None, write_timeout=None, **kwargs):
@@ -32,9 +32,15 @@ class AiohttpTransport(_AiohttpTransport):
             import nest_asyncio
             nest_asyncio.apply()
             AiohttpTransport.nest_asyncio_applied = True
-
+        print("Custom AiohttpTransport here")
         # Start event loop and initialize websocket and client to None
-        self._loop = asyncio.get_event_loop()
+
+        try:
+            self._loop = asyncio.get_running_loop()
+        except RuntimeError:  # no event loop running:
+            self._loop = asyncio.new_event_loop()
+        except Exception as e:
+            print("=====exception", e)
         self._websocket = None
         self._client_session = None
 
