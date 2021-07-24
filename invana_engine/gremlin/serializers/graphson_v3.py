@@ -1,4 +1,5 @@
 from gremlin_python.structure.graph import Vertex, Edge
+import uuid
 
 
 class GraphSONV3Reader:
@@ -32,7 +33,12 @@ class GraphSONV3Reader:
                 cleaned_data.update({"inV": _['id'], "inVLabel": _['label']})
             else:
                 # TODO - check if this is right.
-                cleaned_data['properties'][k] = v[0] if type(v) is list else v
+                __v = v[0] if type(v) is list else v
+                if isinstance(__v, set):
+                    __v = list(__v)
+                cleaned_data['properties'][k] = __v
+                if isinstance(cleaned_data['properties'][k], uuid.UUID):
+                    cleaned_data['properties'][k] = cleaned_data['properties'][k].__str__()
         if cleaned_data['properties'].keys().__len__() == 0:
             del cleaned_data['properties']
         return cleaned_data

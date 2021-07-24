@@ -1,0 +1,3 @@
+
+export GREMLIN_SERVER_URL=ws://localhost:8182/gremlin
+export GREMLIN_TRAVERSAL_SOURCE=food_cql.g

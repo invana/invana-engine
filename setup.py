@@ -18,7 +18,9 @@ setup(
         'graphene==2.1.8',
         'uvicorn==0.12.2',
         'jinja2==2.11.2',
-        'aiofiles==0.6.0'
+        'aiofiles==0.6.0',
+        "termcolor",
+        "websockets"
     ],
     entry_points={
         'console_scripts': [
