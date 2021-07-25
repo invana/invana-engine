@@ -1,5 +1,8 @@
 import abc
+
+from settings import ALLOW_FILTERING, IGNORE_UNINDEXED
 from .core.exceptions import InvalidQueryArguments
+# from gremlin_python.process.graph_traversal import __
 
 
 class GremlinOperationBase:
@@ -22,6 +25,15 @@ class GremlinOperationBase:
 
 class CRUDOperationsBase(GremlinOperationBase, metaclass=abc.ABCMeta):
 
+    #
+    def get_graph_g(self):
+        g = self.gremlin_client.g
+        if IGNORE_UNINDEXED == 1:
+            g = g.with_('ignore-unindexed')
+        if ALLOW_FILTERING == 1:
+            g = g.with_('allow-filtering')
+        return g
+
     def filter_vertex(self, vertex_id=None, label=None, namespace=None, query=None, limit=None, skip=None):
         """
 
@@ -35,7 +47,8 @@ class CRUDOperationsBase(GremlinOperationBase, metaclass=abc.ABCMeta):
         """
         label = self.get_namespaced_label(label=label, namespace=namespace)
         query = {} if query is None else query
-        _ = self.gremlin_client.g.V(vertex_id) if vertex_id else self.gremlin_client.g.V()
+        g = self.get_graph_g()
+        _ = g.V(vertex_id) if vertex_id else g.V()
         if label:
             _.hasLabel(label)
         if query:

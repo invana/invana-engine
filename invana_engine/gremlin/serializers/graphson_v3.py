@@ -36,9 +36,17 @@ class GraphSONV3Reader:
                 __v = v[0] if type(v) is list else v
                 if isinstance(__v, set):
                     __v = list(__v)
+                elif isinstance(__v, dict) and __v.get("@type") == "gx:LocalDate":
+                    __v = __v['@value']
+                elif isinstance(__v, dict) and __v.get("@type") == "gx:LocalTime":
+                    __v = __v['@value']
                 cleaned_data['properties'][k] = __v
                 if isinstance(cleaned_data['properties'][k], uuid.UUID):
                     cleaned_data['properties'][k] = cleaned_data['properties'][k].__str__()
+                # if isinstance(cleaned_data['properties'][k], dict) and cleaned_data['properties'][k].get("@value",
+                #                                                                                          "") == "gx:LocalDate":
+                #     cleaned_data['properties'][k] = cleaned_data['properties'][k]['@value']
+
         if cleaned_data['properties'].keys().__len__() == 0:
             del cleaned_data['properties']
         return cleaned_data

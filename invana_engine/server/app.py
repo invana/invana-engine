@@ -10,12 +10,20 @@ from .views import homepage_view
 from ..gremlin import InvanaEngineClient
 import time
 from ..settings import gremlin_server_url, gremlin_server_password, gremlin_server_username, shall_debug, \
-    gremlin_traversal_source
+    gremlin_traversal_source, ALLOW_FILTERING, IGNORE_UNINDEXED
+import warnings
 
 print(".................................................")
 print("Starting Invana Engine server")
 print(f"Using GREMLIN_SERVER_URL: {gremlin_server_url}")
 print(f"Using GREMLIN_TRAVERSAL_SOURCE: {gremlin_traversal_source}")
+print(f"Using ALLOW_FILTERING: {ALLOW_FILTERING}")
+if ALLOW_FILTERING == 1:
+    warnings.warn("Allowing filtering without labels. This may have performance implications in production. ")
+print(f"Using IGNORE_UNINDEXED: {IGNORE_UNINDEXED}")
+if IGNORE_UNINDEXED == 1:
+    warnings.warn("Allowing unindexed traversal. This may have performance implications in production.")
+
 print(f"Using DEBUG: {shall_debug}")
 print(".................................................")
 

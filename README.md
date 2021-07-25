@@ -20,6 +20,9 @@ used to authenticate gremlin server connection.
 - **GREMLIN_SERVER_USERNAME**(optional): gremlin username. ex: myusername
 - **GREMLIN_SERVER_PASSWORD**(optional): gremlin password. ex: mypassword
 - **SERVER_PORT**(optional, available in standalone python mode only): port on which invana engine server is available: defaults to 8200
+  
+- **ALLOW_FILTERING**(optional): defaults: '0'. to allow filtering without any labels (This may have performance implications.)
+- **IGNORE_UNINDEXED**(optional): defaults: '0'. to allow un-indexed queries. (This may have performance implications.)
 
 ## Running using Docker
 ```shell script.
