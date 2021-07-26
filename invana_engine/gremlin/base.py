@@ -1,6 +1,6 @@
 import abc
 
-from settings import ALLOW_FILTERING, IGNORE_UNINDEXED
+from invana_engine.settings import ALLOW_FILTERING, IGNORE_UNINDEXED
 from .core.exceptions import InvalidQueryArguments
 # from gremlin_python.process.graph_traversal import __
 
