@@ -25,8 +25,9 @@ from invana import GremlinClient
 import time
 from termcolor import cprint
 # from invana_engine.server.pubsub import pubsub
-from invana_engine.server.resolvers import mutation_type, subscription_type, query_type
+from invana_engine.server.resolvers import query_type
 import os
+import warnings
 
 print(".......................................................")
 cprint(f"Invana Engine Server {__VERSION__}", "cyan", attrs=["bold"])
@@ -37,6 +38,14 @@ if GREMLIN_SERVER_SETTINGS['gremlin_server_username']:
     print("Using GREMLIN_SERVER_USERNAME: ******** ")
 if GREMLIN_SERVER_SETTINGS['gremlin_server_password']:
     print("Using GREMLIN_SERVER_PASSWORD: ******** ")
+
+print(f"Using ALLOW_FILTERING: {GREMLIN_SERVER_SETTINGS['ALLOW_FILTERING']}")
+if GREMLIN_SERVER_SETTINGS['ALLOW_FILTERING'] == 1:
+    warnings.warn("Allowing filtering without labels. This may have performance implications in production. ")
+print(f"Using IGNORE_UNINDEXED: {GREMLIN_SERVER_SETTINGS['IGNORE_UNINDEXED']}")
+if GREMLIN_SERVER_SETTINGS['IGNORE_UNINDEXED'] == 1:
+    warnings.warn("Allowing unindexed traversal. This may have performance implications in production.")
+
 print(f"Using DEBUG: {__DEBUG__}")
 print(".......................................................")
 
@@ -46,7 +55,7 @@ if GREMLIN_SERVER_SETTINGS['gremlin_server_url'] is None:
     exit()
 
 type_defs = load_schema_from_path("{}/schema/".format(os.path.dirname(os.path.abspath(__file__))))
-schema = make_executable_schema(type_defs, query_type, mutation_type, subscription_type)
+schema = make_executable_schema(type_defs, query_type)
 
 
 # def on_connect(ws, payload):

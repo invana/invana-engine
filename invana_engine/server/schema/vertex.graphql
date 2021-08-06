@@ -17,10 +17,3 @@ type Query {
 }
 
 
-type Mutation {
-    createVertex(label: String, properties: JSON): Boolean
-}
-
-type Subscription {
-    vertices: VertexOrEdge
-}

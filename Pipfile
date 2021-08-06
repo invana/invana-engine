@@ -3,15 +3,15 @@ url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
-[packages]
-starlette = "*"
-
 [dev-packages]
 pytest = "*"
 pytest-cov = "*"
 
 [requires]
 python_version = "3.8"
+
+[packages]
+starlette = "*"
 
 [packages.invana]
 git = "https://github.com/invanalabs/invana-py.git"

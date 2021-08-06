@@ -20,6 +20,9 @@ GREMLIN_SERVER_SETTINGS = {
     "serializer_class": "invana_engine.gremlin.serializers.graphson_v3.GraphSONV3Reader",
     "gremlin_server_username": os.environ.get("GRAPHQL_USERNAME"),
     "gremlin_server_password": os.environ.get("GRAPHQL_PASSWORD"),
+    "ALLOW_FILTERING": int(os.environ.get("ALLOW_FILTERING", "0")),
+    "IGNORE_UNINDEXED": int(os.environ.get("IGNORE_UNINDEXED", "0"))
+
 }
 
 GRAPHQL_SERVER_SETTINGS = {

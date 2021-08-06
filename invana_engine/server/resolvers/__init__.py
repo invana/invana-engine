@@ -18,8 +18,8 @@ from .generic import GenericOps
 # vertex_ops = VertexOps()
 generic_ops = GenericOps()
 
-mutation_type = MutationType()
-subscription_type = SubscriptionType()
+# mutation_type = MutationType()
+# subscription_type = SubscriptionType()
 query_type = QueryType()
 
 query_type.set_field("executeQuery", generic_ops.resolve_execute_query)
