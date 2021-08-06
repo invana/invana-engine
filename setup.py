@@ -29,7 +29,11 @@ setup(
         exclude=("dist", "docs", "tests", "scripts", "experiments")
     ),
     install_requires=[
-        'gremlinpython==3.5.0'
+        'starlette==0.14.2',
+        'ariadne==0.13.0',
+        'uvicorn==0.14.0',
+        "websockets",
+        "termcolor"
     ],
     entry_points={
         'console_scripts': [
