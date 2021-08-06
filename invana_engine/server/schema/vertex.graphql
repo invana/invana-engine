@@ -1,14 +1,19 @@
 scalar Date
 scalar JSON
 
-type Vertex {
+type VertexOrEdge {
     id: ID
     label: String
     properties: JSON
+    inV: ID
+    inVLabel: String
+    outV: ID
+    outVLabel: String
 }
 
+
 type Query {
-    readVertices: [Vertex]
+    executeQuery(gremlinQuery: String): [VertexOrEdge]
 }
 
 
@@ -17,5 +22,5 @@ type Mutation {
 }
 
 type Subscription {
-    vertices: Vertex
+    vertices: VertexOrEdge
 }

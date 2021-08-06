@@ -11,6 +11,23 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-from broadcaster import Broadcast
+import logging
 
-pubsub = Broadcast("redis://192.168.0.10:6379")
+logger = logging.getLogger(__name__)
+
+
+class GenericOps:
+
+    @staticmethod
+    async def resolve_execute_query(_, info, gremlinQuery=None):
+        """
+
+        :param _:
+        :param info:
+        :param gremlinQuery:
+
+        :return:
+        """
+        logger.info("Executing query: {gremlinQuery}".format(gremlinQuery=gremlinQuery))
+        result = await  info.context['gremlin_client'].execute_query(gremlinQuery)
+        return [element.to_value() for element in result]

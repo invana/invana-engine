@@ -21,10 +21,10 @@ from ariadne.asgi import GraphQL, WebSocketConnectionError
 from invana_engine.default_settings import GREMLIN_SERVER_SETTINGS, \
     __DEBUG__, __VERSION__
 from invana_engine.server.views import HomePageView, GremlinQueryView
-from invana_engine.gremlin import GremlinClient
+from invana import GremlinClient
 import time
 from termcolor import cprint
-from invana_engine.server.pubsub import pubsub
+# from invana_engine.server.pubsub import pubsub
 from invana_engine.server.resolvers import mutation_type, subscription_type, query_type
 import os
 
@@ -49,17 +49,13 @@ type_defs = load_schema_from_path("{}/schema/".format(os.path.dirname(os.path.ab
 schema = make_executable_schema(type_defs, query_type, mutation_type, subscription_type)
 
 
-def on_connect(ws, payload):
-    user_token = str(payload.get("authUser") or "").strip().lower()
-    if "ban" in user_token:
-        raise WebSocketConnectionError(
-            {"message": "User is banned", "code": "BANNED", "ctx": user_token, "loc": "__ROOT__"})
-    ws.scope["user_token"] = user_token or None
-
-
-gremlin_client = GremlinClient(
-    gremlin_server_url=GREMLIN_SERVER_SETTINGS['gremlin_server_url'],
-)
+# def on_connect(ws, payload):
+#     user_token = str(payload.get("authUser") or "").strip().lower()
+#     if "ban" in user_token:
+#         raise WebSocketConnectionError(
+#             {"message": "User is banned", "code": "BANNED", "ctx": user_token, "loc": "__ROOT__"})
+#     ws.scope["user_token"] = user_token or None
+#
 
 
 def get_context(request):
@@ -68,13 +64,23 @@ def get_context(request):
     #         "user": request.scope.get("user_token"),
     #     }
 
-    return {"request": request, "gremlin_client": gremlin_client, "pubsub": pubsub}
+    return {"request": request, "gremlin_client": GremlinClient(
+        GREMLIN_SERVER_SETTINGS['gremlin_server_url'],
+        traversal_source=GREMLIN_SERVER_SETTINGS['traversal_source'],
+        username=GREMLIN_SERVER_SETTINGS['gremlin_server_username'],
+        password=GREMLIN_SERVER_SETTINGS['gremlin_server_password'],
+    ),
+            # "pubsub": pubsub
+            }
 
 
 routes = [
     Route('/', HomePageView),
     WebSocketRoute('/gremlin', GremlinQueryView),
-    Mount('/graphql', GraphQL(schema=schema, context_value=get_context, on_connect=on_connect, debug=__DEBUG__))
+    Mount('/graphql', GraphQL(schema=schema,
+                              context_value=get_context,
+                              # on_connect=on_connect,
+                              debug=__DEBUG__))
 ]
 
 middlewares = [
@@ -84,6 +90,6 @@ middlewares = [
 app = Starlette(
     routes=routes, middleware=middlewares,
     debug=__DEBUG__,
-    on_startup=[pubsub.connect],
-    on_shutdown=[pubsub.disconnect],
+    # on_startup=[pubsub.connect],
+    # on_shutdown=[pubsub.disconnect],
 )

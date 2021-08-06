@@ -22,7 +22,7 @@ class TestVertexFiltersOperations:
 
     @pytest.fixture
     def gremlin_client(self):
-        from invana_engine.gremlin.client import GremlinClient
+        from invana_engine import GremlinClient
         return GremlinClient(f"{TEST_GRAPH_HOST}/gremlin")
 
     @staticmethod

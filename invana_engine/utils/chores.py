@@ -14,12 +14,23 @@
 #
 
 from importlib import import_module
+import asyncio
 
 
 def import_klass(klass_path_string):
     components = klass_path_string.split('.')
     module = import_module(".".join(components[0: (components.__len__() - 1)]))
     return getattr(module, components[-1])
+
+
+def to_camel_case(snake_str):
+    # https://stackoverflow.com/a/19053800
+    components = snake_str.split('_')
+    # We capitalize the first letter of each component except the first one
+    # with the 'title' method and join them together.
+    return components[0] + ''.join(x.title() for x in components[1:])
+
+
 
 #
 # def get_unique_items(elements):

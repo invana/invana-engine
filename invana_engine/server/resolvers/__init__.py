@@ -13,11 +13,15 @@
 #   limitations under the License.
 from ariadne import MutationType, SubscriptionType, QueryType
 from .vertex import VertexOps
+from .generic import GenericOps
+
+# vertex_ops = VertexOps()
+generic_ops = GenericOps()
 
 mutation_type = MutationType()
 subscription_type = SubscriptionType()
 query_type = QueryType()
 
-vertex_ops = VertexOps()
+query_type.set_field("executeQuery", generic_ops.resolve_execute_query)
 
-mutation_type.set_field("createVertex", vertex_ops.resolve_create_vertex)
+# mutation_type.set_field("createVertex", vertex_ops.resolve_create_vertex)
