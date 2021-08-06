@@ -13,6 +13,9 @@ python_version = "3.8"
 [packages]
 starlette = "*"
 ariadne = "*"
+uvicorn = "*"
+websockets = "*"
+termcolor = "*"
 
-[packages.invana]
+[packages.invana_py]
 git = "https://github.com/invanalabs/invana-py.git"

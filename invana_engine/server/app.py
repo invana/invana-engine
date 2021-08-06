@@ -17,11 +17,11 @@ from starlette.applications import Starlette
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.routing import Route, WebSocketRoute, Mount
-from ariadne.asgi import GraphQL, WebSocketConnectionError
+from ariadne.asgi import GraphQL
 from invana_engine.default_settings import GREMLIN_SERVER_SETTINGS, \
     __DEBUG__, __VERSION__
 from invana_engine.server.views import HomePageView, GremlinQueryView
-from invana import GremlinClient
+from invana_py import GremlinClient
 import time
 from termcolor import cprint
 # from invana_engine.server.pubsub import pubsub
