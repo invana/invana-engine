@@ -33,7 +33,13 @@ setup(
         'ariadne==0.13.0',
         'uvicorn==0.14.0',
         "websockets",
-        "termcolor"
+        "termcolor",
+        'invana_py',
+
+    ],
+    dependency_links=[
+        # Make sure to include the `#egg` portion so the `install_requires` recognizes the package
+        'git+http://git@github.com/invanalabs/invana-py#egg=invana_py'
     ],
     entry_points={
         'console_scripts': [
