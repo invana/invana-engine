@@ -12,6 +12,7 @@ python_version = "3.8"
 
 [packages]
 starlette = "*"
+ariadne = "*"
 
 [packages.invana]
 git = "https://github.com/invanalabs/invana-py.git"
