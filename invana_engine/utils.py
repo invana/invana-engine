@@ -11,8 +11,18 @@
 #      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #      See the License for the specific language governing permissions and
 #      limitations under the License.
-from starlette.responses import JSONResponse
+from urllib.parse import urlparse
+import socket
 
 
-async def homepage_view(request):
-    return JSONResponse({'message': 'Hello world! go to /graphql'})
+def get_host(url):
+    o = urlparse(url)
+    return f"{o.scheme}://{o.netloc}"
+
+
+def get_client_info():
+    hostname = socket.gethostname()
+    return {
+        'host_name': hostname,
+        'ip_address': socket.gethostbyname(hostname)
+    }

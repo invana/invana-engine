@@ -1,22 +1,17 @@
 [[source]]
-name = "pypi"
 url = "https://pypi.org/simple"
 verify_ssl = true
-
-[dev-packages]
-codecov = "*"
-pytest-cov = "*"
-pytest = "*"
+name = "pypi"
 
 [packages]
-gremlinpython = "==3.4.6"
 starlette = "*"
-graphene = "*"
 uvicorn = "*"
-Jinja2 = "*"
-aiofiles = "*"
-uvloop = "*"
-httptools = "*"
+graphene = "*"
+starlette-graphene3 = "*"
+websockets = "*"
+invana = {ref = "dev", git = "https://github.com/invanalabs/invana-py.git"}
+
+[dev-packages]
 
 [requires]
 python_version = "3.8"

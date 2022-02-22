@@ -4,10 +4,10 @@ https://github.com/krlawrence/graph/tree/master/sample-data
 
 """
 
-from invana_engine.gremlin.client import InvanaEngineClient
+from invana import InvanaGraph
 import csv
 
-graph_client = InvanaEngineClient(gremlin_server_url="ws://192.168.0.10:8182/gremlin")
+graph_client = InvanaGraph("ws://megamind-ws:8182/gremlin")
 print("Initiating import: graph_client :", graph_client)
 
 
@@ -61,9 +61,9 @@ with open('./air-routes-latest-nodes.csv') as f:
     reader = csv.DictReader(f)
     for line in reader:
         cleaned_data = clean_nodes(line)
-        created_data = graph_client.vertex.create(label=cleaned_data['label'], properties=cleaned_data['properties'])
+        created_data = graph_client.vertex.create(label=cleaned_data['label'], properties=cleaned_data['properties']).to_list()
         print("created_data", created_data.id)
-        node_id_map[cleaned_data['id']] = created_data.id
+        node_id_map[cleaned_data['id']] = created_data[0].id
 
 with open('./air-routes-latest-edges.csv') as f:
     reader = csv.DictReader(f)
@@ -72,5 +72,5 @@ with open('./air-routes-latest-edges.csv') as f:
         created_data = graph_client.edge.create(label=cleaned_data['label'],
                                                 inv=node_id_map[cleaned_data['to']],
                                                 outv=node_id_map[cleaned_data['from']],
-                                                properties=cleaned_data['properties'])
-        print("created_data", created_data.id)
+                                                properties=cleaned_data['properties']).to_list()
+        print("created_data", created_data[0].id)

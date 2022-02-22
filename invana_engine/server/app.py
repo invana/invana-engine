@@ -1,16 +1,40 @@
+#     Copyright 2021 Invana
+#  #
+#      Licensed under the Apache License, Version 2.0 (the "License");
+#      you may not use this file except in compliance with the License.
+#      You may obtain a copy of the License at
+#  #
+#      http:www.apache.org/licenses/LICENSE-2.0
+#  #
+#      Unless required by applicable law or agreed to in writing, software
+#     distributed under the License is distributed on an "AS IS" BASIS,
+#      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#      See the License for the specific language governing permissions and
+#      limitations under the License.
+#
+#     Licensed under the Apache License, Version 2.0 (the "License");
+#     you may not use this file except in compliance with the License.
+#     You may obtain a copy of the License at
+#
+#     http:www.apache.org/licenses/LICENSE-2.0
+#
+#     Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#     See the License for the specific language governing permissions and
+#     limitations under the License.
 from starlette.applications import Starlette
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.routing import Route
-from starlette.graphql import GraphQLApp
-from invana_engine.server.schemas.query import GremlinQuery
-from .schemas.mutation import GremlinMutation
-from graphene import Schema
-from .views import homepage_view
-from ..gremlin import InvanaEngineClient
-import time
-from ..settings import gremlin_server_url, gremlin_server_password, gremlin_server_username, shall_debug, \
+from invana_engine.server.views import homepage_view
+# from ..gremlin import InvanaEngineClient
+from invana_engine.settings import gremlin_server_url, shall_debug, \
     gremlin_traversal_source
+import graphene
+from starlette_graphene3 import GraphQLApp, make_graphiql_handler
+from ..modeller.query import Query
+from invana import InvanaGraph
 
 print(".................................................")
 print("Starting Invana Engine server")
@@ -26,9 +50,9 @@ if gremlin_server_url is None:
 
 routes = [
     Route('/', endpoint=homepage_view),
-    Route('/graphql', GraphQLApp(
-        schema=Schema(query=GremlinQuery, mutation=GremlinMutation),
-    ))
+    # Route('/graphql', GraphQLApp(
+    #     graphene.Schema(query=Query), on_get=make_graphiql_handler()  # , mutation=Mutation, subscription=Subscription),
+    # ))
 ]
 
 middleware = [
@@ -36,9 +60,13 @@ middleware = [
 ]
 
 app = Starlette(routes=routes, middleware=middleware, debug=shall_debug)
-time.sleep(1)
-gremlin_client = InvanaEngineClient(gremlin_server_url=gremlin_server_url,
-                                    gremlin_server_username=gremlin_server_username,
-                                    gremlin_server_password=gremlin_server_password,
-                                    )
-app.state.gremlin_client = gremlin_client
+
+schema = graphene.Schema(query=Query)  # , mutation=Mutation, subscription=Subscription)
+app.mount("/graphql", GraphQLApp(schema, on_get=make_graphiql_handler()))  # Graphiql IDE
+
+app.state.graph = InvanaGraph(
+    gremlin_server_url,
+    # gremlin_server_username=gremlin_server_username,
+    # gremlin_server_password=gremlin_server_password,
+    traversal_source=gremlin_traversal_source
+)

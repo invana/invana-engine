@@ -11,8 +11,17 @@
 #      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #      See the License for the specific language governing permissions and
 #      limitations under the License.
-from starlette.responses import JSONResponse
+import graphene
+from .query_resolvers import GenericClientInfoSchema, ModelVertexSchema
 
 
-async def homepage_view(request):
-    return JSONResponse({'message': 'Hello world! go to /graphql'})
+class Query(GenericClientInfoSchema, ModelVertexSchema):
+    pass
+# def resolve_me(root, info):
+#     return {"id": "john", "name": "John"}
+
+# class Mutation(graphene.ObjectType):
+#     me = graphene.Field(User)
+#
+#     def resolve_me(root, info):
+#         return {"id": "john", "name": "John"}
