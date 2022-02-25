@@ -1,16 +1,16 @@
-#     Copyright 2021 Invana
-#  #
-#      Licensed under the Apache License, Version 2.0 (the "License");
-#      you may not use this file except in compliance with the License.
-#      You may obtain a copy of the License at
-#  #
-#      http:www.apache.org/licenses/LICENSE-2.0
-#  #
-#      Unless required by applicable law or agreed to in writing, software
-#     distributed under the License is distributed on an "AS IS" BASIS,
-#      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#      See the License for the specific language governing permissions and
-#      limitations under the License.
+#  Copyright 2021 Invana
+# 
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+# 
+#  http:www.apache.org/licenses/LICENSE-2.0
+# 
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
 #
 #     Licensed under the Apache License, Version 2.0 (the "License");
 #     you may not use this file except in compliance with the License.
@@ -33,8 +33,9 @@ from invana_engine.settings import gremlin_server_url, shall_debug, \
     gremlin_traversal_source
 import graphene
 from starlette_graphene3 import GraphQLApp, make_graphiql_handler
-from invana_engine.modeller.query import Query
+from invana_engine.server.schema import Query
 from invana import InvanaGraph
+from .schema import schema
 
 print(".................................................")
 print("Starting Invana Engine server")
@@ -50,9 +51,6 @@ if gremlin_server_url is None:
 
 routes = [
     Route('/', endpoint=homepage_view),
-    # Route('/graphql', GraphQLApp(
-    #     graphene.Schema(query=Query), on_get=make_graphiql_handler()  # , mutation=Mutation, subscription=Subscription),
-    # ))
 ]
 
 middleware = [
@@ -61,7 +59,7 @@ middleware = [
 
 app = Starlette(routes=routes, middleware=middleware, debug=shall_debug)
 
-schema = graphene.Schema(query=Query)  # , mutation=Mutation, subscription=Subscription)
+# schema = Query  # , mutation=Mutation, subscription=Subscription)
 app.mount("/graphql", GraphQLApp(schema, on_get=make_graphiql_handler()))  # Graphiql IDE
 
 graph = InvanaGraph(

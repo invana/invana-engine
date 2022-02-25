@@ -83,3 +83,5 @@ class Query(ModellerQuery, GraphSchema):
 
 
 # Query = create_schema_dynamically()
+# Query = create_schema_dynamically()
+schema = graphene.Schema(query=Query)  # , mutation=Mutation, subscription=Subscription)
