@@ -12,6 +12,7 @@ websockets = "*"
 invana = {ref = "dev", git = "https://github.com/invanalabs/invana-py.git"}
 
 [dev-packages]
+pytest = "*"
 
 [requires]
 python_version = "3.8"

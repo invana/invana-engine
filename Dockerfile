@@ -21,3 +21,4 @@ EXPOSE 8200
 # fire it up ...
 # CMD uvicorn invana_engine.server_start:app --port 8200 --host 0.0.0.0 # development
 CMD gunicorn -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8200  invana_engine.server_start:app
+CMD uvicorn invana_engine.server.app:app  --loop=asyncio

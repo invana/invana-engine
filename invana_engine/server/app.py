@@ -33,7 +33,7 @@ from invana_engine.settings import gremlin_server_url, shall_debug, \
     gremlin_traversal_source
 import graphene
 from starlette_graphene3 import GraphQLApp, make_graphiql_handler
-from ..modeller.query import Query
+from invana_engine.modeller.query import Query
 from invana import InvanaGraph
 
 print(".................................................")
@@ -64,9 +64,10 @@ app = Starlette(routes=routes, middleware=middleware, debug=shall_debug)
 schema = graphene.Schema(query=Query)  # , mutation=Mutation, subscription=Subscription)
 app.mount("/graphql", GraphQLApp(schema, on_get=make_graphiql_handler()))  # Graphiql IDE
 
-app.state.graph = InvanaGraph(
+graph = InvanaGraph(
     gremlin_server_url,
     # gremlin_server_username=gremlin_server_username,
     # gremlin_server_password=gremlin_server_password,
     traversal_source=gremlin_traversal_source
 )
+app.state.graph = graph

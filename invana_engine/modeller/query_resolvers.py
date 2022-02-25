@@ -24,10 +24,10 @@ class GremlinClientInfo(graphene.ObjectType):
     ip_address = graphene.String()
 
     def resolve_gremlin_host(self, info):
-        return get_host(info.context['request'].app.state.gremlin_client.gremlin_server_url)
+        return get_host(info.context['request'].app.state.graph.connector.gremlin_url)
 
     def resolve_gremlin_traversal_source(self, info):
-        return info.context['request'].app.state.gremlin_client.gremlin_traversal_source
+        return info.context['request'].app.state.graph.connector.traversal_source
 
     def resolve_host_name(self, info):
         return get_client_info()['host_name']
