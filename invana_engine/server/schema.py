@@ -34,7 +34,7 @@ class_definition_example = [{
 
 def make_resolver(record_name, record_cls):
     def resolver(self, info):
-        print("resolve##################, ", self, info, record_name , record_name)
+        print("resolve##################, ", self, info, record_name, record_name)
         data = "Hello"
         return record_cls(data)
 
@@ -74,14 +74,13 @@ def create_schema_dynamically():
         fields[key] = graphene.Field(rec)
         fields['resolve_%s' % key] = make_resolver(key, rec)
     Query = type('Query', (graphene.ObjectType,), fields)
-
     return graphene.Schema(query=Query, types=list(record_schemas.values()))
 
+
+# schema = create_schema_dynamically()
 
 class Query(ModellerQuery, GraphSchema):
     pass
 
 
-# Query = create_schema_dynamically()
-# Query = create_schema_dynamically()
 schema = graphene.Schema(query=Query)  # , mutation=Mutation, subscription=Subscription)

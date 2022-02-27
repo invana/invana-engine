@@ -33,7 +33,6 @@ from invana_engine.settings import gremlin_server_url, shall_debug, \
     gremlin_traversal_source
 import graphene
 from starlette_graphene3 import GraphQLApp, make_graphiql_handler
-from invana_engine.server.schema import Query
 from invana import InvanaGraph
 from .schema import schema
 
