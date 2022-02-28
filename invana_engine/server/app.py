@@ -28,13 +28,11 @@ from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.routing import Route
 from invana_engine.server.views import homepage_view
-# from ..gremlin import InvanaEngineClient
 from invana_engine.settings import gremlin_server_url, shall_debug, \
     gremlin_traversal_source
-import graphene
 from starlette_graphene3 import GraphQLApp, make_graphiql_handler
 from invana import InvanaGraph
-from .schema import schema
+from invana_engine.core.schema_generator import schema
 
 print(".................................................")
 print("Starting Invana Engine server")

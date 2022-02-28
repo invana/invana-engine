@@ -11,11 +11,12 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
+#
 from invana_engine.utils import get_field_names
-from .query_resolvers import GremlinGenericQuerySchema
+from invana_engine.graph.query_resolvers import GremlinGenericQuerySchema
 import graphene
 
-from .types import NodeOrEdgeType, NodeType, EdgeType
+from invana_engine.types import NodeType
 
 DEFAULT_LIMIT_SIZE = 10
 
@@ -30,17 +31,9 @@ class God(NodeType):
     properties = graphene.Field(TitanPropertiesSchema)
 
 
-# class TitanOrderBySchema(graphene.ObjectType):
-#     # TODO - dynamically generate the fields
-#     age = graphene.String()
-#     name = graphene.String()
-
-
 class TitanOrderByInputObjectType(graphene.InputObjectType):
     # TODO - dynamically generate the fields
-    # age = graphene.String()
     name = graphene.String()
-    # name = graphene.InputField(graphene.String(required=True))
 
 
 class WhereFilters(graphene.InputObjectType):
@@ -63,16 +56,14 @@ class TitanSchema(graphene.ObjectType):
         order_by=graphene.Argument(TitanOrderByInputObjectType,
                                    description="order_by"),
         where=graphene.Argument(TitanWhereFilters,
-                                description="where"),
-
+                                description="where")
     )
 
     def resolve_god(self, info: graphene.ResolveInfo,
                     limit: int = None,
                     offset: int = None,
                     order_by=None,
-                    where=None,
-                    outV=None
+                    where=None
                     ):
         fields = get_field_names(info)
 
@@ -87,9 +78,6 @@ class TitanSchema(graphene.ObjectType):
                 order_value = order_value.lower()
                 order_key = f"-{order_key}" if order_value == "desc" else order_key
                 qs = qs.order_by(order_key)
-
-        if outV:
-            pass
         qs = qs.get_traversal()
         if limit and offset:
             qs = qs.range(offset, offset + limit)
