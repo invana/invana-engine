@@ -39,6 +39,9 @@ class GenericClientInfoSchema(graphene.ObjectType):
     hello = graphene.String(name=graphene.String(default_value="World"))
     get_client_info = graphene.Field(GremlinClientInfo)
 
+    def resolve_hello(self, info, name):
+        return name
+
 
 class ModelVertexSchema(graphene.ObjectType):
     get_vertex_model = graphene.Field(ModelVertexLabel, label=graphene.String())

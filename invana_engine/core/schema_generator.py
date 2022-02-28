@@ -13,12 +13,12 @@
 #  limitations under the License.
 # implementation inspired from - https://stackoverflow.com/a/52690104
 import graphene
-
-from invana_engine.graph.query import GraphSchema, DEFAULT_LIMIT_SIZE
+from invana_engine.graph.query import GraphSchema
 from invana_engine.utils import get_field_names
 from invana_engine.types import NodeType
+from invana_engine.modeller.query import ModellerQuery
 from .utils import convert_to_graphql_schema
-from .constants import FIELD_TYPES_MAP, WHERE_CONDITIONS
+from .constants import FIELD_TYPES_MAP, WHERE_CONDITIONS, DEFAULT_LIMIT_SIZE
 
 class_definition_example = [
     {
@@ -151,13 +151,16 @@ class DynamicSchemaGenerator:
         for key, rec in record_schemas.items():
             record_fields[key] = self.create_record_fields(rec, record_properties[key])  # graphene.Field(rec)
             record_fields['resolve_%s' % key] = self.create_resolver(key, rec)
-        Query = type('Query', (graphene.ObjectType,), record_fields)
+        NodeQuery = type('NodeQuery', (graphene.ObjectType,), record_fields)
+
+        class Query(ModellerQuery, GraphSchema, NodeQuery):
+            pass
+
         return graphene.Schema(query=Query, types=list(record_schemas.values()))
 
 
 schema_data_json = convert_to_graphql_schema(class_definition_example)
 schema_generator = DynamicSchemaGenerator(schema_data_json)
-
 schema = schema_generator.create_schema_dynamically()
 
 # class Query(ModellerQuery, GraphSchema):

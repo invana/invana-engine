@@ -25,3 +25,5 @@ WHERE_CONDITIONS = {
     "lt": graphene.Int,
     "gt": graphene.Int
 }
+
+DEFAULT_LIMIT_SIZE =10
