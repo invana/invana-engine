@@ -20,18 +20,20 @@ from .constants import FIELD_TYPES_MAP, WHERE_CONDITIONS, DEFAULT_LIMIT_SIZE
 
 class DynamicSchemaGenerator:
 
-    def __init__(self, schema_data, element_type):
+    def __init__(self, schema_data, search_type, is_global_search=False):
         # data_type: node, edge
-        if element_type not in ["node", "edge"]:
-            raise Exception(f"element_type can only be node or edge. received {element_type}")
+        if search_type not in ["node", "edge"]:
+            raise Exception(f"search_type can only be node or edge. received {search_type}")
         self.schema_data = schema_data
-        self.element_type = element_type
+        self.search_type = search_type
+        self.is_global_search = is_global_search
 
-    def get_element_type(self):
-        return NodeType if self.element_type == "node" else EdgeType
+    def get_search_type(self):
+        return NodeType if self.search_type == "node" else EdgeType
 
     def create_resolver(self, record_name, record_cls):
-        element_type = self.element_type
+        search_type = self.search_type
+        is_global_search = self.is_global_search
 
         def resolver_func(self, info: graphene.ResolveInfo,
                           limit: int = None,
@@ -39,16 +41,20 @@ class DynamicSchemaGenerator:
                           order_by=None,
                           where=None
                           ):
+
+            search_kwargs = {}
             fields = get_field_names(info)
-            search_kwargs = {"has__label": fields['label']}
+            if is_global_search is not True:
+                search_kwargs = {"has__label": fields['label']}
+
             if where:
                 for property_key, where_item in where.items():
                     if where_item:
                         for predicate_key, predicate_value in where_item.items():
                             search_kwargs[f'has__{property_key}__{predicate_key}'] = predicate_value
-            if element_type == "node":
+            if search_type == "node":
                 qs = info.context['request'].app.state.graph.vertex.search(**search_kwargs)
-            elif element_type == "edge":
+            elif search_type == "edge":
                 qs = info.context['request'].app.state.graph.edge.search(**search_kwargs)
             else:
                 raise NotImplementedError()
@@ -68,7 +74,7 @@ class DynamicSchemaGenerator:
         resolver_func.__name__ = 'resolve_%s' % record_name
         return resolver_func
 
-    def create_record_type(self, classname, properties, element_type):
+    def create_record_type(self, classname, properties, search_type):
         if properties.values().__len__() > 0:
             record_properties_type = type(
                 f"{classname}Properties",
@@ -79,8 +85,8 @@ class DynamicSchemaGenerator:
         else:
             record_extra_fields = {}
         record_type = type(
-            f"{classname}{element_type.capitalize()}Type",
-            (self.get_element_type(),),
+            f"{classname}{search_type.capitalize()}Type",
+            (self.get_search_type(),),
             record_extra_fields
         )
         return record_type
@@ -143,14 +149,13 @@ class DynamicSchemaGenerator:
             record_schemas[record_type['id']] = self.create_record_type(
                 classname,
                 properties,
-                "node"
+                self.search_type
             )
         # create Query in similar way
         record_fields = {}
         for key, rec in record_schemas.items():
             record_fields[key] = self.create_record_fields(rec, record_properties[key])  # graphene.Field(rec)
             record_fields['resolve_%s' % key] = self.create_resolver(key, rec)
-        Query = type('NodeQuery', (graphene.ObjectType,), record_fields)
+        Query = type(f'{self.search_type}Query'.capitalize(), (graphene.ObjectType,), record_fields)
         record_schema_types = list(record_schemas.values())
-
         return Query, record_schema_types

@@ -22,17 +22,48 @@ from invana_engine.graph.query import GraphSchema
 def get_schema():
     vertices_schema_objects = graph.management.schema_reader.get_all_vertices_schema()
     vertices_schema_json = [schema.to_json() for key, schema in vertices_schema_objects.items()]
+
     vertices_schema_data_json = convert_to_graphql_schema(vertices_schema_json)
+    vertices_schema_generator = DynamicSchemaGenerator(vertices_schema_data_json, "node")
 
     edges_schema_objects = graph.management.schema_reader.get_all_edges_schema()
     edges_schema_json = [schema.to_json() for key, schema in edges_schema_objects.items()]
     edges_schema_data_json = convert_to_graphql_schema(edges_schema_json)
-    node_schema_generator = DynamicSchemaGenerator(vertices_schema_data_json, "node")
     edge_schema_generator = DynamicSchemaGenerator(edges_schema_data_json, "edge")
-    NodeQuery, node_record_schema_types = node_schema_generator.create_schema_dynamically()
-    EdgeQuery, edge_record_schema_types = edge_schema_generator.create_schema_dynamically()
 
-    class Query(ModellerQuery, GraphSchema, NodeQuery, EdgeQuery):
+    all_properties = {}
+    for vertices_schema in vertices_schema_json:
+        for prop in vertices_schema['properties']:
+            all_properties[prop['name']] = prop
+    for edges_schema in edges_schema_json:
+        for prop in edges_schema['properties']:
+            all_properties[prop['name']] = prop
+
+    vertex_search_schema_data_json = [{
+        "id": "searchVertices",
+        "name": "searchVertices",
+        "properties": all_properties.values(),
+    }]
+    vertex_search_schema_data_json = convert_to_graphql_schema(vertex_search_schema_data_json)
+    vertex_search_schema_generator = DynamicSchemaGenerator(vertex_search_schema_data_json, "node",
+                                                            is_global_search=True)
+
+    edge_search_schema_data_json = [{
+        "id": "searchEdge",
+        "name": "searchEdge",
+        "properties": all_properties.values(),
+    }]
+    edge_search_schema_data_json = convert_to_graphql_schema(edge_search_schema_data_json)
+    edge_search_schema_generator = DynamicSchemaGenerator(edge_search_schema_data_json, "edge", is_global_search=True)
+
+    NodeQuery, node_record_schema_types = vertices_schema_generator.create_schema_dynamically()
+    EdgeQuery, edge_record_schema_types = edge_schema_generator.create_schema_dynamically()
+    SearchVertexSearchQuery, vertex_search_record_schema_types = vertex_search_schema_generator.create_schema_dynamically()
+    SearchEdgeSearchQuery, edge_search_record_schema_types = edge_search_schema_generator.create_schema_dynamically()
+
+    class Query(ModellerQuery, GraphSchema, NodeQuery, EdgeQuery, SearchVertexSearchQuery, SearchEdgeSearchQuery):
         pass
 
-    return graphene.Schema(query=Query, types=node_record_schema_types + edge_record_schema_types)
+    return graphene.Schema(query=Query,
+                           types=node_record_schema_types + edge_record_schema_types \
+                                 + vertex_search_record_schema_types + edge_search_record_schema_types)
