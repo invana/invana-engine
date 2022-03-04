@@ -2,6 +2,8 @@
 
 from setuptools import setup, find_packages
 from invana_engine.settings import __VERSION__
+
+
 setup(
     name='invana-engine',
     version=__VERSION__,
