@@ -11,28 +11,60 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-from ..utils import get_host, get_client_info
-from invana_engine.data_types import ModelEdgeLabel, ModelVertexLabel
+from ..utils import get_host, get_client_info, snake_case_to_camel_case
+from invana_engine.data_types import ModelEdgeLabel, ModelVertexLabel, AnyField
 import graphene
+import json
+
+
+class FeaturesInfo(graphene.ObjectType):
+    graph_features = AnyField()
+    variable_features = AnyField()
+    vertex_features = AnyField()
+    edge_features = AnyField()
+    vertex_property_features = AnyField()
+    edge_property_features = AnyField()
+
+    # def resolve_graph_features(self, info):
+    #     return info.context['request'].app.state.graph.get_features().data['GraphFeatures']
+    #
+    # def resolve_variable_features(self, info):
+    #     return info.context['request'].app.state.graph.get_features().data['VariableFeatures']
+    #
+    # def resolve_vertex_features(self, info):
+    #     return info.context['request'].app.state.graph.get_features().data['VertexFeatures']
+
+
+#
+# dict_keys(['GraphFeatures', 'VariableFeatures', 'VertexFeatures', 'VertexPropertyFeatures', 'EdgeFeatures',
+#            'EdgePropertyFeatures'])
 
 
 class GremlinClientInfo(graphene.ObjectType):
     gremlin_host = graphene.String()
     gremlin_traversal_source = graphene.String()
     host_name = graphene.String()
-    ip_address = graphene.String()
+    host_ip_address = graphene.String()
+    features = graphene.Field(FeaturesInfo)
 
-    def resolve_gremlin_host(self, info):
-        return get_host(info.context['request'].app.state.graph.connector.gremlin_url)
+    # def resolve_gremlin_host(self, info):
+    #     return get_host(info.context['request'].app.state.graph.connector.gremlin_url)
+    #
+    # def resolve_gremlin_traversal_source(self, info):
+    #     return info.context['request'].app.state.graph.connector.traversal_source
+    #
+    # def resolve_host_name(self, info):
+    #     return get_client_info()['host_name']
+    #
+    # def resolve_ip_address(self, info):
+    #     return get_client_info()['ip_address']
 
-    def resolve_gremlin_traversal_source(self, info):
-        return info.context['request'].app.state.graph.connector.traversal_source
-
-    def resolve_host_name(self, info):
-        return get_client_info()['host_name']
-
-    def resolve_ip_address(self, info):
-        return get_client_info()['ip_address']
+    def resolve_features(self, info):
+        features_data = info.context['request'].app.state.graph.get_features().data
+        data = {}
+        for k, v in features_data.items():
+            data[snake_case_to_camel_case(k)] = v
+        return data
 
 
 class GenericClientInfoSchema(graphene.ObjectType):

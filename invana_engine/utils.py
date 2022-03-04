@@ -25,8 +25,13 @@ def get_client_info():
     hostname = socket.gethostname()
     return {
         'host_name': hostname,
-        'ip_address': socket.gethostbyname(hostname)
+        'host_ip_address': socket.gethostbyname(hostname)
     }
+
+
+def snake_case_to_camel_case(s):
+    return ''.join(['_' + i.lower() if i.isupper()
+                    else i for i in s]).lstrip('_')
 
 
 def get_field_names(info):

@@ -13,10 +13,8 @@
 #  limitations under the License.
 # implementation inspired from - https://stackoverflow.com/a/52690104
 import graphene
-from invana_engine.graph.query import GraphSchema
 from invana_engine.utils import get_field_names
 from invana_engine.data_types import NodeType, EdgeType
-from invana_engine.modeller.query import ModellerQuery
 from .constants import FIELD_TYPES_MAP, WHERE_CONDITIONS, DEFAULT_LIMIT_SIZE
 
 
@@ -34,6 +32,7 @@ class DynamicSchemaGenerator:
 
     def create_resolver(self, record_name, record_cls):
         element_type = self.element_type
+
         def resolver_func(self, info: graphene.ResolveInfo,
                           limit: int = None,
                           offset: int = None,
@@ -70,12 +69,15 @@ class DynamicSchemaGenerator:
         return resolver_func
 
     def create_record_type(self, classname, properties, element_type):
-        record_properties_type = type(
-            f"{classname}Properties",
-            (graphene.ObjectType,),
-            properties
-        )
-        record_extra_fields = {"properties": graphene.Field(record_properties_type)}
+        if properties.values().__len__() > 0:
+            record_properties_type = type(
+                f"{classname}Properties",
+                (graphene.ObjectType,),
+                properties
+            )
+            record_extra_fields = {"properties": graphene.Field(record_properties_type)}
+        else:
+            record_extra_fields = {}
         record_type = type(
             f"{classname}{element_type.capitalize()}Type",
             (self.get_element_type(),),
@@ -84,43 +86,47 @@ class DynamicSchemaGenerator:
         return record_type
 
     def create_record_fields(self, record_class, property_keys):
-        order_by_fields = {}
-        for property_key in property_keys:
-            order_by_fields[property_key] = graphene.String()
-        order_by_type = type(
-            f"{record_class.__name__}OrderBy",
-            (graphene.InputObjectType,),
-            order_by_fields
-        )
+        extra_fields = {}
+        if property_keys.__len__() > 0:
+            order_by_fields = {}
+            for property_key in property_keys:
+                order_by_fields[property_key] = graphene.String()
+            order_by_type = type(
+                f"{record_class.__name__}OrderBy",
+                (graphene.InputObjectType,),
+                order_by_fields
+            )
 
-        where_filter_fields = {}
-        for where_condition_key, where_condition_type in WHERE_CONDITIONS.items():
-            where_filter_fields[where_condition_key] = where_condition_type()
+            where_filter_fields = {}
+            for where_condition_key, where_condition_type in WHERE_CONDITIONS.items():
+                where_filter_fields[where_condition_key] = where_condition_type()
 
-        where_filters = type(
-            f"WhereFilters",
-            (graphene.InputObjectType,),
-            where_filter_fields
-        )
+            where_filters = type(
+                f"WhereFilters",
+                (graphene.InputObjectType,),
+                where_filter_fields
+            )
 
-        node_type_where_filters = {}
-        for property_key in property_keys:
-            node_type_where_filters[property_key] = graphene.Field(where_filters)
-        where_filters = type(
-            f"{record_class.__name__}WhereFilters",
-            (graphene.InputObjectType,),
-            node_type_where_filters
-        )
+            node_type_where_filters = {}
+            for property_key in property_keys:
+                node_type_where_filters[property_key] = graphene.Field(where_filters)
+            where_filters = type(
+                f"{record_class.__name__}WhereFilters",
+                (graphene.InputObjectType,),
+                node_type_where_filters
+            )
+
+            extra_fields['order_by'] = graphene.Argument(order_by_type,
+                                                         description="order_by")
+            extra_fields['where'] = graphene.Argument(where_filters,
+                                                      description="where")
         return graphene.Field(
             graphene.List(record_class),
             limit=graphene.Argument(graphene.Int, default_value=DEFAULT_LIMIT_SIZE,
                                     required=True, description="limits the result count"),
             offset=graphene.Argument(graphene.Int, default_value=0,
                                      description="limits the count"),
-            order_by=graphene.Argument(order_by_type,
-                                       description="order_by"),
-            where=graphene.Argument(where_filters,
-                                    description="where")
+            **extra_fields
         )
 
     def create_schema_dynamically(self):
@@ -144,9 +150,7 @@ class DynamicSchemaGenerator:
         for key, rec in record_schemas.items():
             record_fields[key] = self.create_record_fields(rec, record_properties[key])  # graphene.Field(rec)
             record_fields['resolve_%s' % key] = self.create_resolver(key, rec)
-        NodeQuery = type('NodeQuery', (graphene.ObjectType,), record_fields)
+        Query = type('NodeQuery', (graphene.ObjectType,), record_fields)
+        record_schema_types = list(record_schemas.values())
 
-        class Query(ModellerQuery, GraphSchema, NodeQuery):
-            pass
-
-        return graphene.Schema(query=Query, types=list(record_schemas.values()))
+        return Query, record_schema_types
