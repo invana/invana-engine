@@ -20,10 +20,26 @@ FIELD_TYPES_MAP = {
 }
 
 WHERE_CONDITIONS = {
-    "ne": graphene.String,
+    "eq": graphene.String,
     "neq": graphene.String,
+
     "lt": graphene.Int,
-    "gt": graphene.Int
+    "lte": graphene.Int,
+    "gt": graphene.Int,
+    "gte": graphene.Int,
+
+    "within": lambda: graphene.List(graphene.String),
+    "without": lambda: graphene.List(graphene.String),
+    "inside": lambda: graphene.List(graphene.String),
+    "outside": lambda: graphene.List(graphene.String),
+    "between": lambda: graphene.List(graphene.String),
+
+    "startingWith": graphene.String,
+    "containing": graphene.String,
+    "endingWith": graphene.String,
+    "notStartingWith": graphene.String,
+    "notContaining": graphene.String,
+    "notEndingWith": graphene.String,
 }
 
-DEFAULT_LIMIT_SIZE =10
+DEFAULT_LIMIT_SIZE = 10

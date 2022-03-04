@@ -78,7 +78,6 @@ def get_field_names(info):
         return _results
 
     results = iterate_field_names('', info.field_nodes[0])
-    print("results", results)
     fields = [item.split(f"{results[0]}.")[1] for item in results[1:]]
     properties = [item.split(f"properties.")[1] for item in fields[1:] if item.startswith("properties.")]
     data = {"fields": fields, "properties": properties, "label": results[0]}

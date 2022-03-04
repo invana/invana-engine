@@ -32,7 +32,8 @@ from invana_engine.settings import gremlin_server_url, shall_debug, \
     gremlin_traversal_source
 from starlette_graphene3 import GraphQLApp, make_graphiql_handler
 from invana import InvanaGraph
-from invana_engine.core.schema_generator import schema
+from .schema import get_schema
+from .graph import graph
 
 print(".................................................")
 print("Starting Invana Engine server")
@@ -45,7 +46,7 @@ if gremlin_server_url is None:
     print("ERROR: GREMLIN_SERVER_URL environment variable not set. Please fix it .")
     print("Exiting the program now. Please refer the documentation at https://github.com/invanalabs/invana-engine")
     exit()
-
+schema = get_schema()
 routes = [
     Route('/', endpoint=homepage_view),
 ]
@@ -59,10 +60,4 @@ app = Starlette(routes=routes, middleware=middleware, debug=shall_debug)
 # schema = Query  # , mutation=Mutation, subscription=Subscription)
 app.mount("/graphql", GraphQLApp(schema, on_get=make_graphiql_handler()))  # Graphiql IDE
 
-graph = InvanaGraph(
-    gremlin_server_url,
-    # gremlin_server_username=gremlin_server_username,
-    # gremlin_server_password=gremlin_server_password,
-    traversal_source=gremlin_traversal_source
-)
 app.state.graph = graph

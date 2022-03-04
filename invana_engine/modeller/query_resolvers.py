@@ -12,7 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 from ..utils import get_host, get_client_info
-from invana_engine.types import ModelEdgeLabel, ModelVertexLabel
+from invana_engine.data_types import ModelEdgeLabel, ModelVertexLabel
 import graphene
 
 

@@ -15,29 +15,9 @@
 import graphene
 from invana_engine.graph.query import GraphSchema
 from invana_engine.utils import get_field_names
-from invana_engine.types import NodeType
+from invana_engine.data_types import NodeType
 from invana_engine.modeller.query import ModellerQuery
-from .utils import convert_to_graphql_schema
 from .constants import FIELD_TYPES_MAP, WHERE_CONDITIONS, DEFAULT_LIMIT_SIZE
-
-class_definition_example = [
-    {
-        "name": "titan",
-        "properties": [
-            {
-
-                "name": "age",
-                "cardinality": "SINGLE",
-                "type": "Integer"
-            },
-            {
-                "name": "name",
-                "cardinality": "SINGLE",
-                "type": "String"
-            }
-        ]
-    }
-]
 
 
 class DynamicSchemaGenerator:
@@ -159,12 +139,3 @@ class DynamicSchemaGenerator:
         return graphene.Schema(query=Query, types=list(record_schemas.values()))
 
 
-schema_data_json = convert_to_graphql_schema(class_definition_example)
-schema_generator = DynamicSchemaGenerator(schema_data_json)
-schema = schema_generator.create_schema_dynamically()
-
-# class Query(ModellerQuery, GraphSchema):
-#     pass
-#
-#
-# schema = graphene.Schema(query=Query)  # , mutation=Mutation, subscription=Subscription)
