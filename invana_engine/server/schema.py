@@ -17,8 +17,13 @@ from .graph import graph
 
 
 def get_schema():
-    schema_objects = graph.management.schema_reader.get_all_vertices_schema()
-    schema_json = [schema.to_json() for key, schema in schema_objects.items()]
-    schema_data_json = convert_to_graphql_schema(schema_json)
-    schema_generator = DynamicSchemaGenerator(schema_data_json)
+    vertices_schema_objects = graph.management.schema_reader.get_all_vertices_schema()
+    vertices_schema_json = [schema.to_json() for key, schema in vertices_schema_objects.items()]
+    vertices_schema_data_json = convert_to_graphql_schema(vertices_schema_json)
+
+    edges_schema_objects = graph.management.schema_reader.get_all_edges_schema()
+    edges_schema_json = [schema.to_json() for key, schema in edges_schema_objects.items()]
+    edges_schema_data_json = convert_to_graphql_schema(edges_schema_json)
+    # schema_generator = DynamicSchemaGenerator(vertices_schema_data_json, "node")
+    schema_generator = DynamicSchemaGenerator(edges_schema_data_json, "edge")
     return schema_generator.create_schema_dynamically()

@@ -15,17 +15,25 @@
 import graphene
 from invana_engine.graph.query import GraphSchema
 from invana_engine.utils import get_field_names
-from invana_engine.data_types import NodeType
+from invana_engine.data_types import NodeType, EdgeType
 from invana_engine.modeller.query import ModellerQuery
 from .constants import FIELD_TYPES_MAP, WHERE_CONDITIONS, DEFAULT_LIMIT_SIZE
 
 
 class DynamicSchemaGenerator:
 
-    def __init__(self, schema_data):
+    def __init__(self, schema_data, element_type):
+        # data_type: node, edge
+        if element_type not in ["node", "edge"]:
+            raise Exception(f"element_type can only be node or edge. received {element_type}")
         self.schema_data = schema_data
+        self.element_type = element_type
+
+    def get_element_type(self):
+        return NodeType if self.element_type == "node" else EdgeType
 
     def create_resolver(self, record_name, record_cls):
+        element_type = self.element_type
         def resolver_func(self, info: graphene.ResolveInfo,
                           limit: int = None,
                           offset: int = None,
@@ -39,7 +47,12 @@ class DynamicSchemaGenerator:
                     if where_item:
                         for predicate_key, predicate_value in where_item.items():
                             search_kwargs[f'has__{property_key}__{predicate_key}'] = predicate_value
-            qs = info.context['request'].app.state.graph.vertex.search(**search_kwargs)
+            if element_type == "node":
+                qs = info.context['request'].app.state.graph.vertex.search(**search_kwargs)
+            elif element_type == "edge":
+                qs = info.context['request'].app.state.graph.edge.search(**search_kwargs)
+            else:
+                raise NotImplementedError()
             if order_by:
                 for order_key, order_value in order_by.items():
                     order_value = order_value.lower()
@@ -65,7 +78,7 @@ class DynamicSchemaGenerator:
         record_extra_fields = {"properties": graphene.Field(record_properties_type)}
         record_type = type(
             f"{classname}{element_type.capitalize()}Type",
-            (NodeType,),
+            (self.get_element_type(),),
             record_extra_fields
         )
         return record_type
@@ -137,5 +150,3 @@ class DynamicSchemaGenerator:
             pass
 
         return graphene.Schema(query=Query, types=list(record_schemas.values()))
-
-

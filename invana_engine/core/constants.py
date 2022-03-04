@@ -16,6 +16,7 @@ import graphene
 FIELD_TYPES_MAP = {
     'String': graphene.String,
     'Integer': graphene.Int,
+    'class org.janusgraph.core.attribute.Geoshape': graphene.String
     # ...
 }
 
