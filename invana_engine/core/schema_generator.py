@@ -74,7 +74,7 @@ class DynamicSchemaGenerator:
         resolver_func.__name__ = 'resolve_%s' % record_name
         return resolver_func
 
-    def create_record_type(self, classname, properties, search_type):
+    def create_record_type(self, classname, properties):
         if properties.values().__len__() > 0:
             record_properties_type = type(
                 f"{classname}Properties",
@@ -85,7 +85,7 @@ class DynamicSchemaGenerator:
         else:
             record_extra_fields = {}
         record_type = type(
-            f"{classname}{search_type.capitalize()}Type",
+            f"{classname}{self.search_type.capitalize()}Type",
             (self.get_search_type(),),
             record_extra_fields
         )
@@ -116,6 +116,12 @@ class DynamicSchemaGenerator:
             node_type_where_filters = {}
             for property_key in property_keys:
                 node_type_where_filters[property_key] = graphene.Field(where_filters)
+
+            ## for global search
+            if self.is_global_search:
+                node_type_where_filters["label"] = graphene.Field(where_filters)
+            node_type_where_filters["id"] = graphene.Field(where_filters)
+
             where_filters = type(
                 f"{record_class.__name__}WhereFilters",
                 (graphene.InputObjectType,),
@@ -148,8 +154,7 @@ class DynamicSchemaGenerator:
                 record_properties[record_type['id']].append(option['id'])
             record_schemas[record_type['id']] = self.create_record_type(
                 classname,
-                properties,
-                self.search_type
+                properties
             )
         # create Query in similar way
         record_fields = {}
