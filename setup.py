@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
 from setuptools import setup, find_packages
-
+from invana_engine.settings import __VERSION__
 setup(
     name='invana-engine',
-    version='0.0.4',
+    version=__VERSION__,
     description='GraphQL API and Insights engine for Apache TinkerPop supported graph databases.',
     author='Ravi Raja Merugu',
     author_email='ravi@invana.io',
