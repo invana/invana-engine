@@ -30,8 +30,10 @@ import graphene
 
 
 class GremlinGenericQuerySchema:
-    raw_query = graphene.Field(graphene.List(NodeOrEdgeType), timeout=graphene.Int(), gremlin=graphene.String())
+    execute_query = graphene.Field(graphene.List(NodeOrEdgeType), timeout=graphene.Int(), gremlin=graphene.String())
 
-    def resolve_raw_query(self, info: graphene.ResolveInfo, gremlin: str, timeout: int) -> any:
+    def resolve_execute_query(self, info: graphene.ResolveInfo, gremlin: str, timeout: int) -> any:
         data = info.context['request'].app.state.graph.execute_query(gremlin, timeout=timeout).data
         return [d.to_json() for d in data]
+
+

@@ -13,7 +13,12 @@
 #  limitations under the License.
 #
 from invana_engine.graph.query_resolvers import GremlinGenericQuerySchema
+import graphene
+from invana_engine.settings import __VERSION__
 
 
 class GraphSchema(GremlinGenericQuerySchema):
-    pass
+    version = graphene.String()
+
+    def resolve_version(self, info: graphene.ResolveInfo) -> str:
+        return __VERSION__
