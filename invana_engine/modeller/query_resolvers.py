@@ -25,20 +25,6 @@ class FeaturesInfo(graphene.ObjectType):
     vertex_property_features = AnyField()
     edge_property_features = AnyField()
 
-    # def resolve_graph_features(self, info):
-    #     return info.context['request'].app.state.graph.get_features().data['GraphFeatures']
-    #
-    # def resolve_variable_features(self, info):
-    #     return info.context['request'].app.state.graph.get_features().data['VariableFeatures']
-    #
-    # def resolve_vertex_features(self, info):
-    #     return info.context['request'].app.state.graph.get_features().data['VertexFeatures']
-
-
-#
-# dict_keys(['GraphFeatures', 'VariableFeatures', 'VertexFeatures', 'VertexPropertyFeatures', 'EdgeFeatures',
-#            'EdgePropertyFeatures'])
-
 
 class GremlinClientInfo(graphene.ObjectType):
     gremlin_host = graphene.String()
@@ -46,18 +32,6 @@ class GremlinClientInfo(graphene.ObjectType):
     host_name = graphene.String()
     host_ip_address = graphene.String()
     features = graphene.Field(FeaturesInfo)
-
-    # def resolve_gremlin_host(self, info):
-    #     return get_host(info.context['request'].app.state.graph.connector.gremlin_url)
-    #
-    # def resolve_gremlin_traversal_source(self, info):
-    #     return info.context['request'].app.state.graph.connector.traversal_source
-    #
-    # def resolve_host_name(self, info):
-    #     return get_client_info()['host_name']
-    #
-    # def resolve_ip_address(self, info):
-    #     return get_client_info()['ip_address']
 
     def resolve_features(self, info):
         features_data = info.context['request'].app.state.graph.get_features().data
