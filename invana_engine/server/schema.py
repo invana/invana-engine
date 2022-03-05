@@ -40,8 +40,8 @@ def get_schema():
             all_properties[prop['name']] = prop
 
     vertex_search_schema_data_json = [{
-        "id": "searchVertices",
-        "name": "searchVertices",
+        "id": "search_vertices",
+        "name": "search_vertices",
         "properties": all_properties.values(),
     }]
     vertex_search_schema_data_json = convert_to_graphql_schema(vertex_search_schema_data_json)
@@ -49,8 +49,8 @@ def get_schema():
                                                             is_global_search=True)
 
     edge_search_schema_data_json = [{
-        "id": "searchEdge",
-        "name": "searchEdge",
+        "id": "search_edge",
+        "name": "search_edge",
         "properties": all_properties.values(),
     }]
     edge_search_schema_data_json = convert_to_graphql_schema(edge_search_schema_data_json)

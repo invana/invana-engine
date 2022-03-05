@@ -48,10 +48,11 @@ class DynamicSchemaGenerator:
                 search_kwargs = {"has__label": fields['label']}
 
             if where:
-                for property_key, where_item in where.items():
-                    if where_item:
-                        for predicate_key, predicate_value in where_item.items():
-                            search_kwargs[f'has__{property_key}__{predicate_key}'] = predicate_value
+                for where_each in where:
+                    for property_key, where_item in where_each.items():
+                        if where_item:
+                            for predicate_key, predicate_value in where_item.items():
+                                search_kwargs[f'has__{property_key}__{predicate_key}'] = predicate_value
             if search_type == "node":
                 qs = info.context['request'].app.state.graph.vertex.search(**search_kwargs)
             elif search_type == "edge":
@@ -115,12 +116,12 @@ class DynamicSchemaGenerator:
 
             node_type_where_filters = {}
             for property_key in property_keys:
-                node_type_where_filters[property_key] = graphene.Field(where_filters)
+                node_type_where_filters[property_key] = graphene.Field(graphene.List(where_filters))
 
             ## for global search
             if self.is_global_search:
-                node_type_where_filters["label"] = graphene.Field(where_filters)
-            node_type_where_filters["id"] = graphene.Field(where_filters)
+                node_type_where_filters["label"] = graphene.Field(graphene.List(where_filters))
+            node_type_where_filters["id"] = graphene.Field(graphene.List(where_filters))
 
             where_filters = type(
                 f"{record_class.__name__}WhereFilters",
