@@ -66,4 +66,6 @@ def get_schema():
 
     return graphene.Schema(query=Query,
                            types=node_record_schema_types + edge_record_schema_types \
-                                 + vertex_search_record_schema_types + edge_search_record_schema_types)
+                                 + vertex_search_record_schema_types + edge_search_record_schema_types,
+                           auto_camelcase=False
+                           )
