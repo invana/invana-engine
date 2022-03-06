@@ -39,33 +39,34 @@ def get_schema():
         for prop in edges_schema['properties']:
             all_properties[prop['name']] = prop
 
-    vertex_search_schema_data_json = [{
-        "id": "search_vertices",
-        "name": "search_vertices",
-        "properties": all_properties.values(),
-    }]
-    vertex_search_schema_data_json = convert_to_graphql_schema(vertex_search_schema_data_json)
-    vertex_search_schema_generator = DynamicSchemaGenerator(vertex_search_schema_data_json, "node",
-                                                            is_global_search=True)
-
-    edge_search_schema_data_json = [{
-        "id": "search_edge",
-        "name": "search_edge",
-        "properties": all_properties.values(),
-    }]
-    edge_search_schema_data_json = convert_to_graphql_schema(edge_search_schema_data_json)
-    edge_search_schema_generator = DynamicSchemaGenerator(edge_search_schema_data_json, "edge", is_global_search=True)
+    # vertex_search_schema_data_json = [{
+    #     "id": "search_vertices",
+    #     "name": "search_vertices",
+    #     "properties": all_properties.values(),
+    # }]
+    # vertex_search_schema_data_json = convert_to_graphql_schema(vertex_search_schema_data_json)
+    # vertex_search_schema_generator = DynamicSchemaGenerator(vertex_search_schema_data_json, "node",
+    #                                                         is_global_search=True)
+    #
+    # edge_search_schema_data_json = [{
+    #     "id": "search_edge",
+    #     "name": "search_edge",
+    #     "properties": all_properties.values(),
+    # }]
+    # edge_search_schema_data_json = convert_to_graphql_schema(edge_search_schema_data_json)
+    # edge_search_schema_generator = DynamicSchemaGenerator(edge_search_schema_data_json, "edge", is_global_search=True)
 
     NodeQuery, node_record_schema_types = vertices_schema_generator.create_schema_dynamically()
     EdgeQuery, edge_record_schema_types = edge_schema_generator.create_schema_dynamically()
-    SearchVertexSearchQuery, vertex_search_record_schema_types = vertex_search_schema_generator.create_schema_dynamically()
-    SearchEdgeSearchQuery, edge_search_record_schema_types = edge_search_schema_generator.create_schema_dynamically()
+    # SearchVertexSearchQuery, vertex_search_record_schema_types = vertex_search_schema_generator.create_schema_dynamically()
+    # SearchEdgeSearchQuery, edge_search_record_schema_types = edge_search_schema_generator.create_schema_dynamically()
 
-    class Query(ModellerQuery, GraphSchema, NodeQuery, EdgeQuery, SearchVertexSearchQuery, SearchEdgeSearchQuery):
+    # class Query(ModellerQuery, GraphSchema, NodeQuery, EdgeQuery, SearchVertexSearchQuery, SearchEdgeSearchQuery):
+    class Query(ModellerQuery, GraphSchema, NodeQuery, EdgeQuery):
         pass
 
     return graphene.Schema(query=Query,
-                           types=node_record_schema_types + edge_record_schema_types \
-                                 + vertex_search_record_schema_types + edge_search_record_schema_types,
+                           types=node_record_schema_types + edge_record_schema_types ,
+                                 # + vertex_search_record_schema_types + edge_search_record_schema_types,
                            auto_camelcase=False
                            )

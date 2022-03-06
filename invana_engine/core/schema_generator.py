@@ -108,30 +108,54 @@ class DynamicSchemaGenerator:
             order_by_fields
         )
 
+    def create_filter_based_on_datatype(self, data_type):
+        where_filter_fields = {}
+        allowed_where_conditions = {}  # based on data type
+        # print("=====property_object['type']", property_object['type'])
+        if data_type in ["Integer", "Float", "DateTime"]:
+            allowed_where_conditions.update(WHERE_CONDITIONS_BASE)
+        elif data_type in ["Boolean"]:
+            allowed_where_conditions.update(WHERE_CONDITIONS_BOOLEAN)
+        elif data_type in ['String', 'Geoshape']:
+            allowed_where_conditions.update(ALL_WHERE_CONDITIONS)
+        else:
+            allowed_where_conditions.update(ALL_WHERE_CONDITIONS)
+        for where_condition_key, where_condition_type in allowed_where_conditions.items():
+            where_filter_fields[where_condition_key] = where_condition_type()
+        return where_filter_fields
+
     def create_where_fields(self, record_class, property_objects):
 
         node_type_where_filters = {}
         for property_object in property_objects:
-            where_filter_fields = {}
-            allowed_where_conditions = {}  # based on data type
-            # print("=====property_object['type']", property_object['type'])
-            if property_object['type'] in ["Integer", "Float", "DateTime"]:
-                allowed_where_conditions.update(WHERE_CONDITIONS_BASE)
-            elif property_object['type'] in ["Boolean"]:
-                allowed_where_conditions.update(WHERE_CONDITIONS_BOOLEAN)
-            elif property_object['type'] in ['String', 'Geoshape']:
-                allowed_where_conditions.update(ALL_WHERE_CONDITIONS)
-            else:
-                allowed_where_conditions.update(ALL_WHERE_CONDITIONS)
-            for where_condition_key, where_condition_type in allowed_where_conditions.items():
-                where_filter_fields[where_condition_key] = where_condition_type()
-
+            where_filter_fields = self.create_filter_based_on_datatype(property_object['type'])
             property_where_filters = type(
                 f"{property_object['type']}_where_filters".lower(),
                 (graphene.InputObjectType,),
                 where_filter_fields
             )
             node_type_where_filters[property_object['id']] = graphene.Field(property_where_filters)
+
+        # TODO - add _id filter
+
+        id_where_filter_fields = self.create_filter_based_on_datatype("String")
+        id_property_where_filters = type(
+            f"id_where_filters".lower(),
+            (graphene.InputObjectType,),
+            id_where_filter_fields
+        )
+        node_type_where_filters["_id"] = graphene.Field(id_property_where_filters)
+
+        # TODO - get the _oute_ and _ine_ labels
+        is_node = True if "NodeType" in str(record_class) else False
+        print("is_node", is_node, "=======", record_class)
+        # TOD now detect the ine and oute from this node
+        if is_node:
+            pass
+
+
+        # TODO -
+        print("record_class", record_class)
 
         ## for global search
         # if self.is_global_search:
