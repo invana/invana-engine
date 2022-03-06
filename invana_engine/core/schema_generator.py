@@ -69,7 +69,9 @@ class DynamicSchemaGenerator:
                 qs = qs.range(_offset, _offset + _limit)
             elif _limit and not _offset:
                 qs = qs.limit(_limit)
-            data = [record_cls(**d.to_json()) for d in qs.elementMap(*fields['properties']).toList()]
+
+            result = qs.elementMap(*fields['properties']).toList()
+            data = [d.to_json() for d in result]
             return data
 
         resolver_func.__name__ = 'resolve_%s' % record_name

@@ -170,7 +170,7 @@
         },
         "invana": {
             "git": "https://github.com/invanalabs/invana-py.git",
-            "ref": "159a070f53476a42d0e052d153621e34adfa843c"
+            "ref": "2be3c6a619b96fea3eefeb1ae0e090ab8c4eb4a9"
         },
         "isodate": {
             "hashes": [

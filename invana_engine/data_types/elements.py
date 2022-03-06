@@ -40,11 +40,19 @@ class NodeType(graphene.ObjectType):
     properties = AnyField()
 
 
+class InV(graphene.ObjectType):
+    id = graphene.ID()
+    label = graphene.String()
+
+
+class OutV(graphene.ObjectType):
+    id = graphene.ID()
+    label = graphene.String()
+
+
 class EdgeType(NodeType):
-    in_v = AnyField()
-    out_v = AnyField()
-    inv_label = graphene.String()
-    outv_label = graphene.String()
+    inv = graphene.Field(InV)
+    outv = graphene.Field(OutV)
 
 
 class NodeOrEdgeType(EdgeType):
