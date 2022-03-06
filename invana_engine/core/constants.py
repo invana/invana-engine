@@ -16,13 +16,20 @@ import graphene
 FIELD_TYPES_MAP = {
     'String': graphene.String,
     'Integer': graphene.Int,
-    'class org.janusgraph.core.attribute.Geoshape': graphene.String
+    'Boolean': graphene.Boolean,
+    'Float': graphene.Float,
+    'DateTime': graphene.DateTime,
+    'Geoshape': graphene.String
     # ...
 }
 
-WHERE_CONDITIONS = {
+WHERE_CONDITIONS_BOOLEAN = {
     "eq": graphene.String,
-    "neq": graphene.String,
+    "neq": graphene.String
+
+}
+
+WHERE_CONDITIONS_BASE = {
 
     "lt": graphene.Int,
     "lte": graphene.Int,
@@ -35,12 +42,29 @@ WHERE_CONDITIONS = {
     "outside": lambda: graphene.List(graphene.String),
     "between": lambda: graphene.List(graphene.String),
 
+}
+WHERE_CONDITIONS_BASE.update(WHERE_CONDITIONS_BOOLEAN)
+
+WHERE_CONDITIONS_FOR_STRING = {
     "startingWith": graphene.String,
     "containing": graphene.String,
     "endingWith": graphene.String,
     "notStartingWith": graphene.String,
     "notContaining": graphene.String,
     "notEndingWith": graphene.String,
+}
+
+ALL_WHERE_CONDITIONS = {}
+ALL_WHERE_CONDITIONS.update(WHERE_CONDITIONS_BASE)
+ALL_WHERE_CONDITIONS.update(WHERE_CONDITIONS_FOR_STRING)
+
+WHERE_CONDITIONS_DATATYPE_MAP = {
+    # 'String': graphene.String,
+    # 'Integer': graphene.Int,
+    # 'Boolean': graphene.Boolean,
+    # 'Float': graphene.Float,
+    # 'DateTime': graphene.DateTime,
+    # 'class org.janusgraph.core.attribute.Geoshape': graphene.String
 }
 
 DEFAULT_LIMIT_SIZE = 10

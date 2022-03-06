@@ -43,8 +43,8 @@ class NodeType(graphene.ObjectType):
 class EdgeType(NodeType):
     in_v = AnyField()
     out_v = AnyField()
-    in_v_label = graphene.String()
-    out_v_label = graphene.String()
+    inv_label = graphene.String()
+    outv_label = graphene.String()
 
 
 class NodeOrEdgeType(EdgeType):
