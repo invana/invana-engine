@@ -40,7 +40,8 @@ class DynamicSchemaGenerator:
                           _limit: int = None,
                           _offset: int = None,
                           _order_by=None,
-                          _where=None
+                          _where=None,
+                          _dedup=None
                           ):
 
             search_kwargs = {}
@@ -70,7 +71,10 @@ class DynamicSchemaGenerator:
             elif _limit and not _offset:
                 qs = qs.limit(_limit)
 
-            result = qs.elementMap(*fields['properties']).toList()
+            qs = qs.elementMap(*fields['properties'])
+            if _dedup is True:
+                qs = qs.dedup()
+            result = qs.toList()
             data = [d.to_json() for d in result]
             return data
 
@@ -144,6 +148,9 @@ class DynamicSchemaGenerator:
         extra_fields = {}
         # print("create_record_fields", record_class)
         if property_objects.__len__() > 0:
+            extra_fields['_dedup'] = graphene.Argument(graphene.Boolean, default_value=True,
+                                                       description="dedup the data")
+
             order_by_type = self.create_order_by_fields(record_class, property_objects)
             extra_fields['_order_by'] = graphene.Argument(order_by_type,
                                                           description="order_by")
