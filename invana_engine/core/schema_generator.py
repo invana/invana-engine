@@ -21,13 +21,15 @@ from .constants import FIELD_TYPES_MAP, WHERE_CONDITIONS_BASE, WHERE_CONDITIONS_
 
 class DynamicSchemaGenerator:
 
-    def __init__(self, schema_data, search_type, is_global_search=False):
+    def __init__(self, schema_data, search_type, schema_store, is_global_search=False):
         # data_type: node, edge
+        self.record_schemas = {}
         if search_type not in ["node", "edge"]:
             raise Exception(f"search_type can only be node or edge. received {search_type}")
         self.schema_data = schema_data
         self.search_type = search_type
         self.is_global_search = is_global_search
+        self.schema_store = schema_store
 
     def get_search_type(self):
         return NodeType if self.search_type == "node" else EdgeType
@@ -108,7 +110,7 @@ class DynamicSchemaGenerator:
             order_by_fields
         )
 
-    def create_filter_based_on_datatype(self, data_type):
+    def create_filters_based_on_datatype(self, data_type):
         where_filter_fields = {}
         allowed_where_conditions = {}  # based on data type
         # print("=====property_object['type']", property_object['type'])
@@ -124,38 +126,61 @@ class DynamicSchemaGenerator:
             where_filter_fields[where_condition_key] = where_condition_type()
         return where_filter_fields
 
+    def create_where_filter_object_type(self, object_name, filter_fields):
+        # TODO - register this to a cache
+        return type(
+            f"{object_name}_where_filters".lower(),
+            (graphene.InputObjectType,),
+            filter_fields
+        )
+
     def create_where_fields(self, record_class, property_objects):
 
         node_type_where_filters = {}
         for property_object in property_objects:
-            where_filter_fields = self.create_filter_based_on_datatype(property_object['type'])
-            property_where_filters = type(
-                f"{property_object['type']}_where_filters".lower(),
-                (graphene.InputObjectType,),
-                where_filter_fields
+            where_filter_fields = self.create_filters_based_on_datatype(property_object['type'])
+            property_where_filters = self.create_where_filter_object_type(
+                property_object['type'], where_filter_fields
             )
             node_type_where_filters[property_object['id']] = graphene.Field(property_where_filters)
 
         # TODO - add _id filter
 
-        id_where_filter_fields = self.create_filter_based_on_datatype("String")
-        id_property_where_filters = type(
-            f"id_where_filters".lower(),
-            (graphene.InputObjectType,),
-            id_where_filter_fields
-        )
+        id_where_filter_fields = self.create_filters_based_on_datatype("String")
+        id_property_where_filters = self.create_where_filter_object_type("id", id_where_filter_fields)
         node_type_where_filters["_id"] = graphene.Field(id_property_where_filters)
 
         # TODO - get the _oute_ and _ine_ labels
+
         is_node = True if "NodeType" in str(record_class) else False
         print("is_node", is_node, "=======", record_class)
         # TOD now detect the ine and oute from this node
         if is_node:
             pass
+            # detect in and out edges
+            node_label = str(record_class).replace("NodeType", "")
+            for label in self.schema_store.vertex__edges_map[f"{node_label}__ine"]:
+                # TODO - fix this place
+                where_filter_fields = self.create_filters_based_on_datatype("String")
+                property_where_filters = type(
+                    f"id_where_filters".lower(),
+                    (graphene.InputObjectType,),
+                    where_filter_fields
+                )
+                node_type_where_filters[f"_ine_{label}"] = graphene.Field(property_where_filters)
 
+            for label in self.schema_store.vertex__edges_map[f"{node_label}__oute"]:
+                # TODO - fix this place
+                where_filter_fields = self.create_filters_based_on_datatype("String")
+                property_where_filters = type(
+                    f"id_where_filters".lower(),
+                    (graphene.InputObjectType,),
+                    where_filter_fields
+                )
+                node_type_where_filters[f"_oute_{label}"] = graphene.Field(property_where_filters)
 
         # TODO -
-        print("record_class", record_class)
+        print("record_class", record_class, self.schema_store)
 
         ## for global search
         # if self.is_global_search:
@@ -181,7 +206,7 @@ class DynamicSchemaGenerator:
 
             where_filters = self.create_where_fields(record_class, property_objects)
             extra_fields['_where'] = graphene.Argument(where_filters,
-                                                       description="where")
+                                                       description="to filter the data")
         return graphene.Field(
             graphene.List(record_class),
             _limit=graphene.Argument(graphene.Int, default_value=DEFAULT_LIMIT_SIZE,
@@ -192,7 +217,7 @@ class DynamicSchemaGenerator:
         )
 
     def create_schema_dynamically(self):
-        record_schemas = {}
+        self.record_schemas = {}
         record_property_objects = {}
         for record_type in self.schema_data:
             classname = record_type["id"]  # 'Author'
@@ -202,15 +227,16 @@ class DynamicSchemaGenerator:
                 field_type = FIELD_TYPES_MAP[option['type']]
                 properties[option['id']] = field_type()  # maybe add label as description
                 record_property_objects[record_type['id']].append(option)
-            record_schemas[record_type['id']] = self.create_record_type(
+
+            self.record_schemas[record_type['id']] = self.create_record_type(
                 classname,
                 properties
             )
         # create Query in similar way
         record_fields = {}
-        for key, rec in record_schemas.items():
+        for key, rec in self.record_schemas.items():
             record_fields[key] = self.create_record_fields(rec, record_property_objects[key])  # graphene.Field(rec)
             record_fields['resolve_%s' % key] = self.create_resolver(key, rec)
         Query = type(f'{self.search_type}Query'.capitalize(), (graphene.ObjectType,), record_fields)
-        record_schema_types = list(record_schemas.values())
+        record_schema_types = list(self.record_schemas.values())
         return Query, record_schema_types
