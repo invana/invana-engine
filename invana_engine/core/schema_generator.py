@@ -17,26 +17,37 @@ from invana_engine.utils import get_field_names
 from invana_engine.data_types import NodeType, EdgeType
 from .constants import FIELD_TYPES_MAP, WHERE_CONDITIONS_BASE, WHERE_CONDITIONS_DATATYPE_MAP, \
     WHERE_CONDITIONS_FOR_STRING, DEFAULT_LIMIT_SIZE, ALL_WHERE_CONDITIONS, WHERE_CONDITIONS_BOOLEAN
+from .store import TypeStore
+from .utils import convert_to_graphql_schema
+from ..graph.query import GraphSchema
+from ..modeller.query import ModellerQuery
+
+
+class Helpers:
+
+    def create_schema_type(self, ):
+        pass
 
 
 class DynamicSchemaGenerator:
 
-    def __init__(self, schema_data, search_type, schema_store, is_global_search=False):
-        # data_type: node, edge
-        self.record_schemas = {}
-        if search_type not in ["node", "edge"]:
-            raise Exception(f"search_type can only be node or edge. received {search_type}")
-        self.schema_data = schema_data
-        self.search_type = search_type
-        self.is_global_search = is_global_search
+    def __init__(self, schema_store):
+        # self.type_store = TypeStore()
+        # self.schema_data = schema_data
+        # self.search_type = search_type
+        # self.is_global_search = is_global_search
+
         self.schema_store = schema_store
+        self.record_schema_property_objects = {}
+        self.node_record_schemas = {}
+        self.edge_record_schemas = {}
 
-    def get_search_type(self):
-        return NodeType if self.search_type == "node" else EdgeType
+    @staticmethod
+    def get_record_response_type(search_type):
+        return NodeType if search_type == "node" else EdgeType
 
-    def create_resolver(self, record_name, record_cls):
-        search_type = self.search_type
-        is_global_search = self.is_global_search
+    def create_resolver(self, record_name, record_cls, search_type):
+        # is_global_search = self.is_global_search
 
         def resolver_func(self, info: graphene.ResolveInfo,
                           _limit: int = None,
@@ -48,8 +59,8 @@ class DynamicSchemaGenerator:
 
             search_kwargs = {}
             fields = get_field_names(info)
-            if is_global_search is not True:
-                search_kwargs = {"has__label": fields['label']}
+            # if is_global_search is not True:
+            #     search_kwargs = {"has__label": fields['label']}
 
             if _where:
                 for property_key, where_item in _where.items():
@@ -83,19 +94,19 @@ class DynamicSchemaGenerator:
         resolver_func.__name__ = 'resolve_%s' % record_name
         return resolver_func
 
-    def create_record_type(self, classname, properties):
+    def create_record_type(self, search_type, classname, properties):
         if properties.values().__len__() > 0:
-            record_property_objects_type = type(
+            record_schema_property_objects_type = type(
                 f"{classname}Properties",
                 (graphene.ObjectType,),
                 properties
             )
-            record_extra_fields = {"properties": graphene.Field(record_property_objects_type)}
+            record_extra_fields = {"properties": graphene.Field(record_schema_property_objects_type)}
         else:
             record_extra_fields = {}
         record_type = type(
-            f"{classname}{self.search_type.capitalize()}Type",
-            (self.get_search_type(),),
+            f"{classname}{search_type.capitalize()}Type",
+            (self.get_record_response_type(search_type),),  # extending NodeType/EdgeType
             record_extra_fields
         )
         return record_type
@@ -196,17 +207,17 @@ class DynamicSchemaGenerator:
     def create_record_fields(self, record_class, property_objects):
         extra_fields = {}
         # print("create_record_fields", record_class)
-        if property_objects.__len__() > 0:
-            extra_fields['_dedup'] = graphene.Argument(graphene.Boolean, default_value=True,
-                                                       description="dedup the data")
+        # if property_objects.__len__() > 0:
+        extra_fields['_dedup'] = graphene.Argument(graphene.Boolean, default_value=True,
+                                                   description="dedup the data")
 
-            order_by_type = self.create_order_by_fields(record_class, property_objects)
-            extra_fields['_order_by'] = graphene.Argument(order_by_type,
-                                                          description="order_by")
+        order_by_type = self.create_order_by_fields(record_class, property_objects)
+        extra_fields['_order_by'] = graphene.Argument(order_by_type,
+                                                      description="order_by")
 
-            where_filters = self.create_where_fields(record_class, property_objects)
-            extra_fields['_where'] = graphene.Argument(where_filters,
-                                                       description="to filter the data")
+        where_filters = self.create_where_fields(record_class, property_objects)
+        extra_fields['_where'] = graphene.Argument(where_filters,
+                                                   description="to filter the data")
         return graphene.Field(
             graphene.List(record_class),
             _limit=graphene.Argument(graphene.Int, default_value=DEFAULT_LIMIT_SIZE,
@@ -216,27 +227,65 @@ class DynamicSchemaGenerator:
             **extra_fields
         )
 
-    def create_schema_dynamically(self):
-        self.record_schemas = {}
-        record_property_objects = {}
-        for record_type in self.schema_data:
-            classname = record_type["id"]  # 'Author'
-            properties = {}
-            record_property_objects[record_type['id']] = []
-            for option in record_type["options"]:
-                field_type = FIELD_TYPES_MAP[option['type']]
-                properties[option['id']] = field_type()  # maybe add label as description
-                record_property_objects[record_type['id']].append(option)
+    def create_and_register_record_type(self, record_schema, search_type):
 
-            self.record_schemas[record_type['id']] = self.create_record_type(
+        classname = record_schema["id"]  # 'Author'
+        properties = {}
+        self.record_schema_property_objects[record_schema['id']] = []
+        for option in record_schema["options"]:
+            field_type = FIELD_TYPES_MAP[option['type']]
+            properties[option['id']] = field_type()  # maybe add label as description
+            self.record_schema_property_objects[record_schema['id']].append(option)
+
+        # register here to in memory store
+        if search_type == "node":
+            self.node_record_schemas[record_schema['id']] = self.create_record_type(
+                search_type,
                 classname,
                 properties
             )
+        elif search_type == "edge":
+            self.edge_record_schemas[record_schema['id']] = self.create_record_type(
+                search_type,
+                classname,
+                properties
+            )
+        else:
+            raise Exception("search_type should be either node or edge")
+
+    def get_record_schemas_of_search_types(self, search_type):
+        return self.node_record_schemas if search_type == "node" else self.edge_record_schemas
+
+
+    def create_record_fields_of_search_type(self, search_type ):
         # create Query in similar way
         record_fields = {}
-        for key, rec in self.record_schemas.items():
-            record_fields[key] = self.create_record_fields(rec, record_property_objects[key])  # graphene.Field(rec)
-            record_fields['resolve_%s' % key] = self.create_resolver(key, rec)
-        Query = type(f'{self.search_type}Query'.capitalize(), (graphene.ObjectType,), record_fields)
-        record_schema_types = list(self.record_schemas.values())
-        return Query, record_schema_types
+        record_schemas = self.get_record_schemas_of_search_types(search_type)
+        for key, rec in record_schemas.items():
+            record_fields[key] = self.create_record_fields(rec, self.record_schema_property_objects[key])
+            record_fields['resolve_%s' % key] = self.create_resolver(key, rec, search_type)
+        return record_fields
+
+    def create_schema_dynamically(self):
+        types = []
+        query_schemas = []
+        for search_type in ["node", "edge"]:
+            # create node types
+            for label, record_schema in self.schema_store.vertex_schema_gql_map.items():
+                self.create_and_register_record_type(record_schema, search_type)
+
+            record_fields = self.create_record_fields_of_search_type(search_type)
+            Query = type(f'{search_type}Query'.capitalize(), (graphene.ObjectType,), record_fields)
+            query_schemas.append(Query)
+            record_schemas = self.get_record_schemas_of_search_types(search_type)
+            types.extend(list(record_schemas.values()))
+
+        # return Query, record_schema_types
+        class Query(ModellerQuery, GraphSchema, *query_schemas):
+            pass
+
+        return graphene.Schema(query=Query,
+                               types=types,
+                               # + vertex_search_record_schema_types + edge_search_record_schema_types,
+                               auto_camelcase=False
+                               )

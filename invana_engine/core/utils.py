@@ -14,24 +14,19 @@
 import graphene
 
 
-def convert_to_graphql_schema(schema_items):
-    graphql_schema_items = []
-    for schema_item in schema_items:
-        graphql_schema_item = {
-            'id': schema_item['name'],  # slugify
-            'name': schema_item['name'],
-            'desc': f"browse {schema_item['name']}",
-            'options': []
-        }
-        for property_data in schema_item['properties']:
-            graphql_schema_item['options'].append({
-                "id": property_data["name"],
-                "label": property_data["name"],
-                "type": property_data["type"],
-                "required": None,
-                "placeholder": f'{property_data["name"]} here'
-            })
-        graphql_schema_items.append(graphql_schema_item)
-    return graphql_schema_items
-
-
+def convert_to_graphql_schema(schema_item):
+    graphql_schema_item = {
+        'id': schema_item['name'],  # slugify
+        'name': schema_item['name'],
+        'desc': f"browse {schema_item['name']}",
+        'options': []
+    }
+    for property_data in schema_item['properties']:
+        graphql_schema_item['options'].append({
+            "id": property_data["name"],
+            "label": property_data["name"],
+            "type": property_data["type"],
+            "required": None,
+            "placeholder": f'{property_data["name"]} here'
+        })
+    return graphql_schema_item
