@@ -115,6 +115,11 @@ class DynamicSchemaGenerator:
         order_by_fields = {}
         for property_object in property_objects:
             order_by_fields[property_object['id']] = graphene.String()
+
+        id_where_filter_fields = self.create_filters_based_on_datatype("String")
+        id_property_where_filters = self.create_where_filter_object_type("id", id_where_filter_fields)
+        order_by_fields["_id"] = graphene.Field(id_property_where_filters)
+
         return type(
             f"{record_class.__name__}OrderBy",
             (graphene.InputObjectType,),
@@ -253,14 +258,13 @@ class DynamicSchemaGenerator:
         else:
             raise Exception("search_type should be either node or edge")
 
-    def get_record_schemas_of_search_types(self, search_type):
+    def get_record_schemas_of_search_type(self, search_type):
         return self.node_record_schemas if search_type == "node" else self.edge_record_schemas
 
-
-    def create_record_fields_of_search_type(self, search_type ):
+    def create_record_fields_of_search_type(self, search_type):
         # create Query in similar way
         record_fields = {}
-        record_schemas = self.get_record_schemas_of_search_types(search_type)
+        record_schemas = self.get_record_schemas_of_search_type(search_type)
         for key, rec in record_schemas.items():
             record_fields[key] = self.create_record_fields(rec, self.record_schema_property_objects[key])
             record_fields['resolve_%s' % key] = self.create_resolver(key, rec, search_type)
@@ -271,17 +275,23 @@ class DynamicSchemaGenerator:
         query_schemas = []
         for search_type in ["node", "edge"]:
             # create node types
-            for label, record_schema in self.schema_store.vertex_schema_gql_map.items():
+            schema_gql_map = self.schema_store.vertex_schema_gql_map if search_type == "node" else \
+                self.schema_store.edge_schema_gql_map
+            for label, record_schema in schema_gql_map.items():
                 self.create_and_register_record_type(record_schema, search_type)
 
             record_fields = self.create_record_fields_of_search_type(search_type)
-            Query = type(f'{search_type}Query'.capitalize(), (graphene.ObjectType,), record_fields)
-            query_schemas.append(Query)
-            record_schemas = self.get_record_schemas_of_search_types(search_type)
+            SearchTypeQuery = type(f'{search_type}Query'.capitalize(), (graphene.ObjectType,), record_fields)
+            query_schemas.append(SearchTypeQuery)
+
+            record_schemas = self.get_record_schemas_of_search_type(search_type)
             types.extend(list(record_schemas.values()))
 
         # return Query, record_schema_types
-        class Query(ModellerQuery, GraphSchema, *query_schemas):
+        # class Query(ModellerQuery, GraphSchema, *query_schemas):
+        #     pass
+
+        class Query(*query_schemas):
             pass
 
         return graphene.Schema(query=Query,
