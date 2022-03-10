@@ -296,7 +296,7 @@ class DynamicSchemaGenerator:
 
     # def create_label_fields_of_label(self, record, )
 
-    def create_schema_dynamically(self):
+    def create_schema_dynamically(self, *extra_schema_types):
         types = []
         query_schemas = []
         for search_type in ["node", "edge"]:
@@ -318,7 +318,7 @@ class DynamicSchemaGenerator:
         # class Query(ModellerQuery, GraphSchema, *query_schemas):
         #     pass
 
-        class Query(*query_schemas):
+        class Query(*extra_schema_types, *query_schemas):
             pass
 
         return graphene.Schema(query=Query,

@@ -33,7 +33,7 @@ def get_schema():
 
     schema_generator = DynamicSchemaGenerator(schema_store)
 
-    return schema_generator.create_schema_dynamically()
+    return schema_generator.create_schema_dynamically(ModellerQuery, GraphSchema)
 
     # edge_schema_generator = DynamicSchemaGenerator(edges_schema_data_json, "edge", schema_store)
     #
