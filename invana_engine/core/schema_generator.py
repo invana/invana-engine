@@ -13,7 +13,7 @@
 #  limitations under the License.
 # implementation inspired from - https://stackoverflow.com/a/52690104
 import graphene
-from invana_engine.utils import get_field_names
+from invana_engine.utils import get_field_names_from_resolver_info
 from invana_engine.data_types import NodeType, EdgeType
 from .constants import FIELD_TYPES_MAP, WHERE_CONDITIONS_BASE, WHERE_CONDITIONS_DATATYPE_MAP, \
     WHERE_CONDITIONS_FOR_STRING, DEFAULT_LIMIT_SIZE, ALL_WHERE_CONDITIONS, WHERE_CONDITIONS_BOOLEAN
@@ -63,9 +63,9 @@ class DynamicSchemaGenerator:
                           ):
 
             search_kwargs = {}
-            fields = get_field_names(info)
-            # if is_global_search is not True:
-            #     search_kwargs = {"has__label": fields['label']}
+            fields = get_field_names_from_resolver_info(info)
+            if fields['label']:
+                search_kwargs = {"has__label": fields['label']}
 
             if _where:
                 for property_key, where_item in _where.items():
@@ -181,8 +181,9 @@ class DynamicSchemaGenerator:
         # TODO - get the _oute_ and _ine_ labels
 
         is_node = True if "NodeType" in str(record_class) else False
-        print("is_node", is_node, "=======", record_class)
+        # print("is_node", is_node, "=======", record_class)
         # TOD now detect the ine and oute from this node
+
         if is_node:
             pass
             # detect in and out edges
@@ -200,10 +201,13 @@ class DynamicSchemaGenerator:
                 self.create_and_register_record_type_if_not_exist(self.schema_store.edge_schema_gql_map[label],
                                                                   search_type)
                 self.create_label_fields_of_search_type(search_type)
-                node_type_where_filters[f"ine__{label}"] = self.create_edge_filters(node_label, label, "oute")
+                node_type_where_filters[f"oute__{label}"] = self.create_edge_filters(node_label, label, "oute")
 
+        else:
+            pass
+ 
         # TODO -
-        print("record_class", record_class, self.schema_store)
+        # print("record_class", record_class, self.schema_store)
 
         ## for global search
         # if self.is_global_search:

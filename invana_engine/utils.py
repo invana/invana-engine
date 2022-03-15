@@ -34,7 +34,7 @@ def snake_case_to_camel_case(s):
                     else i for i in s]).lstrip('_')
 
 
-def get_field_names(info):
+def get_field_names_from_resolver_info(info):
     """
     https://github.com/graphql-python/graphene/issues/348#issuecomment-267717809
     Parses a query info into a list of composite field names.
