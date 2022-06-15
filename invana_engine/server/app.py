@@ -29,14 +29,14 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.routing import Route
 from invana_engine.server.views import homepage_view
 from invana_engine.settings import gremlin_server_url, shall_debug, \
-    gremlin_traversal_source
+    gremlin_traversal_source, server_port
 from starlette_graphene3 import GraphQLApp, make_graphiql_handler
 from invana import InvanaGraph
 from .schema import get_schema
 from .graph import graph
 
 print(".................................................")
-print("Starting Invana Engine server")
+print(f"Starting Invana Engine server at port {server_port}")
 print(f"Using GREMLIN_SERVER_URL: {gremlin_server_url}")
 print(f"Using GREMLIN_TRAVERSAL_SOURCE: {gremlin_traversal_source}")
 print(f"Using DEBUG: {shall_debug}")

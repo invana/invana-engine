@@ -12,6 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 from invana_engine.data_types import NodeOrEdgeType, AnyField
+from invana_engine.settings import DEFAULT_QUERY_TIMEOUT
 import graphene
 
 
@@ -30,10 +31,9 @@ import graphene
 
 
 class GremlinGenericQuerySchema:
-    execute_query = graphene.Field(graphene.List(AnyField), timeout=graphene.Int(), gremlin=graphene.String())
+    execute_query = graphene.Field(graphene.List(AnyField), timeout=graphene.Int(default_value=DEFAULT_QUERY_TIMEOUT),
+                                   gremlin=graphene.String())
 
     def resolve_execute_query(self, info: graphene.ResolveInfo, gremlin: str, timeout: int) -> any:
         response = info.context['request'].app.state.graph.execute_query(gremlin, timeout=timeout)
-        return [d.to_json() for d in response.data]
-
-
+        return [d.to_json() for d in response.data] if response.data else []

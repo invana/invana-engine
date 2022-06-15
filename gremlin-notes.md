@@ -3,8 +3,8 @@ pipenv install git+https://github.com/invanalabs/invana-py.git@dev#egg=invana
 
 ```bash
 
-docker run --name janusgraph-instance-1 -d -p 8182:8182 janusgraph/janusgraph
-docker run --name janusgraph-test-instance-1 -d -p 8184:8182 janusgraph/janusgraph
+docker run --restart always --name janusgraph-instance-1 -d -p 8182:8182 janusgraph/janusgraph
+docker run --restart always --name janusgraph-test-instance-1 -d -p 8184:8182 janusgraph/janusgraph
 
 ```
 

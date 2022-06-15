@@ -21,4 +21,4 @@ gremlin_server_password = os.environ.get("GREMLIN_SERVER_PASSWORD")
 gremlin_traversal_source = os.environ.get("GREMLIN_TRAVERSAL_SOURCE", "g")
 shall_debug = os.environ.get("DEBUG", False)
 server_port = os.environ.get("SERVER_PORT", 8200)
-
+DEFAULT_QUERY_TIMEOUT = 180

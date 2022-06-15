@@ -42,13 +42,13 @@ class GremlinClientInfo(graphene.ObjectType):
 
 
 class GenericClientInfoSchema(graphene.ObjectType):
-    hello = graphene.String(name=graphene.String(default_value="World"))
-    get_client_info = graphene.Field(GremlinClientInfo)
+    _hello = graphene.String(name=graphene.String(default_value="World"))
+    _get_client_info = graphene.Field(GremlinClientInfo)
 
-    def resolve_hello(self, info, name):
+    def resolve__hello(self, info, name):
         return name
 
-    def resolve_get_client_info(self, info):
+    def resolve__get_client_info(self, info):
         result = get_client_info()
         result['gremlin_host'] = get_host(info.context['request'].app.state.graph.connector.gremlin_url)
         result['gremlin_traversal_source'] = info.context['request'].app.state.graph.connector.traversal_source
