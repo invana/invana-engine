@@ -18,7 +18,7 @@ from invana_engine.settings import __VERSION__
 
 
 class GraphSchema(GremlinGenericQuerySchema):
-    version = graphene.String()
+    _version = graphene.String()
 
-    def resolve_version(self, info: graphene.ResolveInfo) -> str:
+    def resolve__version(self, info: graphene.ResolveInfo) -> str:
         return __VERSION__
