@@ -24,6 +24,7 @@
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
 from starlette.applications import Starlette
+import logging
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.routing import Route
@@ -35,16 +36,31 @@ from invana import InvanaGraph
 from .schema import get_schema
 from .graph import graph
 
-print(".................................................")
-print(f"Starting Invana Engine server at port {server_port}")
-print(f"Using GREMLIN_SERVER_URL: {gremlin_server_url}")
-print(f"Using GREMLIN_TRAVERSAL_SOURCE: {gremlin_traversal_source}")
-print(f"Using DEBUG: {shall_debug}")
-print(".................................................")
+logger = logging.getLogger(__name__)
+
+
+def welcome():
+    logger.info("""
+██ ███    ██ ██    ██  █████  ███    ██  █████      ███████ ███    ██  ██████  ██ ███    ██ ███████ 
+██ ████   ██ ██    ██ ██   ██ ████   ██ ██   ██     ██      ████   ██ ██       ██ ████   ██ ██      
+██ ██ ██  ██ ██    ██ ███████ ██ ██  ██ ███████     █████   ██ ██  ██ ██   ███ ██ ██ ██  ██ █████   
+██ ██  ██ ██  ██  ██  ██   ██ ██  ██ ██ ██   ██     ██      ██  ██ ██ ██    ██ ██ ██  ██ ██ ██      
+██ ██   ████   ████   ██   ██ ██   ████ ██   ██     ███████ ██   ████  ██████  ██ ██   ████ ███████
+""")
+    logger.info(".................................................")
+    logger.info(f"Starting Invana Engine server at port {server_port}")
+    logger.info(f"Using GREMLIN_SERVER_URL: {gremlin_server_url}")
+    logger.info(f"Using GREMLIN_TRAVERSAL_SOURCE: {gremlin_traversal_source}")
+    logger.info(f"Using DEBUG: {shall_debug}")
+    logger.info(".................................................")
+
+
+welcome()
 
 if gremlin_server_url is None:
-    print("ERROR: GREMLIN_SERVER_URL environment variable not set. Please fix it .")
-    print("Exiting the program now. Please refer the documentation at https://github.com/invanalabs/invana-engine")
+    logger.error("ERROR: GREMLIN_SERVER_URL environment variable not set. Please fix it .")
+    logger.error(
+        "Exiting the program now. Please refer the documentation at https://github.com/invanalabs/invana-engine")
     exit()
 schema = get_schema()
 routes = [
