@@ -34,19 +34,20 @@ from invana_engine.settings import gremlin_server_url, shall_debug, \
 from starlette_graphene3 import GraphQLApp, make_graphiql_handler
 from invana import InvanaGraph
 from .schema import get_schema
+from .. import __VERSION__, __AUTHOR_NAME__, __AUTHOR_EMAIL__
 from .graph import graph
 
 logger = logging.getLogger(__name__)
 
 
 def welcome():
-    logger.info("""
+    logger.info(f"""
 ██ ███    ██ ██    ██  █████  ███    ██  █████      ███████ ███    ██  ██████  ██ ███    ██ ███████ 
 ██ ████   ██ ██    ██ ██   ██ ████   ██ ██   ██     ██      ████   ██ ██       ██ ████   ██ ██      
 ██ ██ ██  ██ ██    ██ ███████ ██ ██  ██ ███████     █████   ██ ██  ██ ██   ███ ██ ██ ██  ██ █████   
 ██ ██  ██ ██  ██  ██  ██   ██ ██  ██ ██ ██   ██     ██      ██  ██ ██ ██    ██ ██ ██  ██ ██ ██      
 ██ ██   ████   ████   ██   ██ ██   ████ ██   ██     ███████ ██   ████  ██████  ██ ██   ████ ███████
-""")
+{__VERSION__} version ; {__AUTHOR_NAME__}({__AUTHOR_EMAIL__})""")
     logger.info(".................................................")
     logger.info(f"Starting Invana Engine server at port {server_port}")
     logger.info(f"Using GREMLIN_SERVER_URL: {gremlin_server_url}")
@@ -74,6 +75,7 @@ middleware = [
 app = Starlette(routes=routes, middleware=middleware, debug=shall_debug)
 
 # schema = Query  # , mutation=Mutation, subscription=Subscription)
-app.mount("/graphql", GraphQLApp(schema, on_get=make_graphiql_handler()))  # Graphiql IDE
+app.mount("/graph", GraphQLApp(schema, on_get=make_graphiql_handler()))  # Graphiql IDE
+app.mount("/modeller", GraphQLApp(schema, on_get=make_graphiql_handler()))  # Graphiql IDE
 
 app.state.graph = graph
