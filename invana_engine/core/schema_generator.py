@@ -123,7 +123,7 @@ class DynamicSchemaGenerator:
 
         id_where_filter_fields = self.create_filters_based_on_datatype("String")
         id_property_order_by_filter = self.create_where_filter_object_type("id", id_where_filter_fields)
-        order_by_fields["_id"] = graphene.Field(id_property_order_by_filter)
+        order_by_fields["_id"] = self.create_filters_based_on_datatype("String") #graphene.Field(id_property_order_by_filter)
 
         return type(
             f"{record_class.__name__}OrderBy",
@@ -150,7 +150,7 @@ class DynamicSchemaGenerator:
     def create_where_filter_object_type(self, object_name, filter_fields):
         # TODO - register this to a cache
         return type(
-            f"{object_name}_where_filters".lower(),
+            f"{object_name}WhereFilters".lower(),
             (graphene.InputObjectType,),
             filter_fields
         )
@@ -215,7 +215,7 @@ class DynamicSchemaGenerator:
         # node_type_where_filters["_id"] = graphene.Field(graphene.List(where_filters))
 
         return type(
-            f"{record_class.__name__}_where_filters",
+            f"{record_class.__name__}WhereFilters",
             (graphene.InputObjectType,),
             node_type_where_filters
         )

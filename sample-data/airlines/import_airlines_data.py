@@ -62,15 +62,15 @@ with open('./air-routes-latest-nodes.csv') as f:
     for line in reader:
         cleaned_data = clean_nodes(line)
         created_data = graph.vertex.create(cleaned_data['label'], **cleaned_data['properties']).to_list()
-        print("created_data", created_data[0].id)
+        print("created node", created_data[0].id)
         node_id_map[cleaned_data['id']] = created_data[0].id
 
 with open('./air-routes-latest-edges.csv') as f:
     reader = csv.DictReader(f)
     for line in reader:
         cleaned_data = clean_edges(line)
-        created_data = graph.edge.create(label=cleaned_data['label'],
-                                                inv=node_id_map[cleaned_data['to']],
-                                                outv=node_id_map[cleaned_data['from']],
-                                                properties=cleaned_data['properties']).to_list()
-        print("created_data", created_data[0].id)
+        created_data = graph.edge.create(cleaned_data['label'],
+                                         node_id_map[cleaned_data['from']],
+                                         node_id_map[cleaned_data['to']],
+                                         **cleaned_data['properties']).to_list()
+        print("created edge", created_data[0].id)
