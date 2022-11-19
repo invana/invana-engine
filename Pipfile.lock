@@ -1,7 +1,11 @@
 {
     "_meta": {
         "hash": {
+<<<<<<< HEAD
             "sha256": "30784db049a21502f6a72f433d55f317d38a46b382a33d3858d735dc56367ded"
+=======
+            "sha256": "15c627340b9860bf33b3231b745fed602f535df8862272ad9d0d30be8bf4fa64"
+>>>>>>> b27ce59 (starlette graphene version freezed in Pipfile)
         },
         "pipfile-spec": 6,
         "requires": {
@@ -277,8 +281,13 @@
                 "sha256:25642c956049920a5aa49edcdd6ab1e06d7e5d467fc00e0506c44ac86fbfca02",
                 "sha256:e6d2677a32f47fc7eb2795db1dd15c1f34eff616bcaf2cfb5e997f854fa1c4a6"
             ],
+<<<<<<< HEAD
             "markers": "python_version < '3.10'",
             "version": "==4.3.0"
+=======
+            "index": "pypi",
+            "version": "==4.2.0"
+>>>>>>> b27ce59 (starlette graphene version freezed in Pipfile)
         },
         "uvicorn": {
             "hashes": [
