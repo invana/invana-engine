@@ -11,18 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
-#     Licensed under the Apache License, Version 2.0 (the "License");
-#     you may not use this file except in compliance with the License.
-#     You may obtain a copy of the License at
-#
-#     http:www.apache.org/licenses/LICENSE-2.0
-#
-#     Unless required by applicable law or agreed to in writing, software
-#    distributed under the License is distributed on an "AS IS" BASIS,
-#     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#     See the License for the specific language governing permissions and
-#     limitations under the License.
 from starlette.applications import Starlette
 import logging
 from starlette.middleware import Middleware
@@ -31,11 +19,13 @@ from starlette.routing import Route
 from invana_engine.server.views import homepage_view
 from invana_engine.settings import gremlin_server_url, shall_debug, \
     gremlin_traversal_source, server_port
-from starlette_graphene3 import GraphQLApp, make_graphiql_handler
-from invana import InvanaGraph
+from starlette_graphene3 import GraphQLApp
+from ..graphiql.handler import make_graphiql_handler
 from .schema import get_schema
 from .. import __VERSION__, __AUTHOR_NAME__, __AUTHOR_EMAIL__
 from .graph import graph
+from starlette.routing import Mount
+from starlette.staticfiles import StaticFiles
 
 logger = logging.getLogger(__name__)
 
@@ -66,6 +56,7 @@ if gremlin_server_url is None:
 schema = get_schema()
 routes = [
     Route('/', endpoint=homepage_view),
+    Mount('/static', app=StaticFiles(packages=[('graphiql', 'static')]), name="static"),
 ]
 
 middleware = [
