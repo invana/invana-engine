@@ -26,9 +26,6 @@ _GRAPHIQL_HTML = """
       <div id="root"></div>
    </body>
 </html>
-I
-
-
 """
 
 
