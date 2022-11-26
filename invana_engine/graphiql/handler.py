@@ -18,7 +18,7 @@ _GRAPHIQL_HTML = """
       <meta name="description" content="Opensource GraphQL API for modelling and querying graph data "/>
       <link rel="manifest" href="/manifest.json"/>
       <title>Invana Engine</title>
-      <script defer="defer" src="/static/js/main.67089516.js"></script>
+      <script defer="defer" src="/static/js/main.4cb84a9b.js"></script>
       <link href="/static/css/main.28998c47.css" rel="stylesheet">
    </head>
    <body>
