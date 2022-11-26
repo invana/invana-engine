@@ -20,7 +20,7 @@ from invana_engine.server.views import homepage_view
 from invana_engine.settings import gremlin_server_url, shall_debug, \
     gremlin_traversal_source, server_port
 from starlette_graphene3 import GraphQLApp
-from ..graphiql.handler import make_graphiql_handler
+from invana_engine.graphiql.handler import make_graphiql_handler
 from .schema import get_schema
 from .. import __VERSION__, __AUTHOR_NAME__, __AUTHOR_EMAIL__
 from .graph import graph
@@ -56,7 +56,7 @@ if gremlin_server_url is None:
 schema = get_schema()
 routes = [
     Route('/', endpoint=homepage_view),
-    Mount('/static', app=StaticFiles(packages=[('graphiql', 'static')]), name="static"),
+    Mount('/static', app=StaticFiles(packages=[('invana_engine.graphiql', 'static')]), name="static"),
 ]
 
 middleware = [
