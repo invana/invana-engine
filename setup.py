@@ -1,27 +1,29 @@
 #!/usr/bin/env python
-
 from setuptools import setup, find_packages
 from invana_engine.settings import __VERSION__
+from pip._internal.req import parse_requirements
+from pip._internal.network.session import PipSession
+import os
 
 
+def get_install_requires():
+    requirements = parse_requirements(os.path.join(os.path.dirname(__file__), 'requirements.txt'),
+                                      session=PipSession())
+    return [str(requirement.requirement) for requirement in requirements]
+
+
+print(get_install_requires())
 setup(
     name='invana-engine',
     version=__VERSION__,
-    description='GraphQL API and Insights engine for Apache TinkerPop supported graph databases.',
+    description='Opensource GraphQL API for graph data',
     author='Ravi Raja Merugu',
     author_email='ravi@invana.io',
     url='https://github.com/invanalabs/invana-engine',
     packages=find_packages(
         exclude=("dist", "docs", "tests", "scripts", "experiments")
     ),
-    install_requires=[
-        'gremlinpython==3.4.6',
-        'starlette==0.13.8',
-        'graphene==2.1.8',
-        'uvicorn==0.12.2',
-        'jinja2==2.11.2',
-        'aiofiles==0.6.0'
-    ],
+    install_requires=get_install_requires(),
     entry_points={
         'console_scripts': [
             'invana-engine-start = invana_engine.server.server:server_start',

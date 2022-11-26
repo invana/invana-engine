@@ -1,0 +1,27 @@
+-i https://pypi.org/simple
+aenum==2.2.6
+aiohttp==3.7.4 ; python_version >= '3.6'
+aniso8601==9.0.1
+anyio==3.6.2 ; python_full_version >= '3.6.2'
+async-timeout==3.0.1 ; python_full_version >= '3.5.3'
+attrs==22.1.0 ; python_version >= '3.5'
+chardet==3.0.4
+click==8.1.3 ; python_version >= '3.7'
+graphene==3.1.1
+graphql-core==3.2.3
+graphql-relay==3.2.0 ; python_version >= '3.6' and python_version < '4'
+gremlinpython==3.5.1
+h11==0.14.0 ; python_version >= '3.7'
+idna==3.4 ; python_version >= '3.5'
+git+https://github.com/invana/invana@46797c971b6abba4538dce3d4af8f5171d5a3dcf#egg=invana
+isodate==0.6.1
+multidict==6.0.2 ; python_version >= '3.7'
+nest-asyncio==1.5.6 ; python_version >= '3.5'
+six==1.16.0 ; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
+sniffio==1.3.0 ; python_version >= '3.7'
+starlette==0.22.0
+starlette-graphene3==0.6.0
+typing-extensions==4.4.0
+uvicorn==0.20.0
+websockets==10.4
+yarl==1.8.1 ; python_version >= '3.7'

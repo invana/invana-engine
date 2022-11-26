@@ -328,5 +328,5 @@ class DynamicSchemaGenerator:
         return graphene.Schema(query=Query,
                                types=types,
                                # + vertex_search_record_schema_types + edge_search_record_schema_types,
-                               auto_camelcase=False
+                               auto_camelcase=True
                                )

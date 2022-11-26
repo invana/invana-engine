@@ -15,8 +15,8 @@ from starlette.applications import Starlette
 import logging
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
-from starlette.routing import Route
-from invana_engine.server.views import homepage_view
+from starlette.routing import Route, WebSocketRoute
+from invana_engine.server.views import homepage_view, GremlinQueryView
 from invana_engine.settings import gremlin_server_url, shall_debug, \
     gremlin_traversal_source, server_port
 from starlette_graphene3 import GraphQLApp
@@ -56,6 +56,7 @@ if gremlin_server_url is None:
 schema = get_schema()
 routes = [
     Route('/', endpoint=homepage_view),
+    WebSocketRoute('/gremlin', GremlinQueryView),
     Mount('/static', app=StaticFiles(packages=[('invana_engine.graphiql', 'static')]), name="static"),
 ]
 
