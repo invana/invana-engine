@@ -3,7 +3,7 @@ from graphene import ObjectType, String, Field, JSONString, ResolveInfo, Int, No
 from invana_engine.data_types import AnyField, NodeType, EdgeType
 
 
-class GremlinVertexMutationSchema(ObjectType):
+class VertexMutationSchema(ObjectType):
     create_vertex = Field(NodeType, label=String(required=True), namespace=String(),
                           properties=JSONString(required=True))
     update_vertex_by_id = Field(NodeType, id=AnyField(required=True), properties=JSONString(required=True))
@@ -15,15 +15,16 @@ class GremlinVertexMutationSchema(ObjectType):
             label=label, **properties)
         return data.__dict__() if data else None
 
-    def resolve_update_vertex_by_id(self, info: ResolveInfo, id: str, properties: str):
-        data = info.context['request'].app.state.graph.vertex.search(has__id=id).update(**properties)
-        return data.__dict__() if data else None
+    def resolve_update_vertex_by_id(self, info: ResolveInfo, id: str, properties: dict):
+        info.context['request'].app.state.graph.vertex.search(has__id=id).update(**properties)
+        _ = info.context['request'].app.state.graph.vertex.search(has__id=id).to_list()
+        return _[0].to_json() if _ and _.__len__() > 0 else None
 
     def resolve_remove_vertex_by_id(self, info: ResolveInfo, id: str):
         data = info.context['request'].app.state.graph.vertex.delete(has__id=id)
         return data.__dict__() if data else None
 
-    def resolve_remove_vertices(self, info: ResolveInfo, filters: str = None):
+    def resolve_remove_vertices(self, info: ResolveInfo, filters: dict = None):
         info.context['request'].app.state.graph.vertex.edlete(**filters)
         return None
 
@@ -58,6 +59,6 @@ class GremlinVertexMutationSchema(ObjectType):
 #         return None
 
 
-# class GremlinMutation(GremlinEdgeMutationSchema, GremlinVertexMutationSchema):
-class GremlinMutation(GremlinVertexMutationSchema):
+# class MutationSchema(GremlinEdgeMutationSchema, VertexMutationSchema):
+class MutationSchema(VertexMutationSchema):
     pass

@@ -18,7 +18,7 @@ import graphene
 
 
 # class RawQuerySchema(graphene.ObjectType):
-#     filter_vertex = graphene.Field(graphene.List(GrapheneVertexType),
+#     filter_vertex_by_label = graphene.Field(graphene.List(GrapheneVertexType),
 #                                    label=String(),
 #
 #                                    query=JSONString(),
@@ -34,7 +34,7 @@ import graphene
 class GremlinGenericQuerySchema:
     execute_query = graphene.Field(QueryResponseData, timeout=graphene.Int(default_value=DEFAULT_QUERY_TIMEOUT),
                                    gremlin=graphene.String())
-    filter_vertex = graphene.Field(graphene.List(NodeType), label=graphene.String(),
+    filter_vertex_by_label = graphene.Field(graphene.List(NodeType), label=graphene.String(),
                                    limit=graphene.Int(default_value=DEFAULT_PAGINATION_SIZE), skip=graphene.Int())
     get_or_create_vertex = graphene.Field(getOrCreateNodeType, label=graphene.String(),
                                           properties=graphene.JSONString())
@@ -45,7 +45,7 @@ class GremlinGenericQuerySchema:
         response = info.context['request'].app.state.graph.execute_query(gremlin, timeout=timeout)
         return {"data": [d.to_json() if hasattr(d, "to_json") else d for d in response.data] if response.data else []}
 
-    def resolve_filter_vertex(self, info: graphene.ResolveInfo, label: str = None,
+    def resolve_filter_vertex_by_label(self, info: graphene.ResolveInfo, label: str = None,
                               limit: int = DEFAULT_PAGINATION_SIZE, skip: int = 0):
         filters = {}
         if label:

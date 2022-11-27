@@ -18,7 +18,7 @@ from .graph import graph
 from invana_engine.modeller.query import ModellerQuery
 from invana_engine.graph.query import GraphSchema
 from invana_engine.core.store import SchemaStore
-from invana_engine.graph.mutation import GremlinMutation
+from invana_engine.graph.mutation import MutationSchema
 
 
 def get_schema():
@@ -35,7 +35,7 @@ def get_schema():
     schema_generator = DynamicSchemaGenerator(schema_store)
 
     return schema_generator.create_schema_dynamically(query_classes=[ModellerQuery, GraphSchema],
-                                                      mutation_classes=[GremlinMutation, ])
+                                                      mutation_classes=[MutationSchema, ])
 
     # edge_schema_generator = DynamicSchemaGenerator(edges_schema_data_json, "edge", schema_store)
     #
