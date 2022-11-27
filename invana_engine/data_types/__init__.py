@@ -11,5 +11,5 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-from .schema import LabelSchemaEdgeType, LabelSchemaVertexType, ModelProperty, ModelGraphIndex, ModelRelationIndex
+from .schema import LabelSchemaEdgeType, LabelSchemaVertexType, PropertyType, ModelGraphIndex, ModelRelationIndex
 from .elements import AnyField, NodeType, NodeOrEdgeType, EdgeType, QueryResponseData

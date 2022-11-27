@@ -15,7 +15,7 @@
 from graphene import ObjectType, String, Boolean, List
 
 
-class ModelProperty(ObjectType):
+class PropertyType(ObjectType):
     name = String()
     cardinality = String()
     type = String()
@@ -30,7 +30,7 @@ class LabelSchemaVertexType(ObjectType):
     name = String()
     partitioned = String()
     static = Boolean()
-    properties = List(ModelProperty)
+    properties = List(PropertyType)
 
 
 class LabelSchemaEdgeType(ObjectType):
@@ -38,7 +38,7 @@ class LabelSchemaEdgeType(ObjectType):
     directed = Boolean()
     unidirected = Boolean()
     multiplicity = String()  # MULTI / MANY2ONE/ ONE2ONE / ONE2MANY
-    properties = List(ModelProperty)
+    properties = List(PropertyType)
     link_paths = List(LinkPath)
 
     # https://docs.janusgraph.org/schema/#edge-label-multiplicity
