@@ -12,7 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 from ..utils import get_host, get_client_info, snake_case_to_camel_case
-from invana_engine.data_types import ModelEdgeLabel, ModelVertexLabel, AnyField
+from invana_engine.data_types import LabelSchemaEdgeType, LabelSchemaVertexType, AnyField
 import graphene
 import json
 
@@ -55,23 +55,42 @@ class GenericClientInfoSchema(graphene.ObjectType):
         return result
 
 
-class ModelVertexSchema(graphene.ObjectType):
-    get_vertex_model = graphene.Field(ModelVertexLabel, label=graphene.String())
-    get_edge_model = graphene.Field(ModelEdgeLabel, label=graphene.String())
-    get_all_vertex_models = graphene.Field(graphene.List(ModelVertexLabel))
-    get_all_edges_models = graphene.Field(graphene.List(ModelEdgeLabel))
+class LabelSchemaObjectTypes(graphene.ObjectType):
+    schema_get_vertex = graphene.Field(LabelSchemaVertexType, label=graphene.String())
+    schema_get_edge = graphene.Field(LabelSchemaEdgeType, label=graphene.String())
+    schema_get_all_vertices = graphene.Field(graphene.List(LabelSchemaVertexType))
+    schema_get_all_edges = graphene.Field(graphene.List(LabelSchemaEdgeType))
 
-    def resolve_get_vertex_model(self, info: graphene.ResolveInfo, label: str = None) -> ModelVertexLabel:
+    schema_get_vertex_labels = graphene.Field(graphene.List(graphene.String))
+    schema_get_edge_labels = graphene.Field(graphene.List(graphene.String))
+
+    # get_vertex_label_schema = graphene.Field(VertexSchemaType, label=graphene.String())
+    # get_edge_label_schema = graphene.Field(EdgeSchemaType, label=graphene.String())
+
+    def resolve_schema_get_vertex_labels(self, info: graphene.ResolveInfo) -> any:
+        return info.context['request'].app.state.graph.management.schema_reader.get_all_vertex_labels()
+
+    def resolve_schema_get_edge_labels(self, info: graphene.ResolveInfo) -> any:
+        return info.context['request'].app.state.graph.management.schema_reader.get_all_edge_labels()
+
+    #
+    # def resolve_get_vertex_label_schema(self, info: graphene.ResolveInfo, label: str = None) -> any:
+    #     return info.context['request'].app.state.graph.schema_reader.get_vertex_schema(label)
+    #
+    # def resolve_get_edge_label_schema(self, info: graphene.ResolveInfo, label: str = None) -> any:
+    #     return info.context['request'].app.state.graph.schema_readr.get_edge_schema(label)
+
+    def resolve_schema_get_vertex(self, info: graphene.ResolveInfo, label: str = None) -> LabelSchemaVertexType:
         model = info.context['request'].app.state.graph.management.schema_reader.get_vertex_schema(label)
         model.properties = model.properties_as_list()
         return model
 
-    def resolve_get_edge_model(self, info: graphene.ResolveInfo, label: str = None) -> ModelEdgeLabel:
+    def resolve_schema_get_edge(self, info: graphene.ResolveInfo, label: str = None) -> LabelSchemaEdgeType:
         model = info.context['request'].app.state.graph.management.schema_reader.get_edge_schema(label)
         model.properties = model.properties_as_list()
         return model
 
-    def resolve_get_all_vertex_models(self, info: graphene.ResolveInfo) -> graphene.List(ModelVertexLabel):
+    def resolve_schema_get_all_vertices(self, info: graphene.ResolveInfo) -> graphene.List(LabelSchemaVertexType):
         models = info.context['request'].app.state.graph.management.schema_reader.get_all_vertices_schema()
         cleaned_models = []
         for model in models.values():
@@ -79,7 +98,7 @@ class ModelVertexSchema(graphene.ObjectType):
             cleaned_models.append(model)
         return cleaned_models
 
-    def resolve_get_all_edges_models(self, info: graphene.ResolveInfo) -> graphene.List(ModelEdgeLabel):
+    def resolve_schema_get_all_edges(self, info: graphene.ResolveInfo) -> graphene.List(LabelSchemaEdgeType):
         models = info.context['request'].app.state.graph.management.schema_reader.get_all_edges_schema()
         cleaned_models = []
         for model in models.values():

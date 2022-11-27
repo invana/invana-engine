@@ -86,3 +86,5 @@ class NodeOrEdgeType(EdgeType):
 
 class QueryResponseData(graphene.ObjectType):
     data = graphene.List(AnyField)
+
+

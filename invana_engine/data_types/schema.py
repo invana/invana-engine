@@ -26,14 +26,14 @@ class LinkPath(ObjectType):
     inv_label = String()
 
 
-class ModelVertexLabel(ObjectType):
+class LabelSchemaVertexType(ObjectType):
     name = String()
     partitioned = String()
     static = Boolean()
     properties = List(ModelProperty)
 
 
-class ModelEdgeLabel(ObjectType):
+class LabelSchemaEdgeType(ObjectType):
     name = String()
     directed = Boolean()
     unidirected = Boolean()

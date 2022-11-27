@@ -12,10 +12,10 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 import graphene
-from .query_resolvers import GenericClientInfoSchema, ModelVertexSchema
+from .query_resolvers import GenericClientInfoSchema, LabelSchemaObjectTypes
 
 
-class ModellerQuery(GenericClientInfoSchema, ModelVertexSchema):
+class ModellerQuery(GenericClientInfoSchema, LabelSchemaObjectTypes):
     pass
 # def resolve_me(root, info):
 #     return {"id": "john", "name": "John"}

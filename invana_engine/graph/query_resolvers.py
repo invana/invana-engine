@@ -11,7 +11,7 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-from invana_engine.data_types import NodeOrEdgeType, AnyField, NodeType, QueryResponseData
+from invana_engine.data_types import NodeOrEdgeType, AnyField, NodeType, QueryResponseData, EdgeType
 from invana_engine.settings import DEFAULT_QUERY_TIMEOUT, DEFAULT_PAGINATION_SIZE
 import graphene
 
@@ -23,7 +23,7 @@ import graphene
 #                                    query=JSONString(),
 #                           limit=Int(default_value=default_pagination_size), skip=Int())
 #
-#     def resolve_get_vertex_model(self, info: graphene.ResolveInfo, label: str = None) -> ModelVertexLabel:
+#     def resolve_get_vertex_model(self, info: graphene.ResolveInfo, label: str = None) -> LabelSchemaVertexType:
 #         model = info.context['request'].app.state.graph.management.schema_reader.get_vertex_schema(label)
 #         model.properties = model.properties_as_list()
 #         return model
@@ -35,6 +35,8 @@ class GremlinGenericQuerySchema:
                                    gremlin=graphene.String())
     filter_vertex = graphene.Field(graphene.List(NodeType), label=graphene.String(),
                                    limit=graphene.Int(default_value=DEFAULT_PAGINATION_SIZE), skip=graphene.Int())
+    get_or_create_vertex = graphene.Field(NodeType, label=graphene.String(), properties=graphene.JSONString())
+    # get_or_create_edge = graphene.Field(EdgeType, label=graphene.String(), properties=graphene.JSONString())
 
     def resolve_execute_query(self, info: graphene.ResolveInfo, gremlin: str, timeout: int) -> any:
         response = info.context['request'].app.state.graph.execute_query(gremlin, timeout=timeout)
@@ -49,3 +51,11 @@ class GremlinGenericQuerySchema:
             limit=limit, skip=skip, **filters
         ).order_by('id').range(skip, limit).to_list()
         return [datum.to_json() for datum in data]
+
+    def resolve_get_or_create_vertex(self, info: graphene.ResolveInfo, label: str = None,
+                                     properties: str = None):
+        return info.context['request'].app.state.graph.vertex.get_or_create(label, **properties)
+
+    # def resolve_get_or_create_edge(self, info: graphene.ResolveInfo, label: str = None,
+    #                                  properties: str = None):
+    #     return info.context['request'].app.state.graph.edge.get_or_create(label, **properties)
