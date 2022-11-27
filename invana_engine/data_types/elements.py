@@ -70,19 +70,19 @@ class getOrCreateNodeType(graphene.ObjectType):
     data = graphene.Field(NodeType())
 
 
-class InV(graphene.ObjectType):
-    id = graphene.ID()
-    label = graphene.String()
-
-
-class OutV(graphene.ObjectType):
-    id = graphene.ID()
-    label = graphene.String()
+# class InV(graphene.ObjectType):
+#     id = graphene.ID()
+#     label = graphene.String()
+#
+#
+# class OutV(graphene.ObjectType):
+#     id = graphene.ID()
+#     label = graphene.String()
 
 
 class EdgeType(NodeType):
-    inv = graphene.Field(InV)
-    outv = graphene.Field(OutV)
+    inv = graphene.Field(NodeType)
+    outv = graphene.Field(NodeType)
 
 
 class NodeOrEdgeType(EdgeType):

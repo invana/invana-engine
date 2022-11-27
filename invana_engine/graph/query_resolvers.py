@@ -11,6 +11,9 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
+from invana.helpers import get_vertex_properties_of_edges
+from invana.serializer.element_structure import RelationShip
+
 from invana_engine.data_types import NodeOrEdgeType, AnyField, NodeType, \
     QueryResponseData, EdgeType, getOrCreateNodeType
 from invana_engine.settings import DEFAULT_QUERY_TIMEOUT, DEFAULT_PAGINATION_SIZE
@@ -42,6 +45,7 @@ class GremlinGenericQuerySchema:
                                   skip=graphene.Int())
     get_edges = graphene.Field(graphene.List(EdgeType),
                                filters=graphene.JSONString(),
+                               get_vertex_properties=graphene.Boolean(default_value=False),
                                limit=graphene.Int(default_value=DEFAULT_PAGINATION_SIZE),
                                order_by=graphene.String(),
                                skip=graphene.Int())
@@ -67,7 +71,7 @@ class GremlinGenericQuerySchema:
         return [datum.to_json() for datum in data]
 
     def resolve_get_edges(self, info: graphene.ResolveInfo, filters: dict = None,
-                          order_by: str = None,
+                          order_by: str = None, get_vertex_properties: bool = None,
                           limit: int = DEFAULT_PAGINATION_SIZE, skip: int = 0):
         filters = {} if filters is None else filters
         _ = info.context['request'].app.state.graph.edge.search(
@@ -76,7 +80,10 @@ class GremlinGenericQuerySchema:
         if order_by:
             _.order_by(order_by)
         data = _.range(skip, limit).to_list()
-        return [datum.to_json() for datum in data]
+        if get_vertex_properties is True:
+            data = get_vertex_properties_of_edges(data, info.context['request'].app.state.graph)
+        __ = [datum.to_json() for datum in data]
+        return __
 
     def resolve_get_or_create_vertex(self, info: graphene.ResolveInfo, label: str = None,
                                      properties=None):

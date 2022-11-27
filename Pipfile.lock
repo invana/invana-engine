@@ -162,7 +162,7 @@
         },
         "invana": {
             "git": "https://github.com/invana/invana",
-            "ref": "140ef2e8ba28ed15acace5e6ffb85eba3f18581d"
+            "ref": "39c1418492154222b922a9a3d23636a8d33a86cd"
         },
         "isodate": {
             "hashes": [
