@@ -35,8 +35,16 @@ class GremlinGenericQuerySchema:
     execute_query = graphene.Field(QueryResponseData, timeout=graphene.Int(default_value=DEFAULT_QUERY_TIMEOUT),
                                    gremlin=graphene.String())
 
-    get_vertices = graphene.Field(graphene.List(NodeType), filters=graphene.JSONString(),
-                                  limit=graphene.Int(default_value=DEFAULT_PAGINATION_SIZE), skip=graphene.Int())
+    get_vertices = graphene.Field(graphene.List(NodeType),
+                                  filters=graphene.JSONString(),
+                                  order_by=graphene.String(),
+                                  limit=graphene.Int(default_value=DEFAULT_PAGINATION_SIZE),
+                                  skip=graphene.Int())
+    get_edges = graphene.Field(graphene.List(EdgeType),
+                               filters=graphene.JSONString(),
+                               limit=graphene.Int(default_value=DEFAULT_PAGINATION_SIZE),
+                               order_by=graphene.String(),
+                               skip=graphene.Int())
     get_or_create_vertex = graphene.Field(getOrCreateNodeType, label=graphene.String(),
                                           properties=graphene.JSONString())
 
@@ -47,11 +55,27 @@ class GremlinGenericQuerySchema:
         return {"data": [d.to_json() if hasattr(d, "to_json") else d for d in response.data] if response.data else []}
 
     def resolve_get_vertices(self, info: graphene.ResolveInfo, filters: dict = None,
+                             order_by: str = None,
                              limit: int = DEFAULT_PAGINATION_SIZE, skip: int = 0):
         filters = {} if filters is None else filters
-        data = info.context['request'].app.state.graph.vertex.search(
+        _ = info.context['request'].app.state.graph.vertex.search(
             limit=limit, skip=skip, **filters
-        ).order_by('id').range(skip, limit).to_list()
+        )
+        if order_by:
+            _.order_by(order_by)
+        data = _.range(skip, limit).to_list()
+        return [datum.to_json() for datum in data]
+
+    def resolve_get_edges(self, info: graphene.ResolveInfo, filters: dict = None,
+                          order_by: str = None,
+                          limit: int = DEFAULT_PAGINATION_SIZE, skip: int = 0):
+        filters = {} if filters is None else filters
+        _ = info.context['request'].app.state.graph.edge.search(
+            limit=limit, skip=skip, **filters
+        )
+        if order_by:
+            _.order_by(order_by)
+        data = _.range(skip, limit).to_list()
         return [datum.to_json() for datum in data]
 
     def resolve_get_or_create_vertex(self, info: graphene.ResolveInfo, label: str = None,
