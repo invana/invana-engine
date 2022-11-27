@@ -31,6 +31,7 @@ class LabelSchemaVertexType(ObjectType):
     partitioned = String()
     static = Boolean()
     properties = List(PropertyType)
+    property_keys = List(String)
 
 
 class LabelSchemaEdgeType(ObjectType):
@@ -38,8 +39,9 @@ class LabelSchemaEdgeType(ObjectType):
     directed = Boolean()
     unidirected = Boolean()
     multiplicity = String()  # MULTI / MANY2ONE/ ONE2ONE / ONE2MANY
-    properties = List(PropertyType)
     link_paths = List(LinkPath)
+    properties = List(PropertyType)
+    property_keys = List(String)
 
     # https://docs.janusgraph.org/schema/#edge-label-multiplicity
 

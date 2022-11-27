@@ -65,6 +65,11 @@ class NodeType(graphene.ObjectType):
     properties = AnyField()
 
 
+class getOrCreateNodeType(graphene.ObjectType):
+    is_created = graphene.Boolean()
+    data = graphene.Field(NodeType())
+
+
 class InV(graphene.ObjectType):
     id = graphene.ID()
     label = graphene.String()
@@ -86,5 +91,3 @@ class NodeOrEdgeType(EdgeType):
 
 class QueryResponseData(graphene.ObjectType):
     data = graphene.List(AnyField)
-
-

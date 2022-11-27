@@ -56,10 +56,10 @@ class GenericClientInfoSchema(graphene.ObjectType):
 
 
 class LabelSchemaObjectTypes(graphene.ObjectType):
-    schema_get_vertex = graphene.Field(LabelSchemaVertexType, label=graphene.String())
-    schema_get_edge = graphene.Field(LabelSchemaEdgeType, label=graphene.String())
-    schema_get_all_vertices = graphene.Field(graphene.List(LabelSchemaVertexType))
-    schema_get_all_edges = graphene.Field(graphene.List(LabelSchemaEdgeType))
+    schema_get_vertex_schema = graphene.Field(LabelSchemaVertexType, label=graphene.String())
+    schema_get_edge_schema = graphene.Field(LabelSchemaEdgeType, label=graphene.String())
+    schema_get_all_vertex_schema = graphene.Field(graphene.List(LabelSchemaVertexType))
+    schema_get_all_edge_schema = graphene.Field(graphene.List(LabelSchemaEdgeType))
 
     schema_get_vertex_labels = graphene.Field(graphene.List(graphene.String))
     schema_get_edge_labels = graphene.Field(graphene.List(graphene.String))
@@ -80,28 +80,25 @@ class LabelSchemaObjectTypes(graphene.ObjectType):
     # def resolve_get_edge_label_schema(self, info: graphene.ResolveInfo, label: str = None) -> any:
     #     return info.context['request'].app.state.graph.schema_readr.get_edge_schema(label)
 
-    def resolve_schema_get_vertex(self, info: graphene.ResolveInfo, label: str = None) -> LabelSchemaVertexType:
+    def resolve_schema_get_vertex_schema(self, info: graphene.ResolveInfo, label: str = None) -> LabelSchemaVertexType:
         model = info.context['request'].app.state.graph.management.schema_reader.get_vertex_schema(label)
-        model.properties = model.properties_as_list()
-        return model
+        return model.to_json()
 
-    def resolve_schema_get_edge(self, info: graphene.ResolveInfo, label: str = None) -> LabelSchemaEdgeType:
+    def resolve_schema_get_edge_schema(self, info: graphene.ResolveInfo, label: str = None) -> LabelSchemaEdgeType:
         model = info.context['request'].app.state.graph.management.schema_reader.get_edge_schema(label)
-        model.properties = model.properties_as_list()
-        return model
+        return model.to_json()
 
-    def resolve_schema_get_all_vertices(self, info: graphene.ResolveInfo) -> graphene.List(LabelSchemaVertexType):
+
+    def resolve_schema_get_all_vertex_schema(self, info: graphene.ResolveInfo) -> graphene.List(LabelSchemaVertexType):
         models = info.context['request'].app.state.graph.management.schema_reader.get_all_vertices_schema()
         cleaned_models = []
         for model in models.values():
-            model.properties = model.properties_as_list()
-            cleaned_models.append(model)
+            cleaned_models.append(model.to_json())
         return cleaned_models
 
-    def resolve_schema_get_all_edges(self, info: graphene.ResolveInfo) -> graphene.List(LabelSchemaEdgeType):
+    def resolve_schema_get_all_edge_schema(self, info: graphene.ResolveInfo) -> graphene.List(LabelSchemaEdgeType):
         models = info.context['request'].app.state.graph.management.schema_reader.get_all_edges_schema()
         cleaned_models = []
         for model in models.values():
-            model.properties = model.properties_as_list()
-            cleaned_models.append(model)
+            cleaned_models.append(model.to_json())
         return cleaned_models

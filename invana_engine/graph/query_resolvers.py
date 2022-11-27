@@ -11,7 +11,8 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-from invana_engine.data_types import NodeOrEdgeType, AnyField, NodeType, QueryResponseData, EdgeType
+from invana_engine.data_types import NodeOrEdgeType, AnyField, NodeType, \
+    QueryResponseData, EdgeType, getOrCreateNodeType
 from invana_engine.settings import DEFAULT_QUERY_TIMEOUT, DEFAULT_PAGINATION_SIZE
 import graphene
 
@@ -35,7 +36,9 @@ class GremlinGenericQuerySchema:
                                    gremlin=graphene.String())
     filter_vertex = graphene.Field(graphene.List(NodeType), label=graphene.String(),
                                    limit=graphene.Int(default_value=DEFAULT_PAGINATION_SIZE), skip=graphene.Int())
-    get_or_create_vertex = graphene.Field(NodeType, label=graphene.String(), properties=graphene.JSONString())
+    get_or_create_vertex = graphene.Field(getOrCreateNodeType, label=graphene.String(),
+                                          properties=graphene.JSONString())
+
     # get_or_create_edge = graphene.Field(EdgeType, label=graphene.String(), properties=graphene.JSONString())
 
     def resolve_execute_query(self, info: graphene.ResolveInfo, gremlin: str, timeout: int) -> any:
@@ -53,8 +56,9 @@ class GremlinGenericQuerySchema:
         return [datum.to_json() for datum in data]
 
     def resolve_get_or_create_vertex(self, info: graphene.ResolveInfo, label: str = None,
-                                     properties: str = None):
-        return info.context['request'].app.state.graph.vertex.get_or_create(label, **properties)
+                                     properties=None):
+        _ = info.context['request'].app.state.graph.vertex.get_or_create(label, **properties)
+        return dict(zip(['is_created', 'data'], [_[0], _[1].to_json()]))
 
     # def resolve_get_or_create_edge(self, info: graphene.ResolveInfo, label: str = None,
     #                                  properties: str = None):
