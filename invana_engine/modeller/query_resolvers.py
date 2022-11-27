@@ -58,6 +58,10 @@ class GenericClientInfoSchema(graphene.ObjectType):
 class LabelSchemaObjectTypes(graphene.ObjectType):
     schema_get_vertex_schema = graphene.Field(LabelSchemaVertexType, label=graphene.String())
     schema_get_edge_schema = graphene.Field(LabelSchemaEdgeType, label=graphene.String())
+
+    schema_get_vertex_label_property_keys = graphene.List(graphene.String, label=graphene.String())
+    schema_get_edge_label_property_keys = graphene.List(graphene.String, label=graphene.String())
+
     schema_get_all_vertex_schema = graphene.Field(graphene.List(LabelSchemaVertexType))
     schema_get_all_edge_schema = graphene.Field(graphene.List(LabelSchemaEdgeType))
 
@@ -66,6 +70,12 @@ class LabelSchemaObjectTypes(graphene.ObjectType):
 
     # get_vertex_label_schema = graphene.Field(VertexSchemaType, label=graphene.String())
     # get_edge_label_schema = graphene.Field(EdgeSchemaType, label=graphene.String())
+
+    def resolve_schema_get_vertex_label_property_keys(self, info: graphene.ResolveInfo, label: str = None) -> any:
+        return info.context['request'].app.state.graph.management.schema_reader.get_vertex_property_keys(label)
+
+    def resolve_schema_get_edge_label_property_keys(self, info: graphene.ResolveInfo, label: str = None) -> any:
+        return info.context['request'].app.state.graph.management.schema_reader.get_edge_property_keys(label)
 
     def resolve_schema_get_vertex_labels(self, info: graphene.ResolveInfo) -> any:
         return info.context['request'].app.state.graph.management.schema_reader.get_all_vertex_labels()
@@ -87,7 +97,6 @@ class LabelSchemaObjectTypes(graphene.ObjectType):
     def resolve_schema_get_edge_schema(self, info: graphene.ResolveInfo, label: str = None) -> LabelSchemaEdgeType:
         model = info.context['request'].app.state.graph.management.schema_reader.get_edge_schema(label)
         return model.to_json()
-
 
     def resolve_schema_get_all_vertex_schema(self, info: graphene.ResolveInfo) -> graphene.List(LabelSchemaVertexType):
         models = info.context['request'].app.state.graph.management.schema_reader.get_all_vertices_schema()

@@ -300,9 +300,9 @@ class DynamicSchemaGenerator:
 
     # def create_label_fields_of_label(self, record, )
 
-    def create_schema_dynamically(self, *extra_schema_types):
+    def create_schema_dynamically(self, query_classes=None, mutation_classes=None ):
         types = []
-        query_schemas = []
+        dynaimc_query_schemas = []
         for search_type in ["node", "edge"]:
             # create node types
             schema_gql_map = self.schema_store.vertex_schema_gql_map if search_type == "node" else \
@@ -313,20 +313,24 @@ class DynamicSchemaGenerator:
             self.create_label_fields_of_search_type(search_type)
             label_fields = self.node_label_fields if search_type == "node" else self.edge_label_fields
             SearchTypeQuery = type(f'{search_type}Query'.capitalize(), (graphene.ObjectType,), label_fields)
-            query_schemas.append(SearchTypeQuery)
+            dynaimc_query_schemas.append(SearchTypeQuery)
 
             record_schemas = self.get_record_schemas_of_search_type(search_type)
             types.extend(list(record_schemas.values()))
 
         # return Query, record_schema_types
-        # class Query(ModellerQuery, GraphSchema, *query_schemas):
+        # class Query(ModellerQuery, GraphSchema, *dynaimc_query_schemas):
         #     pass
 
-        class Query(*extra_schema_types, *query_schemas):
+        class Query(*query_classes, *dynaimc_query_schemas):
+            pass
+
+        class Mutation(*mutation_classes):
             pass
 
         return graphene.Schema(query=Query,
                                types=types,
+                               mutation=Mutation,
                                # + vertex_search_record_schema_types + edge_search_record_schema_types,
                                auto_camelcase=True
                                )
