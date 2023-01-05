@@ -10,10 +10,10 @@
                 "--port=8200",
                 "--host=0.0.0.0",
                 "--loop=asyncio",
-                "--reload",
+                "--reload"
             ],
             "env": {
-                "GREMLIN_SERVER_URL": "ws://192.168.0.40:8182/gremlin"
+                "GREMLIN_SERVER_URL": "ws://megamind.local:8182/gremlin"
             },
             "justMyCode": true
         }
