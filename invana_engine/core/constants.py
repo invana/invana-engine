@@ -19,7 +19,8 @@ FIELD_TYPES_MAP = {
     'Boolean': graphene.Boolean,
     'Float': graphene.Float,
     'DateTime': graphene.DateTime,
-    'Geoshape': graphene.String
+    'Geoshape': graphene.String,
+    'Double': graphene.BigInt
     # ...
 }
 

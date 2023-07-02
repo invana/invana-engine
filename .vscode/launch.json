@@ -1,7 +1,7 @@
 {
     "configurations": [
         {
-            "name": "Python: File",
+            "name": "GraphQL App",
             "type": "python",
             "request": "launch",
             "module": "uvicorn",
