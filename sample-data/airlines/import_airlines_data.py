@@ -7,7 +7,7 @@ https://github.com/krlawrence/graph/tree/master/sample-data
 from invana import InvanaGraph
 import csv
 
-graph = InvanaGraph("ws://megamind-ws:8182/gremlin")
+graph = InvanaGraph("ws://localhost:8182/gremlin")
 print("Initiating import: graph :", graph)
 
 
@@ -69,8 +69,8 @@ with open('./air-routes-latest-edges.csv') as f:
     reader = csv.DictReader(f)
     for line in reader:
         cleaned_data = clean_edges(line)
-        created_data = graph.edge.create(label=cleaned_data['label'],
-                                                inv=node_id_map[cleaned_data['to']],
-                                                outv=node_id_map[cleaned_data['from']],
-                                                properties=cleaned_data['properties']).to_list()
+        created_data = graph.edge.create(cleaned_data['label'],
+                                         node_id_map[cleaned_data['from']],
+                                                node_id_map[cleaned_data['to']],
+                                                  **cleaned_data['properties']).to_list()
         print("created_data", created_data[0].id)
