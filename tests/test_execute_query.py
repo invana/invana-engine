@@ -1,4 +1,4 @@
-from invana import InvanaGraph
+from invana_engine.invana import InvanaGraph
 
 
 class TestConnection:

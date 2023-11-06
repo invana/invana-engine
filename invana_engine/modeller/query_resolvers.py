@@ -50,7 +50,7 @@ class GenericClientInfoSchema(graphene.ObjectType):
 
     def resolve__get_client_info(self, info):
         result = get_client_info()
-        result['gremlin_host'] = get_host(info.context['request'].app.state.graph.connector.gremlin_url)
+        result['gremlin_host'] = get_host(info.context['request'].app.state.graph.connector.connection_uri)
         result['gremlin_traversal_source'] = info.context['request'].app.state.graph.connector.traversal_source
         return result
 

@@ -11,8 +11,8 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-from invana.helpers import get_vertex_properties_of_edges
-from invana.serializer.element_structure import RelationShip
+from invana_engine.invana.helpers.helpers import get_vertex_properties_of_edges
+from invana_engine.invana.serializer.element_structure import RelationShip
 
 from invana_engine.data_types import NodeOrEdgeType, AnyField, NodeType, \
     QueryResponseData, EdgeType, getOrCreateNodeType

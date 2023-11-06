@@ -11,7 +11,7 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-from invana import InvanaGraph
+from invana_engine.invana import InvanaGraph
 
 from invana_engine.settings import gremlin_server_url, gremlin_traversal_source
 

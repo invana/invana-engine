@@ -3,11 +3,12 @@ This script will import airlines data from Kevin Lawrence's book
 https://github.com/krlawrence/graph/tree/master/sample-data
 
 """
-
-from invana import InvanaGraph
+import sys
+sys.path.append("../../")
+from invana_engine.invana import InvanaGraph
 import csv
 
-graph = InvanaGraph("ws://megamind-ws:8182/gremlin")
+graph = InvanaGraph("ws://localhost:8182/gremlin")
 print("Initiating import: graph :", graph)
 
 
@@ -74,3 +75,6 @@ with open('./air-routes-latest-edges.csv') as f:
                                          node_id_map[cleaned_data['to']],
                                          **cleaned_data['properties']).to_list()
         print("created edge", created_data[0].id)
+
+
+graph.close()
