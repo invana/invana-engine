@@ -34,7 +34,7 @@ class GremlinClientInfo(graphene.ObjectType):
     features = graphene.Field(FeaturesInfo)
 
     def resolve_features(self, info):
-        features_data = info.context['request'].app.state.graph.get_features().data
+        features_data = info.context['request'].app.state.graph.connector.get_features().data
         data = {}
         for k, v in features_data.items():
             data[snake_case_to_camel_case(k)] = v
