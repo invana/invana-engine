@@ -22,7 +22,7 @@ from invana_engine2.settings import gremlin_server_url, shall_debug, \
 from starlette_graphene3 import GraphQLApp
 from invana_engine2.graphiql.handler import make_graphiql_handler
 from .schema import get_schema
-from ..settings import __VERSION__, __AUTHOR_NAME__, __AUTHOR_EMAIL__
+from .. import __VERSION__, __AUTHOR_NAME__, __AUTHOR_EMAIL__
 from .graph import graph
 from starlette.routing import Mount
 from starlette.staticfiles import StaticFiles

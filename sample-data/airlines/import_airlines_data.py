@@ -5,7 +5,7 @@ https://github.com/krlawrence/graph/tree/master/sample-data
 """
 import sys
 sys.path.append("../../")
-from invana_engine.invana import InvanaGraph
+from invana_engine2.invana import InvanaGraph
 import csv
 
 graph = InvanaGraph("ws://localhost:8182/gremlin")

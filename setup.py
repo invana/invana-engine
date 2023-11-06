@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from setuptools import setup, find_packages
-from invana_engine.settings import __VERSION__
+from invana_engine2.settings import __VERSION__
 from pip._internal.req import parse_requirements
 from pip._internal.network.session import PipSession
 import os

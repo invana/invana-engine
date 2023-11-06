@@ -1,6 +1,23 @@
 {
     "configurations": [
         {
+            "name": "GraphQL App 2",
+            "type": "python",
+            "request": "launch",
+            "module": "uvicorn",
+            "args":[
+                "invana_engine2.server.app:app",
+                "--port=8201",
+                "--host=0.0.0.0",
+                "--loop=asyncio",
+                "--reload"
+            ],
+            "env": {
+                "GREMLIN_SERVER_URL": "ws://localhost:8182/gremlin"
+            },
+            "justMyCode": true
+        },
+        {
             "name": "GraphQL App",
             "type": "python",
             "request": "launch",
