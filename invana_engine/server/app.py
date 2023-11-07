@@ -17,7 +17,7 @@ from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.routing import Route, WebSocketRoute
 from .views import HomePageView, GremlinQueryView
-from invana_engine.settings import GRAPH_BACKEND_URL, DEBUG, \
+from invana_engine.settings import GRAPH_BACKEND, DEBUG, GRAPH_BACKEND_URL,  \
     GRAPH_BACKEND_GREMLIN_TRAVERSAL_SOURCE, SERVER_PORT
 from starlette_graphene3 import GraphQLApp
 from invana_engine.graphql.graphiql.handler import make_graphiql_handler
@@ -42,7 +42,7 @@ def welcome():
     logger.info(".................................................")
     logger.info(f"Starting Invana Engine server at 0.0.0.0:{SERVER_PORT}")
     logger.info(f"Using GRAPH_BACKEND_URL: {GRAPH_BACKEND_URL}")
-    logger.info(f"Using GREMLIN_TRAVERSAL_SOURCE: {GRAPH_BACKEND_GREMLIN_TRAVERSAL_SOURCE}")
+    logger.info(f"Using GRAPH_BACKEND: {GRAPH_BACKEND}")
     logger.info(f"Using DEBUG: {DEBUG}")
     logger.info(".................................................")
 
@@ -75,7 +75,7 @@ def create_app():
     schema =  GraphQLSchemaGenerator().get_schema()
     app.mount("/graph", GraphQLApp(schema, on_get=make_graphiql_handler()))  # Graphiql IDE
 
-    app.state.graph = InvanaGraph(GRAPH_BACKEND_URL)
+    app.state.graph = InvanaGraph(GRAPH_BACKEND)
     return app
 
 app = create_app()

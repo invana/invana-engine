@@ -29,6 +29,9 @@ class GremlinConnector(ConnectorBase):
                 is_readonly=False, 
                 default_timeout=None,
                 default_query_language="gremlin",
+                database_name=None,
+                username=None,
+                password=None,
                 traversal_source="g",
                 strategies=None,
                 graph_traversal_source_cls=InvanaTraversalSource, 
@@ -37,6 +40,9 @@ class GremlinConnector(ConnectorBase):
                 **transport_kwargs) -> None:
         super().__init__(connection_uri, is_readonly=is_readonly,
                         default_query_language=default_query_language,
+                        database_name=database_name,
+                        username=username,
+                        password=password,
                         default_timeout=default_timeout, **transport_kwargs)
         self.g = None
         self.traversal_source = traversal_source

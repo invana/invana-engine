@@ -10,7 +10,9 @@ def get_host(url):
 def get_client_info():
     # get the info of the server where this graphql is running.
     hostname = socket.gethostname()
+    # _ = socket.gethostbyaddr()
     return {
         'host_name': hostname,
-        'host_ip_address': socket.gethostbyname(hostname)
+        'host_ip_address': socket.gethostbyname(hostname),
+        "host_port": 1
     }

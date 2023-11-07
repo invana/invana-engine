@@ -1,0 +1,64 @@
+
+class CypherSerializer:
+    # https://community.neo4j.com/t/convert-stream-of-records-to-json-in-python-driver/39720/3
+
+
+    def serialize_data_custom(self, index, record):
+        """
+        A custom serializer.
+
+        Keyword arguments:
+        index -- optional
+        record -- required
+
+        Record class documentation - https://neo4j.com/docs/api/python-driver/4.2/api.html#record
+        """
+        print('record ', index, ':', record)  # console print statement
+        # Create an empty dictionary
+        graph_data_type_list = {}
+        # Iterate over the list of records also enumerating it.
+        for j, graph_data_type in enumerate(record):
+            # Check if the record has string or integer literal.
+            if isinstance(graph_data_type, str) or isinstance(graph_data_type, int):
+                # Return the keys and values of this record as a dictionary and store it inside graph_data_type_dict.
+                graph_data_type_dict = record.data(j)
+            else:
+                # If the record fails the above check then manually convert them into dictionary with __dict__
+                graph_data_type_dict = graph_data_type.__dict__
+                # Remove unnecessary _graph as we do not need it to serialize from the record.
+                if '_graph' in graph_data_type_dict:
+                    del graph_data_type_dict['_graph']
+                # Add a _start_node key from the record.
+                if '_start_node' in graph_data_type_dict:
+                    graph_data_type_dict['_start_node'] = graph_data_type_dict['_start_node'].__dict__
+                    # Add a _labels key of start node from the record.
+                    if '_labels' in graph_data_type_dict['_start_node']:
+                        frozen_label_set = graph_data_type.start_node['_labels']
+                        graph_data_type_dict['_start_node']['_labels'] = [v for v in frozen_label_set]
+                    # Remove unnecessary _graph as we do not need it to serialize from the record.
+                    if '_graph' in graph_data_type_dict['_start_node']:
+                        del graph_data_type_dict['_start_node']['_graph']
+                # Add a _start_node key from the record.
+                if '_end_node' in graph_data_type_dict:
+                    graph_data_type_dict['_end_node'] = graph_data_type_dict['_end_node'].__dict__
+                    # Add a _labels key of start node from the record.
+                    if '_labels' in graph_data_type_dict['_end_node']:
+                        frozen_label_set = graph_data_type.start_node['_labels']
+                        graph_data_type_dict['_end_node']['_labels'] = [v for v in frozen_label_set]
+                    # Remove unnecessary _graph as we do not need it to serialize from the record.
+                    if '_graph' in graph_data_type_dict['_end_node']:
+                        del graph_data_type_dict['_end_node']['_graph']
+                # Add other labels for representation from frozenset()
+                if '_labels' in graph_data_type_dict:
+                    frozen_label_set = graph_data_type_dict['_labels']
+                    graph_data_type_dict['_labels'] = [v for v in frozen_label_set]
+                # print(graph_data_type_dict) # test statement
+            graph_data_type_list.update(graph_data_type_dict)
+
+        return graph_data_type_list
+    
+    
+    
+    def serialize_response(self, result):
+        _ =   [self.serialize_data_custom(index, record) for index, record in enumerate(result)]
+        return _

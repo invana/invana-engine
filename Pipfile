@@ -11,6 +11,7 @@ websockets = "*"
 graphql-core = "*"
 typing-extensions = "*"
 starlette-graphene3 = "*"
+neo4j = "*"
 
 [dev-packages]
 pytest = "*"

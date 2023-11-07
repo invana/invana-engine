@@ -10,11 +10,18 @@ class ConnectorBase(abc.ABC):
 
     def __init__(self, connection_uri:str, is_readonly=False,
                 default_timeout=DEFAULT_QUERY_TIMEOUT,
+                database_name=None,
+                username=None,
+                password=None,
                 default_query_language=None,
                 **kwargs ) -> None:
         self.CONNECTION_STATE = None
         self.connection_uri = connection_uri
         self.is_readonly = is_readonly
+        self.database_name = database_name
+        self.username = username
+        self.password = password
+
         self.default_query_language = default_query_language
         self.validate_query_language(self.default_query_language)
         self.default_timeout = default_timeout
@@ -64,7 +71,7 @@ class ConnectorBase(abc.ABC):
         self.update_connection_state(ConnectionStateTypes.DISCONNECTED)
 
     @abc.abstractmethod
-    def serialize_response(self, response):
+    def serialize_response(self, *args, **kwargs):
         pass
 
     @abc.abstractmethod

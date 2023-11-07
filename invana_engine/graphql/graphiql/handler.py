@@ -25,6 +25,9 @@ _GRAPHIQL_HTML = """
       <noscript>You need to enable JavaScript to run this app.</noscript>
       <div id="root"></div>
    </body>
+   <script>
+      localStorage.setItem("INVANA_ENGINE_URL", "http://localhost:8202/graph/");
+   </script>
 </html>
 """
 

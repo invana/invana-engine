@@ -37,8 +37,11 @@ existing functionality. Checkout how to add new graph db support by extending [i
 ### 1. Start a supported graph database
 
 ```
-# for example; janusgraph 
+# for janusgraph 
 docker run -it -p 8182:8182 -d janusgraph/janusgraph
+
+# for neo4j
+docker run -d -p 7474:7474 -p 7687:7687 -e NEO4J_AUTH=neo4j/testsecret neo4j 
 ```
 ### 2. Start Invana Engine
 

@@ -1,11 +1,19 @@
 {
     "configurations": [
         {
-            "name": "GraphQL App 2",
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "Old GraphQL App",
             "type": "python",
             "request": "launch",
             "module": "uvicorn",
-            "args":[
+            "args": [
                 "invana_engine2.server.app:app",
                 "--port=8201",
                 "--host=0.0.0.0",
@@ -18,11 +26,11 @@
             "justMyCode": true
         },
         {
-            "name": "GraphQL App",
+            "name": "GraphQL App: Janusgraph",
             "type": "python",
             "request": "launch",
             "module": "uvicorn",
-            "args":[
+            "args": [
                 "invana_engine.server.app:app",
                 "--port=8200",
                 "--host=0.0.0.0",
@@ -30,7 +38,29 @@
                 "--reload"
             ],
             "env": {
+                "GRAPH_BACKEND": "GremlinConnector",
                 "GRAPH_BACKEND_URL": "ws://localhost:8182/gremlin"
+            },
+            "justMyCode": true
+        },
+        {
+            "name": "GraphQL App: Neo4j",
+            "type": "python",
+            "request": "launch",
+            "module": "uvicorn",
+            "args": [
+                "invana_engine.server.app:app",
+                "--port=8202",
+                "--host=0.0.0.0",
+                "--loop=asyncio",
+                "--reload"
+            ],
+            "env": {
+                "GRAPH_BACKEND": "CypherConnector",
+                "GRAPH_BACKEND_URL": "neo4j://localhost:17687",
+                "GRAPH_BACKEND_DATABASE_NAME": "neo4j",
+                "GRAPH_BACKEND_AUTH_USERNAME": "neo4j",
+                "GRAPH_BACKEND_AUTH_PASSWORD": "testsecret"
             },
             "justMyCode": true
         }
