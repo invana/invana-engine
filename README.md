@@ -1,12 +1,12 @@
 # invana-engine
 
-Unified data modelling toolkit with GraphQL API and search engine capabilities for graph databases.
+Unified graph data modelling and management toolkit served as GraphQL API for graph databases.
 
 
 [![Apache license](https://img.shields.io/badge/license-Apache-blue.svg)](https://github.com/invanalabs/invana-engine/blob/master/LICENSE) 
 [![Build Status](https://travis-ci.org/invanalabs/invana-engine.svg?branch=develop)](https://travis-ci.org/invanalabs/invana-engine)
 [![Commit Activity](https://img.shields.io/github/commit-activity/m/invanalabs/invana-engine)](https://github.com/invanalabs/invana-engine/commits)
-[![codecov](https://codecov.io/gh/invanalabs/invana-engine/branch/develop/graph/badge.svg)](https://codecov.io/gh/invanalabs/invana-engine)
+<!-- [![codecov](https://codecov.io/gh/invanalabs/invana-engine/branch/develop/graph/badge.svg)](https://codecov.io/gh/invanalabs/invana-engine) -->
 
 
 ## Features 
@@ -27,6 +27,8 @@ Unified data modelling toolkit with GraphQL API and search engine capabilities f
 | Datastax(DSE) | Gremlin           | YES       |           |               |
 | Neo4j         | Cypher            |           |           |               |
 
+**Note** Any database that supports Cypher or Gremlin can be supported extending 
+the 
 
 ## How to get started
 
