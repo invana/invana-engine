@@ -67,7 +67,7 @@ middleware = [
 app = Starlette(routes=routes, middleware=middleware, debug=shall_debug)
 
 # schema = Query  # , mutation=Mutation, subscription=Subscription)
-app.mount("/graph", GraphQLApp(schema, on_get=make_graphiql_handler()))  # Graphiql IDE
+app.mount("/graph", GraphQLApp(schema, on_get=make_graphiql_handler()),)  # Graphiql IDE
 app.mount("/modeller", GraphQLApp(schema, on_get=make_graphiql_handler()))  # Graphiql IDE
 
 app.state.graph = graph

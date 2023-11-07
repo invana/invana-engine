@@ -1,9 +1,7 @@
 # invana-engine
 
-GraphQL API and Insights engine for Apache TinkerPop supported graph databases.
+Unified data modelling toolkit with GraphQL API and search engine capabilities for graph databases.
 
-
-**Note: Under active development.** 
 
 [![Apache license](https://img.shields.io/badge/license-Apache-blue.svg)](https://github.com/invanalabs/invana-engine/blob/master/LICENSE) 
 [![Build Status](https://travis-ci.org/invanalabs/invana-engine.svg?branch=develop)](https://travis-ci.org/invanalabs/invana-engine)
@@ -11,49 +9,44 @@ GraphQL API and Insights engine for Apache TinkerPop supported graph databases.
 [![codecov](https://codecov.io/gh/invanalabs/invana-engine/branch/develop/graph/badge.svg)](https://codecov.io/gh/invanalabs/invana-engine)
 
 
-## Environment variables
-Following environment variables are supported and optional variables can be 
-used to authenticate gremlin server connection.
+## Features 
 
-- **GREMLIN_SERVER_URL**: http or ws gremlin url. ex: ws://xx.xx.xx.xx:8182/gremlin or http://xx.xx.xx.xx:8182/gremlin
-- **GREMLIN_TRAVERSAL_SOURCE**(optional): defaults: 'g'
-- **GREMLIN_SERVER_USERNAME**(optional): gremlin username. ex: myusername
-- **GREMLIN_SERVER_PASSWORD**(optional): gremlin password. ex: mypassword
-- **SERVER_PORT**(optional, available in standalone python mode only): port on which invana engine server is available: defaults to 8200
+- [ ] Unified data modelleling for Graph databases
+- [ ] GraphQL API for graph databases 
+- [ ] Interactive Search - filter and traverse through data.
+- [ ] Support for large scale queries with Apache Spark
 
-## Running using Docker
-```shell script.
-docker run -p 8200:8200 -d  -e GREMLIN_SERVER_URL=ws://xx.xx.xx.xx:8182/gremlin --name invana-engine invanalabs/invana-engine 
+
+## Supported Databases
+
+| database 	    | query language 	| query 	| search 	| modelling 	|
+|----------	    |----------------	|-------	|--------	|-----------	|
+| Janusgraph    | Gremlin          	| YES     	| YES       | WIP          	|
+| Amazon Neptune| Gremlin          	| YES      	|        	|           	|
+| CosmosDB      | Gremlin         	| YES      	|        	|           	|
+| Datastax(DSE) | Gremlin           | YES       |           |               |
+| Neo4j         | Cypher            |           |           |               |
+
+
+## How to get started
+
+### 1. Start a supported graph database
+
 ```
-
-## Running using standalone python
-```shell
-#example usage :
-pip install invana-engine
-or
-pip install -e git+https://github.com/invanalabs/invana-engine.git@develop#egg=invana_engine
-
-export GREMLIN_SERVER_URL=ws://xx.xx.xx.xx:8182/gremlin
-invana-engine-start # this will start invana-engine server.
+# for example; janusgraph 
+docker run -it -p 8182:8182 -d janusgraph/janusgraph
 ```
+### 2. Start Invana Engine
 
-Optional env variable in cmd line **SERVER_PORT** can be used to run the invana engine server at
-port of your interest(defaults to 8200)
-
+```
+docker run -p 8200:8200 -d -e GREMLIN_SERVER_URL=ws://xx.xx.xx.xx:8182/gremlin --name invana-engine invanalabs/invana-engine 
+```
 
 This will start invana-engine service at 8200 port. GraphQL API can be 
 accessed at `http://localhost:8200/graphql`
 
+For more `-e` options, check [invana_engine/settings.py](invana_engine/settings.py) 
 
-
-
-## Supported Graph Databases
-
-- [x] janusgraph 
-
-Invana Engine uses gremlin at the core, so in theory any database that supports 
-Apache TinkerPop's Gremlin 3.4.x shall work. Vertex/Edge Id resolution, needs to be fixed to 
-add any new database support.
 
 ## License 
 

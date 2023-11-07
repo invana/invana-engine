@@ -1,19 +1,22 @@
 
+from ..backends.gremlin.connector import GremlinConnector
+
 class InvanaGraph:
 
-    def __init__(self, connection_uri: str, backend="janusgraph", auth=None):
-        pass
+    def __init__(self, connection_uri: str):
+        self.backend = GremlinConnector(connection_uri)
 
     def connect(self):
-        pass
+        return self.backend.connect()
 
     def close(self):
-        pass
+        return self.backend.close()
 
     def reconnect(self):
-        pass
+        return self.backend.reconnect()
 
-    def execute_query(self, query: str, timeout: int = None, raise_exception: bool = False,
+    def execute_query(self, query_string: str, timeout: int = None, raise_exception: bool = False,
+                      query_language=None,
                       finished_callback=None) -> any:
         """
         :param query:
@@ -22,5 +25,6 @@ class InvanaGraph:
         :param finished_callback:
         :return:
         """
-        pass
- 
+        return self.backend.execute_query(query_string, timeout=timeout, raise_exception=raise_exception,
+                                          query_language=query_language,
+                                             finished_callback=finished_callback)

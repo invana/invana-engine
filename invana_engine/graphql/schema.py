@@ -1,6 +1,7 @@
 import graphene
-from .types.client import ClientInfoType
+from .types.client import BasicInfoType
 from .types.hello import HelloType
+from .types.querytypes import ExecuteQueryType
 
 
 
@@ -9,8 +10,8 @@ class GraphQLSchemaGenerator:
 
     def generate_query_types(self):
         return type("Query", (
-            ClientInfoType, 
-            HelloType
+            BasicInfoType, 
+            ExecuteQueryType
         ), {})
         
     def generate_mutation_types(self):

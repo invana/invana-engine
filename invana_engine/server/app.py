@@ -75,7 +75,7 @@ def create_app():
     schema =  GraphQLSchemaGenerator().get_schema()
     app.mount("/graph", GraphQLApp(schema, on_get=make_graphiql_handler()))  # Graphiql IDE
 
-    # app.state.graph = InvanaGraph()
+    app.state.graph = InvanaGraph(GRAPH_BACKEND_URL)
     return app
 
 app = create_app()

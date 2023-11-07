@@ -332,5 +332,5 @@ class DynamicSchemaGenerator:
                                types=types,
                                mutation=Mutation,
                                # + vertex_search_record_schema_types + edge_search_record_schema_types,
-                               auto_camelcase=True
+                               auto_camelcase=False
                                )
