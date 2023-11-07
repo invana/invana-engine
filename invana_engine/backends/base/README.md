@@ -7,4 +7,4 @@
 4. **search.<vertex|edge>** - for search operations on vertex and edge
 5. **traversals.<vertex|edge>** - for traversal operations on vertex and edge
 6. **algorithms** - for any search algorithms
-7. **serializer** - 
+7. **serializer** - for serialising data to invana-engine objects

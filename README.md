@@ -21,14 +21,16 @@ Unified graph data modelling and management toolkit served as GraphQL API for gr
 
 | database 	    | query language 	| query 	| search 	| modelling 	|
 |----------	    |----------------	|-------	|--------	|-----------	|
-| Janusgraph    | Gremlin          	| YES     	| YES       | WIP          	|
+| Janusgraph    | Gremlin          	| YES     	| WIP       | WIP          	|
 | Amazon Neptune| Gremlin          	| YES      	|        	|           	|
 | CosmosDB      | Gremlin         	| YES      	|        	|           	|
 | Datastax(DSE) | Gremlin           | YES       |           |               |
-| Neo4j         | Cypher            |           |           |               |
+| Neo4j         | Cypher            | WIP       |           |               |
+| ArcadeDB      | Gremlin,Cypher,SQL|           |           |               |
 
-**Note** Any database that supports Cypher or Gremlin can be supported extending 
-the 
+**Note** Any database that supports Cypher or Gremlin can be supported extending the 
+existing functionality. Checkout how to add new graph db support by extending [invana_engine/backends/base](invana_engine/backends/base/README.md)
+
 
 ## How to get started
 
@@ -41,7 +43,9 @@ docker run -it -p 8182:8182 -d janusgraph/janusgraph
 ### 2. Start Invana Engine
 
 ```
-docker run -p 8200:8200 -d -e GREMLIN_SERVER_URL=ws://xx.xx.xx.xx:8182/gremlin --name invana-engine invanalabs/invana-engine 
+export GRAPH_BACKEND_URL="ws://localhost:8182/gremlin"
+
+uvicorn invana_engine.server.app:app --port=8200 --host=0.0.0.0 --loop=asyncio
 ```
 
 This will start invana-engine service at 8200 port. GraphQL API can be 
