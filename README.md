@@ -22,10 +22,10 @@ Unified graph data modelling and management toolkit served as GraphQL API for gr
 | database 	    | query language 	| query 	| search 	| modelling 	|
 |----------	    |----------------	|-------	|--------	|-----------	|
 | Janusgraph    | Gremlin          	| YES     	| WIP       | WIP          	|
-| Amazon Neptune| Gremlin          	| YES      	|        	|           	|
-| CosmosDB      | Gremlin         	| YES      	|        	|           	|
-| Datastax(DSE) | Gremlin           | YES       |           |               |
-| Neo4j         | Cypher            | WIP       |           |               |
+| Amazon Neptune| Gremlin          	| YES      	| WIP     	|           	|
+| CosmosDB      | Gremlin         	| YES      	| WIP     	|           	|
+| Datastax(DSE) | Gremlin           | YES       | WIP     	|           	|
+| Neo4j         | Cypher            | YES       |           |               |
 | ArcadeDB      | Gremlin,Cypher,SQL|           |           |               |
 
 **Note** Any database that supports Cypher or Gremlin can be supported extending the 
