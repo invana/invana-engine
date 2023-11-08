@@ -1,4 +1,7 @@
-from invana_engine2.invana.helpers.utils import create_uuid, get_elapsed_time, get_datetime
+from invana_engine.utils.utils import create_uuid, get_elapsed_time, get_datetime
+from invana_engine.backends.base.transporter.constants import RequestStateTypes
+from invana_engine.backends.base.events import RequestStartedEvent
+
 
 class RequestBase:
 
@@ -6,10 +9,20 @@ class RequestBase:
     request_id = None
     status_last_updated_at = None
 
-    def __init__(self):
+    def __init__(self,  query: str, request_options: dict = None):
         self.request_id = create_uuid()
         self.created_at = get_datetime()
         self.status_last_updated_at = None
+        self.query = query
+        self.request_options = request_options or {}
+        self.started()
+
+
+    def started(self):
+        self.state = RequestStateTypes.STARTED
+        self.update_last_updated_at()
+        RequestStartedEvent(self)
+
 
     def get_elapsed_time(self):
         return get_elapsed_time(get_datetime(), self.created_at)

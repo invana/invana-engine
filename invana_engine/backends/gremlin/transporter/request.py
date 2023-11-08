@@ -30,17 +30,6 @@ class GremlinQueryRequest(RequestBase):
     def __repr__(self):
         return f"<GremlinQueryRequest {self.request_id}>"
 
-    def __init__(self, query: str, request_options: dict = None):
-        super(GremlinQueryRequest, self).__init__()
-        self.query = query
-        self.request_options = request_options or {}
-        self.started()
-
-
-    def started(self):
-        self.state = RequestStateTypes.STARTED
-        self.update_last_updated_at()
-        RequestStartedEvent(self)
 
     def response_received_but_failed(self, exception: GremlinServerError):
         self.state = RequestStateTypes.RESPONSE_RECEIVED

@@ -57,6 +57,9 @@ class CypherConnector(ConnectorBase):
         :return:
         """
         
+
+        # request = GremlinQueryRequest(query)
+
         records, _, _ = self.connection.execute_query(
             query,
             database_=self.database_name,

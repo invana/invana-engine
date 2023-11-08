@@ -1,3 +1,5 @@
+from invana_engine.backends.base.data_types import Node, RelationShip
+
 
 class CypherSerializer:
     # https://community.neo4j.com/t/convert-stream-of-records-to-json-in-python-driver/39720/3
@@ -54,11 +56,24 @@ class CypherSerializer:
                     graph_data_type_dict['_labels'] = [v for v in frozen_label_set]
                 # print(graph_data_type_dict) # test statement
             graph_data_type_list.update(graph_data_type_dict)
-
         return graph_data_type_list
     
-    
+
+    def create_vertex_object(self, node):
+        return Node(node['_element_id'], node['_labels'][0], node['_properties']  )
+
+    def create_edge_object(self, node):
+        # return RelationShip()
+        return 
+
+    def convert_to_invana_objects(self, result_json):
+        result_objs = []
+        for  r in result_json:
+            result_objs.append(self.create_vertex_object(r)) # TODO - assign Node, Relationship
+        return result_objs
+        
     
     def serialize_response(self, result):
         _ =   [self.serialize_data_custom(index, record) for index, record in enumerate(result)]
+        _ = self.convert_to_invana_objects(_)
         return _

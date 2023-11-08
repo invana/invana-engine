@@ -31,10 +31,10 @@ class BasicInfoType(graphene.ObjectType):
     
     def resolve_client(self, info):
         return get_client_info()
-        return {
-            "host": socket.gethostname(),
-            "host_ip_address": socket.gethostbyname(socket.gethostname())
-        }
+        # return {
+        #     "host": socket.gethostname(),
+        #     "host_ip_address": socket.gethostbyname(socket.gethostname())
+        # }
     
     def resolve_backend(self, info):
         return info.context['request'].app.state.graph.backend.get_basic_info()
