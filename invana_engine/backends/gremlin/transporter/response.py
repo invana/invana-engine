@@ -12,8 +12,8 @@
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
 
-from invana_engine2.invana.base.transporter import ResponseBase
+from invana_engine.backends.base.transporter import QueryResponse
 
 
-class GremlinQueryResponse(ResponseBase):
+class GremlinQueryResponse(QueryResponse):
     pass

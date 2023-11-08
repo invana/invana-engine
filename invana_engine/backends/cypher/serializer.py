@@ -1,4 +1,4 @@
-from invana_engine.backends.base.data_types import Node, RelationShip
+from invana_engine.backends.base.data_types import Node, RelationShip, GenericData
 
 
 class CypherSerializer:
@@ -60,16 +60,31 @@ class CypherSerializer:
     
 
     def create_vertex_object(self, node):
-        return Node(node['_element_id'], node['_labels'][0], node['_properties']  )
+        return Node(node['_id'], node['_labels'][0], node['_properties']  )
 
-    def create_edge_object(self, node):
-        # return RelationShip()
-        return 
+    def create_edge_object(self, edge):
+        out_v = edge['_start_node']
+        in_v = edge['_end_node']
+        return RelationShip(edge['_id'], edge['_labels'][0],
+                            Node(out_v['_id'], out_v['_labels'][0],  out_v['_properties']) ,
+                            Node(in_v['_id'], in_v['_labels'][0],  in_v['_properties']) ,
+                            edge['_properties']  )
 
     def convert_to_invana_objects(self, result_json):
         result_objs = []
-        for  r in result_json:
-            result_objs.append(self.create_vertex_object(r)) # TODO - assign Node, Relationship
+        for r in result_json:
+            print("=====type.r", type(r))
+            if type(r) is dict:
+                if  r.get("_element_id") and r.get("_start_node"): 
+                    # relationship
+                    result_objs.append(self.create_edge_object(r))
+                elif r.get("_element_id"):
+                    # node
+                    result_objs.append(self.create_vertex_object(r)) # TODO - assign Node, Relationship
+                else:
+                    result_objs.append(GenericData(r))
+            else:
+                result_objs.append(GenericData(r))
         return result_objs
         
     

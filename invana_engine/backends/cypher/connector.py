@@ -1,6 +1,7 @@
 from invana_engine.settings import DEFAULT_QUERY_TIMEOUT, GRAPH_BACKEND_AUTH_USERNAME,  \
     GRAPH_BACKEND_AUTH_PASSWORD, GRAPH_BACKEND_DATABASE_NAME
 from ..base.connector import ConnectorBase
+from ..base.transporter import QueryRequest, QueryResponse
 from neo4j import GraphDatabase, RoutingControl
 import logging
 from .serializer import CypherSerializer
@@ -58,7 +59,7 @@ class CypherConnector(ConnectorBase):
         """
         
 
-        # request = GremlinQueryRequest(query)
+        request = QueryRequest(query)
 
         records, _, _ = self.connection.execute_query(
             query,
@@ -66,6 +67,7 @@ class CypherConnector(ConnectorBase):
             routing_=RoutingControl.READ if self.is_readonly is True else RoutingControl.WRITE,
             # result_transformer_=lambda r: r.value("name")
         )
-        _ =  self.serialize_response(records)
-        return _
+        results =  self.serialize_response(records)
+        
+        return QueryResponse(request.request_id, 200, data=results)
     

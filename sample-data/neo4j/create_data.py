@@ -5,6 +5,11 @@ URI = "neo4j://localhost:17687"
 AUTH = ("neo4j", "testsecret")
 
 
+""""
+MATCH (n:Person) RETURN n LIMIT 25
+MATCH (n:Person)-[r:KNOWS]->(m) where ID(n) = 0 return *
+"""
+
 def add_friend(driver, name, friend_name):
     driver.execute_query(
         "MERGE (a:Person {name: $name}) "

@@ -1,4 +1,5 @@
 
+
 class RequestStateTypes:
     STARTED = "STARTED"
     RESPONSE_RECEIVED = "RESPONSE_RECEIVED"  # this status can be many for async execution
@@ -30,8 +31,6 @@ class QueryResponseErrorReasonTypes:
     @classmethod
     def get_allowed_types(cls):
         return [k for k in list(cls.__dict__.keys()) if not k.startswith("__") and k.isupper()]
-
-
 
 
 class GremlinServerErrorStatusCodes:

@@ -1,4 +1,6 @@
 
+
+
 class PropertiesObject:
 
     def __repr__(self):
@@ -6,6 +8,17 @@ class PropertiesObject:
         for k, v in self.__dict__.items():
             __str += f'{k}={v} '
         return __str
+
+    def to_json(self):
+        return self.__dict__
+
+class GenericData:
+
+    def __init__(self, data) -> None:
+        self.data = data
+    
+    def to_json(self):
+        return self.data
 
 
 class ElementBase:
