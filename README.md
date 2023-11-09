@@ -22,14 +22,14 @@ Unified graph data modelling and management toolkit served as GraphQL API.
 
 ## Supported Databases
 
-| database 	    | query language 	| query     | search 	        | modelling 	|
-|----------	    |----------------	|-------	|--------	        |-----------	|
-| Janusgraph    | Gremlin          	| YES     	| filter/traversal  | READ          |
-| Amazon Neptune| Gremlin          	| YES      	| WIP     	        |           	|
-| CosmosDB      | Gremlin         	| YES      	| WIP     	        |           	|
-| Datastax(DSE) | Gremlin           | YES       | WIP     	        |           	|
-| Neo4j         | Cypher            | YES       |                   |               |
-| ArcadeDB      | Gremlin,Cypher,SQL|           |                   |               |
+| database 	    | query language 	| query     | search:filter | search:traversal | modelling 	|
+|----------	    |----------------	|-------	|--------	    |-----------	|-----------	|
+| Janusgraph    | Gremlin          	| YES     	| WIP           | WIP           |          	    |
+| Amazon Neptune| Gremlin          	| YES      	| WIP     	    |           	|          	    |
+| CosmosDB      | Gremlin         	| YES      	| WIP     	    |           	|          	    |
+| Datastax(DSE) | Gremlin           | YES       | WIP     	    |           	|          	    |
+| Neo4j         | Cypher            | YES       |               |               |          	    |
+| ArcadeDB      | Gremlin,Cypher,SQL|           |               |               |          	    |
 
 **Note** Any database that supports Cypher or Gremlin can be supported extending the 
 existing functionality. Checkout how to add new graph db support by extending [invana_engine/backends/base](invana_engine/backends/base/README.md)
