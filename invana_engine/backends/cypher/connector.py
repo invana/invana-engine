@@ -60,14 +60,17 @@ class CypherConnector(ConnectorBase):
         
 
         request = QueryRequest(query)
-
-        records, _, _ = self.connection.execute_query(
-            query,
-            database_=self.database_name,
-            routing_=RoutingControl.READ if self.is_readonly is True else RoutingControl.WRITE,
-            # result_transformer_=lambda r: r.value("name")
-        )
-        results =  self.serialize_response(records)
-        
+        try:
+            records, _, _ = self.connection.execute_query(
+                query,
+                database_=self.database_name,
+                routing_=RoutingControl.READ if self.is_readonly is True else RoutingControl.WRITE,
+            )
+            results =  self.serialize_response(records)
+            request.response_received_successfully(200)
+            request.finished_with_success()
+        except Exception as e:
+            request.finished_with_failure(e)
+            raise e
         return QueryResponse(request.request_id, 200, data=results)
     
