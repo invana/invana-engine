@@ -27,6 +27,12 @@ from starlette.routing import Mount
 from starlette.staticfiles import StaticFiles
 from ..graphql.schema import GraphQLSchemaGenerator
 from invana_engine.connector.graph import InvanaGraph
+import logging
+
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+logging.getLogger('neo4j').setLevel(logging.INFO)
 
 logger = logging.getLogger(__name__)
 

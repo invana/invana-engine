@@ -49,6 +49,7 @@ class Node(ElementBase):
 
     def __short_repr__(self):
               return f'{self.label}::{self.id}'
+    
 
 class RelationShip(ElementBase):
     inv = None
@@ -75,3 +76,9 @@ class RelationShip(ElementBase):
         base_data['inv'] = self.inv.to_json()
         base_data['outv'] = self.outv.to_json()
         return base_data
+
+# class UnLabelledNode(Node):
+#     pass
+
+# class UnLabelledRelation(RelationShip):
+#     pass

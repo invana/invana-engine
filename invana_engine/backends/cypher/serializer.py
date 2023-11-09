@@ -1,8 +1,12 @@
 from invana_engine.backends.base.data_types import Node, RelationShip, GenericData
+import logging
 
+logger = logging.getLogger(__name__)
 
 class CypherSerializer:
     # https://community.neo4j.com/t/convert-stream-of-records-to-json-in-python-driver/39720/3
+
+
 
 
     def serialize_data_custom(self, index, record):
@@ -15,7 +19,6 @@ class CypherSerializer:
 
         Record class documentation - https://neo4j.com/docs/api/python-driver/4.2/api.html#record
         """
-        print('record ', index, ':', record)  # console print statement
         # Create an empty dictionary
         graph_data_type_list = {}
         # Iterate over the list of records also enumerating it.
@@ -25,6 +28,7 @@ class CypherSerializer:
                 # Return the keys and values of this record as a dictionary and store it inside graph_data_type_dict.
                 graph_data_type_dict = record.data(j)
             else:
+
                 # If the record fails the above check then manually convert them into dictionary with __dict__
                 graph_data_type_dict = graph_data_type.__dict__
                 # Remove unnecessary _graph as we do not need it to serialize from the record.
@@ -54,26 +58,38 @@ class CypherSerializer:
                 if '_labels' in graph_data_type_dict:
                     frozen_label_set = graph_data_type_dict['_labels']
                     graph_data_type_dict['_labels'] = [v for v in frozen_label_set]
+
+                if hasattr(graph_data_type, "type") and '_labels' in graph_data_type_dict \
+                      and  graph_data_type_dict['_labels'].__len__() == 0:
+                    graph_data_type_dict['_labels'] = [graph_data_type.type]
                 # print(graph_data_type_dict) # test statement
             graph_data_type_list.update(graph_data_type_dict)
         return graph_data_type_list
     
 
     def create_vertex_object(self, node):
-        return Node(node['_id'], node['_labels'][0], node['_properties']  )
+        try:
+            return Node(node['_id'], node['_labels'][0], node['_properties']  )
+        except Exception as e :
+            logger.debug(f"Failed to create Node object with error : {e.__str__()}")
+            return node
 
     def create_edge_object(self, edge):
-        out_v = edge['_start_node']
-        in_v = edge['_end_node']
-        return RelationShip(edge['_id'], edge['_labels'][0],
+        try:
+            out_v = edge['_start_node']
+            in_v = edge['_end_node']
+            return RelationShip(edge['_id'], edge['_labels'][0],
                             Node(out_v['_id'], out_v['_labels'][0],  out_v['_properties']) ,
                             Node(in_v['_id'], in_v['_labels'][0],  in_v['_properties']) ,
                             edge['_properties']  )
+        except Exception as e :
+            logger.debug(f"Failed to create Relationship object with error : {e.__str__()}")
+            return edge
+        
 
     def convert_to_invana_objects(self, result_json):
         result_objs = []
         for r in result_json:
-            print("=====type.r", type(r))
             if type(r) is dict:
                 if  r.get("_element_id") and r.get("_start_node"): 
                     # relationship

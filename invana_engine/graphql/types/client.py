@@ -13,7 +13,7 @@ class BackendBasicInfoType(graphene.ObjectType):
 class ClientInfoType(graphene.ObjectType):
     host = graphene.String()
     host_ip_address = graphene.String()
-    host_port = graphene.Int()
+    # host_port = graphene.Int()
     # def resolve_host(self, info):
     #     return socket.gethostname()
  
@@ -30,11 +30,11 @@ class BasicInfoType(graphene.ObjectType):
         return name
     
     def resolve_client(self, info):
-        return get_client_info()
-        # return {
-        #     "host": socket.gethostname(),
-        #     "host_ip_address": socket.gethostbyname(socket.gethostname())
-        # }
+        # return get_client_info()
+        return {
+            "host": info.context['request'].base_url._url.rstrip("/"),
+            "host_ip_address": info.context['request'].base_url.netloc
+        }
     
     def resolve_backend(self, info):
         return info.context['request'].app.state.graph.backend.get_basic_info()
