@@ -15,6 +15,7 @@ Unified graph data modelling and management toolkit served as GraphQL API.
 - [ ] graph data modelling
 - [ ] Interactive Search - filter and traverse through data.
 - [ ] Query streaming 
+- [ ] Extendable to support any graph database
 <!-- - [ ] Support for large scale queries with Apache Spark -->
 <!-- - [ ] graph data management system -->
 
@@ -37,7 +38,6 @@ existing functionality. Checkout how to add new graph db support by extending [i
 ## How to get started
 
 ### 1. with gremlin supported databases
-
 ```
 # start janusgraph instance 
 docker run -it -p 8182:8182 -d janusgraph/janusgraph
@@ -47,11 +47,11 @@ export GRAPH_BACKEND_URL="ws://localhost:8182/gremlin"
 export GRAPH_BACKEND="GremlinConnector"
 uvicorn invana_engine.server.app:app --port=8200 --host=0.0.0.0 --loop=asyncio
 ```
-### 2. Start Invana Engine
 
+### 2. with neo4j database
 ```
 # start neo4j instance 
-docker run -d -p 7474:7474 -p 7687:7687 -e NEO4J_AUTH=neo4j/testsecret neo4j 
+docker run -d -p 7474:7474 -p 7687:7687 -e NEO4J_AUTH=neo4j/supersecret neo4j 
 
 
 export GRAPH_BACKEND=CypherConnector
