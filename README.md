@@ -1,6 +1,6 @@
 # invana-engine
 
-Unified graph data modelling and management toolkit served as GraphQL API.
+Unified graph data modelling and management toolkit.
 
 
 [![Apache license](https://img.shields.io/badge/license-Apache-blue.svg)](https://github.com/invanalabs/invana-engine/blob/master/LICENSE) 
