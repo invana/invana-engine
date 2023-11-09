@@ -1,6 +1,6 @@
 # invana-engine
 
-Unified graph data modelling and management toolkit served as GraphQL API for graph databases.
+Unified graph data modelling and management toolkit served as GraphQL API.
 
 
 [![Apache license](https://img.shields.io/badge/license-Apache-blue.svg)](https://github.com/invanalabs/invana-engine/blob/master/LICENSE) 
@@ -11,22 +11,24 @@ Unified graph data modelling and management toolkit served as GraphQL API for gr
 
 ## Features 
 
-- [ ] Unified data modelleling for Graph databases
-- [ ] GraphQL API for graph databases 
+- [ ] Vendor agnostic GraphQL API
+- [ ] graph data modelling
 - [ ] Interactive Search - filter and traverse through data.
-- [ ] Support for large scale queries with Apache Spark
+- [ ] Query streaming 
+<!-- - [ ] Support for large scale queries with Apache Spark -->
+<!-- - [ ] graph data management system -->
 
 
 ## Supported Databases
 
-| database 	    | query language 	| query 	| search 	| modelling 	|
-|----------	    |----------------	|-------	|--------	|-----------	|
-| Janusgraph    | Gremlin          	| YES     	| WIP       | WIP          	|
-| Amazon Neptune| Gremlin          	| YES      	| WIP     	|           	|
-| CosmosDB      | Gremlin         	| YES      	| WIP     	|           	|
-| Datastax(DSE) | Gremlin           | YES       | WIP     	|           	|
-| Neo4j         | Cypher            | YES       |           |               |
-| ArcadeDB      | Gremlin,Cypher,SQL|           |           |               |
+| database 	    | query language 	| query     | search 	        | modelling 	|
+|----------	    |----------------	|-------	|--------	        |-----------	|
+| Janusgraph    | Gremlin          	| YES     	| filter/traversal  | READ          |
+| Amazon Neptune| Gremlin          	| YES      	| WIP     	        |           	|
+| CosmosDB      | Gremlin         	| YES      	| WIP     	        |           	|
+| Datastax(DSE) | Gremlin           | YES       | WIP     	        |           	|
+| Neo4j         | Cypher            | YES       |                   |               |
+| ArcadeDB      | Gremlin,Cypher,SQL|           |                   |               |
 
 **Note** Any database that supports Cypher or Gremlin can be supported extending the 
 existing functionality. Checkout how to add new graph db support by extending [invana_engine/backends/base](invana_engine/backends/base/README.md)
@@ -34,20 +36,29 @@ existing functionality. Checkout how to add new graph db support by extending [i
 
 ## How to get started
 
-### 1. Start a supported graph database
+### 1. with gremlin supported databases
 
 ```
-# for janusgraph 
+# start janusgraph instance 
 docker run -it -p 8182:8182 -d janusgraph/janusgraph
 
-# for neo4j
-docker run -d -p 7474:7474 -p 7687:7687 -e NEO4J_AUTH=neo4j/testsecret neo4j 
+# start invana engine
+export GRAPH_BACKEND_URL="ws://localhost:8182/gremlin"
+export GRAPH_BACKEND="GremlinConnector"
+uvicorn invana_engine.server.app:app --port=8200 --host=0.0.0.0 --loop=asyncio
 ```
 ### 2. Start Invana Engine
 
 ```
-export GRAPH_BACKEND_URL="ws://localhost:8182/gremlin"
+# start neo4j instance 
+docker run -d -p 7474:7474 -p 7687:7687 -e NEO4J_AUTH=neo4j/testsecret neo4j 
 
+
+export GRAPH_BACKEND=CypherConnector
+export GRAPH_BACKEND_URL="neo4j://localhost:17687"
+export GRAPH_BACKEND_DATABASE_NAME=neo4j
+export GRAPH_BACKEND_AUTH_USERNAME=neo4j
+export GRAPH_BACKEND_AUTH_PASSWORD=supersecret
 uvicorn invana_engine.server.app:app --port=8200 --host=0.0.0.0 --loop=asyncio
 ```
 
