@@ -44,5 +44,5 @@ class BasicInfoType(graphene.ObjectType):
             "host_ip_address": info.context['request'].base_url.netloc
         }
     
-    def resolve__backend(self, info):
+    def resolve_backend(self, info):
         return info.context['request'].app.state.graph.backend.get_basic_info()

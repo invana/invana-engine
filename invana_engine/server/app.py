@@ -82,10 +82,10 @@ def create_app():
 
     # schema = example_schema_with_subscription()
     # schema = example_schema()
-    schema = generate_schema_dynamically()
+    # schema = generate_schema_dynamically()
 
-    # schema =  GrapheneGraphQLSchemaGenerator().get_schema() 
-    # schema = schema.graphql_schema
+    schema =  GrapheneGraphQLSchemaGenerator().get_schema() 
+    schema = schema.graphql_schema
     # app.mount("/graph", GraphQL(schema.graphql_schema, debug=True,
     #                              websocket_handler=GraphQLTransportWSHandler(),
     #                              explorer=ExplorerGraphiQL(explorer_plugin=True ), 
@@ -97,5 +97,6 @@ def create_app():
 
     app.state.graph = InvanaGraph()
     return app
+
 
 app = create_app()

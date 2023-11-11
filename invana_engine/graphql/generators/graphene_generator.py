@@ -7,6 +7,11 @@ from ..subscriptions.execute_query import SubscriptionExample
 from ariadne import make_executable_schema
 from ariadne import SubscriptionType, make_executable_schema, MutationType, QueryType, ObjectType
 import asyncio
+from ariadne import SubscriptionType
+from datetime import datetime
+
+
+
 
 
 class GrapheneGraphQLSchemaGenerator:
@@ -32,6 +37,7 @@ class GrapheneGraphQLSchemaGenerator:
         Query = self.generate_query_types()
         Mutation = self.generate_mutation_types()
         Subscription = self.generate_subscription_types()
+
         return graphene.Schema(query=Query, mutation=Mutation, subscription=Subscription,
                                 auto_camelcase=auto_camelcase)
 
