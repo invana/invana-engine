@@ -2,6 +2,7 @@ import graphene
 from ..queries.client import BasicInfoType
 from ..queries.hello import HelloType
 from ..queries.raw_query import ExecuteQueryType
+from ..queries.node_label_filters import LabelQueryTypes
 from ..subscriptions.execute_query import SubscriptionExample
 from ariadne import make_executable_schema
 from ariadne import SubscriptionType, make_executable_schema, MutationType, QueryType, ObjectType
@@ -13,7 +14,8 @@ class GrapheneGraphQLSchemaGenerator:
     def generate_query_types(self):
         return type("Query", (
             BasicInfoType, 
-            ExecuteQueryType
+            ExecuteQueryType,
+            LabelQueryTypes
         ), {})
         
     def generate_mutation_types(self):
