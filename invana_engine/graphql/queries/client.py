@@ -1,6 +1,7 @@
 import graphene
 from ..utils import get_client_info, get_host
 import socket
+from invana_engine.settings import __VERSION__
 
 
 class BackendBasicInfoType(graphene.ObjectType):
@@ -22,21 +23,26 @@ class ClientInfoType(graphene.ObjectType):
  
 
 class BasicInfoType(graphene.ObjectType):
-    hello = graphene.String()
-    client = graphene.Field(ClientInfoType)
-    backend = graphene.Field(BackendBasicInfoType)
+    _hello = graphene.String()
+    _version = graphene.String()
 
-    def resolve_hello(self, info):
+    _client = graphene.Field(ClientInfoType)
+    _backend = graphene.Field(BackendBasicInfoType)
+
+    def resolve__version(self, info: graphene.ResolveInfo) -> str:
+        return __VERSION__
+
+    def resolve__hello(self, info):
         request = info.context["request"]
         user_agent = request.headers.get("user-agent", "guest")
         return "Hello, %s!" % user_agent
         
-    def resolve_client(self, info):
+    def resolve__client(self, info):
         # return get_client_info()
         return {
             "host": info.context['request'].base_url._url.rstrip("/"),
             "host_ip_address": info.context['request'].base_url.netloc
         }
     
-    def resolve_backend(self, info):
+    def resolve__backend(self, info):
         return info.context['request'].app.state.graph.backend.get_basic_info()
