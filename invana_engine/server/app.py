@@ -25,7 +25,8 @@ from invana_engine.graphql.graphiql.handler import make_graphiql_handler
 from ..settings import __VERSION__, __AUTHOR_NAME__, __AUTHOR_EMAIL__
 from starlette.routing import Mount
 from starlette.staticfiles import StaticFiles
-from ..graphql.schema import GraphQLSchemaGenerator
+from ariadne.asgi import GraphQL
+from ..graphql.schema_generators import GrapheneGraphQLSchemaGenerator, AriadneGraphQLSchemaGenerator
 from invana_engine.connector.graph import InvanaGraph
 import logging
 
@@ -78,8 +79,60 @@ def create_app():
 
     # schema = Query  # , mutation=Mutation, subscription=Subscription)
 
-    schema =  GraphQLSchemaGenerator().get_schema()
-    app.mount("/graph", GraphQLApp(schema, on_get=make_graphiql_handler()))  # Graphiql IDE
+    schema =  GrapheneGraphQLSchemaGenerator().get_schema()
+
+    # app.mount("/graph", GraphQLApp(schema, on_get=make_graphiql_handler()))  # starlette graphql 
+
+    # from ariadne import QueryType, make_executable_schema
+    # from ariadne.asgi import GraphQL
+    # type_defs = """
+    #     type Query {
+    #         hello: String!
+    #     }
+    # """
+
+    # query = QueryType()
+
+
+    # @query.field("hello")
+    # def resolve_hello(*_):
+    #     return "Hello world!"
+
+
+    # # Create executable schema instance
+    # schema = make_executable_schema(type_defs, query)
+    import asyncio
+    from ariadne.asgi.handlers import GraphQLTransportWSHandler
+    from ariadne import SubscriptionType, make_executable_schema
+    type_def = """
+        type Query {
+            _unused: Boolean
+        }
+
+        type Subscription {
+            counter: Int!
+        }
+    """
+
+    subscription = SubscriptionType()
+
+    @subscription.source("counter")
+    async def counter_generator(obj, info):
+        for i in range(50):
+            await asyncio.sleep(1)
+            yield i
+
+
+    @subscription.field("counter")
+    def counter_resolver(count, info):
+        return count + 1
+    schema = AriadneGraphQLSchemaGenerator().get_schema(type_def, subscription)
+
+
+    # app.mount("/graph", GraphQL(schema.graphql_schema, debug=True ))  # Graphiql IDE
+    app.mount("/graph", GraphQL(schema, debug=True,
+                                websocket_handler=GraphQLTransportWSHandler(),
+                                 ))  # Graphiql IDE
 
     app.state.graph = InvanaGraph(GRAPH_BACKEND)
     return app
