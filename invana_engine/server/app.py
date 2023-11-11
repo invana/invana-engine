@@ -27,9 +27,10 @@ from starlette.routing import Mount
 from starlette.staticfiles import StaticFiles
 from ariadne.asgi import GraphQL
 from ..graphql.schema_generators import GrapheneGraphQLSchemaGenerator, \
-    AriadneGraphQLSchemaGenerator, example_schema_with_subscription
+    AriadneGraphQLSchemaGenerator, example_schema_with_subscription, example_schema
 from invana_engine.connector.graph import InvanaGraph
 from ariadne.asgi.handlers import GraphQLTransportWSHandler
+from ariadne.explorer import ExplorerGraphiQL
 import logging
 
 
@@ -77,12 +78,13 @@ def create_app():
     ]
     app = Starlette(routes=routes, middleware=middleware, debug=DEBUG)
 
-    type_def, subscription = example_schema_with_subscription()
-    schema = AriadneGraphQLSchemaGenerator().get_schema(type_def, subscription)
+    schema = example_schema_with_subscription()
+    # schema = example_schema()
 
     # schema =  GrapheneGraphQLSchemaGenerator().get_schema() 
     # app.mount("/graph", GraphQL(schema.graphql_schema, debug=True ))  # Graphiql IDE
     app.mount("/graph", GraphQL(schema, debug=True,
+                                explorer=ExplorerGraphiQL(explorer_plugin=True), 
                                 websocket_handler=GraphQLTransportWSHandler(),
                             )) 
 

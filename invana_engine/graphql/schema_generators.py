@@ -4,7 +4,7 @@ from .queries.hello import HelloType
 from .queries.querytypes import ExecuteQueryType
 from .subscriptions.execute_query import SubscriptionExample
 from ariadne import make_executable_schema
-from ariadne import SubscriptionType, make_executable_schema
+from ariadne import SubscriptionType, make_executable_schema, MutationType, QueryType
 import asyncio
 
 
@@ -35,9 +35,13 @@ class GrapheneGraphQLSchemaGenerator:
 
 class AriadneGraphQLSchemaGenerator:
 
+    def __init__(self) -> None:
+        self.subscription = SubscriptionType()
+        self.mutation = MutationType()
+        self.query = QueryType()
 
-    def get_schema(self, type_def, subscription):
-        return make_executable_schema(type_def, subscription)
+    def get_schema(self, type_def):
+        return make_executable_schema(type_def, self.query, self.mutation, self.subscription)
 
 
 def example_schema_with_subscription():
@@ -45,22 +49,83 @@ def example_schema_with_subscription():
         type Query {
             _unused: Boolean
         }
+        
+        type Mutation {
+            _unused: Boolean
+        }
 
         type Subscription {
             counter: Int!
         }
     """
+    schema_generator = AriadneGraphQLSchemaGenerator()
+ 
+    @schema_generator.subscription.source("counter")
+    async def counter_generator(obj, info):
+        for i in range(50):
+            await asyncio.sleep(1)
+            yield i
 
-    subscription = SubscriptionType()
+    @schema_generator.subscription.field("counter")
+    def counter_resolver(count, info):
+        return count + 1
+    
+    return schema_generator.get_schema(type_def)
 
-    @subscription.source("counter")
+
+
+
+def example_schema():
+    type_def = """
+        interface Node {
+            id: ID!
+            label: String!
+        }
+
+        interface Relationship implements Node {
+            id: ID!
+            label: String!
+            inv: ID!
+            outv: ID!
+        }
+
+        type Person implements Node {
+            id: ID!
+            label: String!
+            name: String
+        }
+
+
+        type Project implements Node {
+            id: ID!
+            label: String!
+            name: String
+        }
+        
+        type Query {
+            person: Person
+        }
+
+        type Mutation {
+            ok: String
+        }
+        
+        type Subscription {
+            counter: Int!
+        }
+    """
+
+    schema_generator = AriadneGraphQLSchemaGenerator()
+ 
+    @schema_generator.subscription.source("counter")
     async def counter_generator(obj, info):
         for i in range(50):
             await asyncio.sleep(1)
             yield i
 
 
-    @subscription.field("counter")
+    @schema_generator.subscription.field("counter")
     def counter_resolver(count, info):
         return count + 1
-    return type_def, subscription
+    
+    return schema_generator.get_schema(type_def)
