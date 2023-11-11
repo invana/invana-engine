@@ -123,8 +123,6 @@ def example_schema():
         parse,
     )
 
-    # ast_document = parse(type_def)
-    # schema = build_ast_schema(ast_document)
     schema_generator = AriadneGraphQLSchemaGenerator()
  
     @schema_generator.subscription.source("counter")

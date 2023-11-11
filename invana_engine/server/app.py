@@ -30,7 +30,7 @@ from ..graphql.schema_generators import GrapheneGraphQLSchemaGenerator, \
     AriadneGraphQLSchemaGenerator, example_schema_with_subscription, example_schema
 from invana_engine.connector.graph import InvanaGraph
 from ariadne.asgi.handlers import GraphQLTransportWSHandler
-from ariadne.explorer import ExplorerGraphiQL
+from ariadne.explorer import ExplorerGraphiQL, ExplorerApollo
 import logging
 
 
@@ -84,7 +84,7 @@ def create_app():
     # schema =  GrapheneGraphQLSchemaGenerator().get_schema() 
     # app.mount("/graph", GraphQL(schema.graphql_schema, debug=True ))  # Graphiql IDE
     app.mount("/graph", GraphQL(schema, debug=True,
-                                explorer=ExplorerGraphiQL(explorer_plugin=True), 
+                                explorer=ExplorerApollo( ), 
                                 websocket_handler=GraphQLTransportWSHandler(),
                             )) 
 
