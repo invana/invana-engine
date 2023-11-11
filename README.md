@@ -12,7 +12,7 @@ Unified graph data modelling and management toolkit.
 ## Features 
 
 - [ ] Vendor agnostic GraphQL API
-- [ ] graph data modelling
+- [ ] graph data modelling - schema reader and editor
 - [ ] Interactive Search - filter and traverse through data.
 - [ ] Query streaming 
 - [ ] Extendable to support any graph database
@@ -44,7 +44,8 @@ docker run -it -p 8182:8182 -d janusgraph/janusgraph
 
 # start invana engine
 export GRAPH_BACKEND_URL="ws://localhost:8182/gremlin"
-export GRAPH_BACKEND="GremlinConnector"
+export GRAPH_BACKEND="JanusGraphConnector"  # or GremlinConnector for other gremlin based dbs
+
 uvicorn invana_engine.server.app:app --port=8200 --host=0.0.0.0 --loop=asyncio
 ```
 

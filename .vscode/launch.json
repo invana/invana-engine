@@ -38,7 +38,7 @@
                 "--reload"
             ],
             "env": {
-                "GRAPH_BACKEND": "GremlinConnector",
+                "GRAPH_BACKEND": "JanusGraphConnector",
                 "GRAPH_BACKEND_URL": "ws://localhost:8182/gremlin"
             },
             "justMyCode": true

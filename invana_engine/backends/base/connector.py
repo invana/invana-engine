@@ -38,7 +38,7 @@ class ConnectorBase(abc.ABC):
     def get_basic_info(self):
         return {
             "connection_uri" : self.connection_uri,
-            "backend_class": type(self).__name__,
+            "backend_class": self.__class__.__name__, # type(self).__name__,
             "is_readonly": self.is_readonly,
             "default_query_language": self.default_query_language,
             "supported_query_languages": self.supported_query_languages()
