@@ -78,8 +78,8 @@ def create_app():
     ]
     app = Starlette(routes=routes, middleware=middleware, debug=DEBUG)
 
-    schema = example_schema_with_subscription()
-    # schema = example_schema()
+    # schema = example_schema_with_subscription()
+    schema = example_schema()
 
     # schema =  GrapheneGraphQLSchemaGenerator().get_schema() 
     # app.mount("/graph", GraphQL(schema.graphql_schema, debug=True ))  # Graphiql IDE

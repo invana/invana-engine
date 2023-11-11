@@ -76,7 +76,10 @@ def example_schema_with_subscription():
 
 
 def example_schema():
+
+ 
     type_def = """
+
         interface Node {
             id: ID!
             label: String!
@@ -89,14 +92,13 @@ def example_schema():
             outv: ID!
         }
 
-        type Person implements Node {
+        type Person {
             id: ID!
             label: String!
             name: String
         }
 
-
-        type Project implements Node {
+        type Project {
             id: ID!
             label: String!
             name: String
@@ -114,7 +116,15 @@ def example_schema():
             counter: Int!
         }
     """
+    from graphql import (
+        GraphQLSchema,
+        assert_valid_schema,
+        build_ast_schema,
+        parse,
+    )
 
+    # ast_document = parse(type_def)
+    # schema = build_ast_schema(ast_document)
     schema_generator = AriadneGraphQLSchemaGenerator()
  
     @schema_generator.subscription.source("counter")
@@ -127,5 +137,14 @@ def example_schema():
     @schema_generator.subscription.field("counter")
     def counter_resolver(count, info):
         return count + 1
+    
+
+    schema_generator.query.set_field("person", lambda x, y: {
+        "id":1, "label": "Hello", "name": "Hello world"})
+
+    # schema_generator.query.field("person_by_id", )
+    
+    # schema_generator.query.set_field("person_by_id", lambda x, y: {
+    #     "id":1, "label": "Hello", "name": "Hello world"})
     
     return schema_generator.get_schema(type_def)
