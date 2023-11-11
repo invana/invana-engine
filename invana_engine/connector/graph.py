@@ -6,12 +6,11 @@ import importlib
 
 class InvanaGraph:
 
-    backend_cls_str = None
-    def __init__(self, backend_cls_str: any):
+    def __init__(self):
         # self.settings = settings
-        self.backend_cls_str = backend_cls_str
-        backend_cls = self.get_backend_class(backend_cls_str)
-        if backend_cls_str == "CypherConnector":
+        self.backend_cls_str = settings.GRAPH_BACKEND
+        backend_cls = self.get_backend_class(self.backend_cls_str)
+        if self.backend_cls_str == "CypherConnector":
             self.backend = backend_cls(getattr(settings, "GRAPH_BACKEND_URL"), 
                                     database_name=getattr(settings,"GRAPH_BACKEND_DATABASE_NAME"),
                                     username=getattr(settings,"GRAPH_BACKEND_AUTH_USERNAME"),

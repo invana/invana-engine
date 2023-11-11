@@ -26,8 +26,10 @@ from ..settings import __VERSION__, __AUTHOR_NAME__, __AUTHOR_EMAIL__
 from starlette.routing import Mount
 from starlette.staticfiles import StaticFiles
 from ariadne.asgi import GraphQL
-from ..graphql.schema_generators import GrapheneGraphQLSchemaGenerator, AriadneGraphQLSchemaGenerator
+from ..graphql.schema_generators import GrapheneGraphQLSchemaGenerator, \
+    AriadneGraphQLSchemaGenerator, example_schema_with_subscription
 from invana_engine.connector.graph import InvanaGraph
+from ariadne.asgi.handlers import GraphQLTransportWSHandler
 import logging
 
 
@@ -70,71 +72,21 @@ def create_app():
         WebSocketRoute('/gremlin', GremlinQueryView),
         Mount('/static', app=StaticFiles(packages=[('invana_engine.graphql.graphiql', 'static')]), name="static"),
     ]
-
     middleware = [
         Middleware(CORSMiddleware, allow_origins=['*'], allow_methods=["GET", "POST", "PUT", "DELETE"])
     ]
-
     app = Starlette(routes=routes, middleware=middleware, debug=DEBUG)
 
-    # schema = Query  # , mutation=Mutation, subscription=Subscription)
-
-    schema =  GrapheneGraphQLSchemaGenerator().get_schema()
-
-    # app.mount("/graph", GraphQLApp(schema, on_get=make_graphiql_handler()))  # starlette graphql 
-
-    # from ariadne import QueryType, make_executable_schema
-    # from ariadne.asgi import GraphQL
-    # type_defs = """
-    #     type Query {
-    #         hello: String!
-    #     }
-    # """
-
-    # query = QueryType()
-
-
-    # @query.field("hello")
-    # def resolve_hello(*_):
-    #     return "Hello world!"
-
-
-    # # Create executable schema instance
-    # schema = make_executable_schema(type_defs, query)
-    import asyncio
-    from ariadne.asgi.handlers import GraphQLTransportWSHandler
-    from ariadne import SubscriptionType, make_executable_schema
-    type_def = """
-        type Query {
-            _unused: Boolean
-        }
-
-        type Subscription {
-            counter: Int!
-        }
-    """
-
-    subscription = SubscriptionType()
-
-    @subscription.source("counter")
-    async def counter_generator(obj, info):
-        for i in range(50):
-            await asyncio.sleep(1)
-            yield i
-
-
-    @subscription.field("counter")
-    def counter_resolver(count, info):
-        return count + 1
+    type_def, subscription = example_schema_with_subscription()
     schema = AriadneGraphQLSchemaGenerator().get_schema(type_def, subscription)
 
-
+    # schema =  GrapheneGraphQLSchemaGenerator().get_schema() 
     # app.mount("/graph", GraphQL(schema.graphql_schema, debug=True ))  # Graphiql IDE
     app.mount("/graph", GraphQL(schema, debug=True,
                                 websocket_handler=GraphQLTransportWSHandler(),
-                                 ))  # Graphiql IDE
+                            )) 
 
-    app.state.graph = InvanaGraph(GRAPH_BACKEND)
+    app.state.graph = InvanaGraph()
     return app
 
 app = create_app()
