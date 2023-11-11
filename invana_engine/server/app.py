@@ -26,8 +26,10 @@ from ..settings import __VERSION__, __AUTHOR_NAME__, __AUTHOR_EMAIL__
 from starlette.routing import Mount
 from starlette.staticfiles import StaticFiles
 from ariadne.asgi import GraphQL
-from ..graphql.schema_generators import GrapheneGraphQLSchemaGenerator, \
-    AriadneGraphQLSchemaGenerator, example_schema_with_subscription, example_schema
+from ..graphql.generators.ariadne_generator import  \
+    AriadneGraphQLSchemaGenerator, generate_schema_dynamically
+from ..graphql.generators.graphene_generator import GrapheneGraphQLSchemaGenerator
+from ..graphql.generators.schema_generator_examples import example_schema_with_subscription, example_schema
 from invana_engine.connector.graph import InvanaGraph
 from ariadne.asgi.handlers import GraphQLTransportWSHandler
 from ariadne.explorer import ExplorerGraphiQL, ExplorerApollo
@@ -79,14 +81,17 @@ def create_app():
     app = Starlette(routes=routes, middleware=middleware, debug=DEBUG)
 
     # schema = example_schema_with_subscription()
-    schema = example_schema()
+    # schema = example_schema()
+    schema = generate_schema_dynamically()
 
-    # schema =  GrapheneGraphQLSchemaGenerator().get_schema() 
-    # app.mount("/graph", GraphQL(schema.graphql_schema, debug=True ))  # Graphiql IDE
-    app.mount("/graph", GraphQL(schema, debug=True,
-                                explorer=ExplorerApollo( ), 
-                                websocket_handler=GraphQLTransportWSHandler(),
-                            )) 
+    schema =  GrapheneGraphQLSchemaGenerator().get_schema() 
+    app.mount("/graph", GraphQL(schema.graphql_schema, debug=True,
+                                 websocket_handler=GraphQLTransportWSHandler(),
+                                 ))  # Graphiql IDE
+    # app.mount("/graph", GraphQL(schema, debug=True,
+    #                             explorer=ExplorerApollo( ), 
+    #                             websocket_handler=GraphQLTransportWSHandler(),
+    #                         )) 
 
     app.state.graph = InvanaGraph()
     return app

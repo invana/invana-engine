@@ -22,13 +22,15 @@ class ClientInfoType(graphene.ObjectType):
  
 
 class BasicInfoType(graphene.ObjectType):
-    hello = graphene.String(name=graphene.String(default_value="World"))
+    hello = graphene.String()
     client = graphene.Field(ClientInfoType)
     backend = graphene.Field(BackendBasicInfoType)
 
-    def resolve_hello(self, info, name):
-        return name
-    
+    def resolve_hello(self, info):
+        request = info.context["request"]
+        user_agent = request.headers.get("user-agent", "guest")
+        return "Hello, %s!" % user_agent
+        
     def resolve_client(self, info):
         # return get_client_info()
         return {

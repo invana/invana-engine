@@ -41,14 +41,14 @@ class AnyField(graphene.Scalar):
         return value
 
 
-class NodeType(graphene.ObjectType):
+class NodeType(graphene.Scalar):
     id = AnyField()
     type = graphene.String()
     label = graphene.String()
     properties = AnyField(required=False)
 
 
-class GetOrCreateNodeType(graphene.ObjectType):
+class GetOrCreateNodeType(graphene.Scalar):
     is_created = graphene.Boolean()
     data = graphene.Field(NodeType())
 
