@@ -19,7 +19,6 @@ from starlette.routing import Route, WebSocketRoute
 from .views import HomePageView, GremlinQueryView
 from invana_engine.settings import GRAPH_BACKEND, DEBUG, GRAPH_BACKEND_URL,  \
     GRAPH_BACKEND_GREMLIN_TRAVERSAL_SOURCE, SERVER_PORT
-from starlette_graphene3 import GraphQLApp
 from invana_engine.graphql.graphiql.handler import make_graphiql_handler
 # from invana_engine.graphql.schema import get_schema
 from ..settings import __VERSION__, __AUTHOR_NAME__, __AUTHOR_EMAIL__

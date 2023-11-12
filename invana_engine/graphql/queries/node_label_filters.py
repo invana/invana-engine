@@ -1,5 +1,4 @@
 import graphene
-import importlib
 
 """
 
@@ -18,14 +17,7 @@ IntFilersExpressions = type("IntFilersExpressions", (graphene.InputObjectType, )
     "in": graphene.List(graphene.Int)
 })
 
-# IntFilersExpressions = type("BooleanFilersExpressions", (graphene.InputObjectType, ), {
-#     "eq": graphene.Int(),
-#     "gt": graphene.Int(),
-#     "gte": graphene.Int(),
-#     "lt": graphene.Int(),
-#     "in": graphene.List(graphene.Int)
-# })
-
+ 
 """
 all the types above are generic reusable
 """
@@ -78,8 +70,8 @@ def create_label_query_type(type_name, type_def_dict):
     def resolve_query(self, info: graphene.ResolveInfo):
         return [{
             "id": "op",
-            "name": "my name is good",
-            "label": "me"
+            "first_name": "my name is good",
+            "email": "me@gmail.com"
         }]
 
     LabelQueryTypes  = type(type_name, (graphene.ObjectType, ), {

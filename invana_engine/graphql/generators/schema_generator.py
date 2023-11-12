@@ -1,7 +1,4 @@
-import pathlib
-import os
 import graphene
-from graphql import GraphQLObjectType , GraphQLField
 from .ariadne_generator import AriadneGraphQLSchemaGenerator, AdriadneSchemUtils
 from ..queries.node_label_filters import create_label_query_type
 from ..queries.client import BasicInfoType
