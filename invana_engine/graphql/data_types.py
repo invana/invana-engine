@@ -15,6 +15,7 @@ import graphene
 import datetime
 
 
+
 class AnyField(graphene.Scalar):
 
     @staticmethod
@@ -70,6 +71,7 @@ class EdgeType(NodeType):
 
 class NodeOrEdgeType(EdgeType):
     pass
+
 
 
 class QueryResponseData(graphene.ObjectType):
