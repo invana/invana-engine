@@ -29,7 +29,7 @@ from ariadne.asgi import GraphQL
 #     AriadneGraphQLSchemaGenerator, generate_schema_dynamically
 from ..graphql.generators import SchemaGenerator
 # from ..graphql.generators.schema_generator_examples import example_schema_with_subscription, example_schema
-from invana_engine.connector.graph import InvanaGraph
+from invana_engine import InvanaGraph
 from ariadne.asgi.handlers import GraphQLTransportWSHandler
 from ariadne.explorer import ExplorerGraphiQL, ExplorerApollo
 import logging

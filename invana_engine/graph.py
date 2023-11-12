@@ -1,5 +1,5 @@
 
-from ..backends import GremlinConnector, CypherConnector
+from .backends import GremlinConnector, CypherConnector
 from invana_engine import settings
 import importlib
 
