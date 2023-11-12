@@ -2,11 +2,12 @@ import graphene
 
 
 OrderByEnum = type("OrderByEnum", (graphene.Enum, ), {"asc": "asc", "desc": "desc"})
+
 StringFilersExpressions = type("StringFilerExpressions", (graphene.InputObjectType, ), {
     "eq": graphene.String(),
-    "in": graphene.List(graphene.String),
- 
+    "in": graphene.List(graphene.String)
 })
+
 IntFilersExpressions = type("IntFilersExpressions", (graphene.InputObjectType, ), {
     "eq": graphene.Int(),
     "gt": graphene.Int(),
@@ -21,7 +22,6 @@ all the types above are generic reusable
 
 class QueryGenerators:
  
-
     def __init__(self, type_name, type_def_dict) -> None:
         self.type_name = type_name
         self.type_def_dict = type_def_dict
@@ -29,7 +29,6 @@ class QueryGenerators:
     def create_field(self, field):
         field_str = field['field_type_str']
         return getattr(graphene, field_str)()
-
 
     def create_node_type(self):
         # create node type
@@ -66,11 +65,9 @@ class QueryGenerators:
         return type(f"{self.type_name}WhereConditions",(graphene.InputObjectType, ),white_condition_fields)
 
     def generate(self):
-
         NodeType = self.create_node_type()
         NodeOrderBy = self.create_order_by()
         NodeWhereConditions = self.create_where_conditions()
-
 
         def resolve_query(self, info: graphene.ResolveInfo):
             return [{
