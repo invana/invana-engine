@@ -1,6 +1,6 @@
 import graphene
 from .ariadne_generator import AriadneGraphQLSchemaGenerator, AdriadneSchemUtils
-from ..queries.node_label_filters import create_label_query_type
+from ..queries.query_generators import QueryGenerators
 from ..queries.client import BasicInfoType
 from ..queries.hello import HelloType
 from ..queries.raw_query import ExecuteQueryType
@@ -67,7 +67,7 @@ class SchemaGenerator:
         mutation_classes =[]
         subscription_classes = []
         for type_name, type_def_dict in self.type_defs_dict.items():
-            LabelQueryTypes = create_label_query_type(type_name, type_def_dict)
+            LabelQueryTypes = QueryGenerators(type_name, type_def_dict).generate()
             query_classes.append(LabelQueryTypes)            
 
         Query = self.generate_query_types(*query_classes)
