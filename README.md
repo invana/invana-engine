@@ -14,7 +14,7 @@ Unified graph data modelling and management toolkit.
 - [ ] Vendor agnostic GraphQL API
 - [ ] graph data modelling - schema reader and editor
 - [ ] Interactive Search - filter and traverse through data.
-- [ ] Query streaming 
+<!-- - [ ] Query streaming  -->
 - [ ] Extendable to support any graph database
 <!-- - [ ] Support for large scale queries with Apache Spark -->
 <!-- - [ ] graph data management system -->
@@ -22,7 +22,7 @@ Unified graph data modelling and management toolkit.
 
 ## Supported Databases
 
-| database 	    | query language 	| query     | search:filter | search:traversal | modelling 	|
+| database 	    | query language 	| raw query     | search:filter | search:traversal | modelling 	|
 |----------	    |----------------	|-------	|--------	    |-----------	|-----------	|
 | Janusgraph    | Gremlin          	| YES     	| WIP           | WIP           |          	    |
 | Amazon Neptune| Gremlin          	| YES      	| WIP     	    |           	|          	    |
