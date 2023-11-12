@@ -19,6 +19,20 @@ class SchemaGenerator:
     schema_str = \"""
 
 
+        type Person {
+            id: ID!
+            label: String!
+            name: String
+            projects: [Project!]! @relationship(label: "authored_project", direction: OUT)
+
+        }
+
+        type Project {
+            id: ID!
+            label: String!
+            name: String
+        }
+
 
 \"""
     schema_generator = SchemaGenerator()

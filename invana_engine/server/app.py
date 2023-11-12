@@ -29,7 +29,7 @@ from ariadne.asgi import GraphQL
 # from ..graphql.generators.ariadne_generator import  \
 #     AriadneGraphQLSchemaGenerator, generate_schema_dynamically
 from ..graphql.generators import SchemaGenerator
-from ..graphql.generators.schema_generator_examples import example_schema_with_subscription, example_schema
+# from ..graphql.generators.schema_generator_examples import example_schema_with_subscription, example_schema
 from invana_engine.connector.graph import InvanaGraph
 from ariadne.asgi.handlers import GraphQLTransportWSHandler
 from ariadne.explorer import ExplorerGraphiQL, ExplorerApollo
@@ -75,18 +75,16 @@ def create_app():
 
         type Person {
             id: ID!
-            label: String!
-            name: String
-            # projects: [Project!]! @relationship(label: "authored_project", direction: OUT)
-
+            email: String!
+            first_name: String
+            projects: [Project!]! @relationship(label: "authored_project", direction: OUT)
         }
 
         type Project {
             id: ID!
-            label: String!
-            name: String
+            name: String!
+            description: String
         }
-
 """
 
     routes = [
