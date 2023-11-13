@@ -70,14 +70,12 @@ def create_app():
     schema_def =  """
 
         type Person {
-            id: ID!
             email: String!
             first_name: String
             projects: [Project!]! @relationship(label: "authored_project", direction: OUT)
         }
 
         type Project {
-            id: ID!
             name: String!
             description: String
         }

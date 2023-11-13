@@ -47,29 +47,49 @@ class QueryGenerators:
             order_by_fields[field_name] = OrderByEnum()
         return type(f"{self.type_name}OrderBy", (graphene.InputObjectType, ), order_by_fields)
     
+
+    def create_where_relationship_condition(self, relationship_label, direction, ):
+        return type(f"{relationship_label}WhereConditions", (graphene.InputObjectType, ), {
+            "id": graphene.String()
+        })
+
+    
     def create_where_conditions(self):
         # create where 
         # NodeWhereConditions2 is a hack to avoid the error 
         # `UnboundLocalError: local variable 'NodeWhereConditions' referenced before assignment`
         NodeWhereConditions2 = type(f"{self.type_name}WhereConditions",(graphene.InputObjectType, ),{})
-        white_condition_fields = {     
+        where_condition_fields = {     
             "_and": NodeWhereConditions2(),
             "_or": NodeWhereConditions2(),
             "_not": NodeWhereConditions2()
         }
+        # fields
         for field_name, field in self.type_def_dict['fields'].items():
-            if field['field_type_str'] == "String":
-                white_condition_fields[field_name] = StringFilersExpressions()
+            if list(field['directives'].keys()).__len__() >  0:
+                for directive_name, directive_data in field['directives'].items():
+                    if directive_name == "relationship":
+                        cls = self.create_where_relationship_condition(
+                                directive_data['label'],
+                                directive_data['direction'],
+                            )
+                        where_condition_fields[directive_data['label']] = cls()
+            elif field['field_type_str'] == "String":
+                where_condition_fields[field_name] = StringFilersExpressions()
             elif field['field_type_str'] == "Int":
-                white_condition_fields[field_name] = IntFilersExpressions()
-        return type(f"{self.type_name}WhereConditions",(graphene.InputObjectType, ),white_condition_fields)
+                where_condition_fields[field_name] = IntFilersExpressions()
+
+        # traversals 
+
+
+        return type(f"{self.type_name}WhereConditions",(graphene.InputObjectType,), where_condition_fields)
 
     def generate(self):
         NodeType = self.create_node_type()
         NodeOrderBy = self.create_order_by()
         NodeWhereConditions = self.create_where_conditions()
 
-        def resolve_query(self, info: graphene.ResolveInfo):
+        def resolve_query(self, info: graphene.ResolveInfo, **kwargs):
             return [{
                 "id": "op",
                 "first_name": "my name is good",
