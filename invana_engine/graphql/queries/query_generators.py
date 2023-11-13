@@ -32,8 +32,11 @@ class QueryGenerators:
     
     def create_relationship_field(self, directive):
         # dummy
-        NodeType =  type(directive['label'], (graphene.ObjectType, ), {}) 
+        NodeType =  type(directive['node_label'], (graphene.ObjectType, ), {})
         return graphene.Field(graphene.List(NodeType)) 
+    
+    def create_relationship_field_name(self, directive):
+        return f"{directive['relation_label']}__{directive['node_label']}"
 
     def create_node_type(self):
         # create node type
@@ -44,8 +47,9 @@ class QueryGenerators:
             else:
                 for directive_name, directive in field['directives'].items():
                     if directive_name == "relationship":
-                        node_type_fields[field_name] = self.create_relationship_field(directive) 
+                        node_type_fields[self.create_relationship_field_name(directive)] = self.create_relationship_field(directive) 
         return type(self.type_name, (graphene.ObjectType, ), node_type_fields) 
+
 
     def create_order_by(self):
         # create order by 
@@ -75,10 +79,10 @@ class QueryGenerators:
                 for directive_name, directive_data in field['directives'].items():
                     if directive_name == "relationship":
                         cls = self.create_where_relationship_condition(
-                                directive_data['label'],
+                                directive_data['node_label'],
                                 directive_data['direction'],
                             )
-                        where_condition_fields[directive_data['label']] = cls()
+                        where_condition_fields[self.create_relationship_field_name(directive_data)] = cls()
             elif field['field_type_str'] == "String":
                 where_condition_fields[field_name] = StringFilersExpressions()
             elif field['field_type_str'] == "Int":

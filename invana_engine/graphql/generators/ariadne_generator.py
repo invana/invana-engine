@@ -79,10 +79,11 @@ class AdriadneSchemUtils():
             data[directive.name.value] = {}
             for argument in  directive.arguments:
                 data[directive.name.value][argument.name.value] =  argument.value.value
-            data[directive.name.value]['label'] = self.get_type_of_field(field.type).name
+            data[directive.name.value]['node_label'] = self.get_type_of_field(field.type).name
+            data[directive.name.value]['relation_label'] = data[directive.name.value]['label']
+            del data[directive.name.value]['label']
         return data
     
-
     def get_field_defintion_str(self, type_):
         body = type_.ast_node.loc.source.body
         return body[type_.ast_node.loc.start: type_.ast_node.loc.end]  
@@ -101,6 +102,7 @@ class AdriadneSchemUtils():
                 'field_type' : field_type,
                 'directives' : {}
             }
+            # this will get the relationships 
             if field.ast_node.directives.__len__() > 0 :
                 directives_dict = self.get_directives_on_field(field)
                 type_def_dict['fields'][field_string]['directives'] = directives_dict
