@@ -41,7 +41,7 @@ class SchemaGenerator:
     def __init__(self, schema_str) -> None:
         self.schema_str = schema_str
         self.interim_schema = AriadneGraphQLSchemaGenerator().create_interim_schema(schema_str)
-        self.type_defs_dict = AdriadneSchemUtils(self.interim_schema).get_type_defs_dict()
+        self.type_defs_dict = AdriadneSchemUtils().get_type_defs_dict(self.interim_schema)
     
     def generate_query_types(self, *type_def_classes):
         return type("Query", (
@@ -66,6 +66,7 @@ class SchemaGenerator:
         query_classes = []
         mutation_classes =[]
         subscription_classes = []
+
         for type_name, type_def_dict in self.type_defs_dict.items():
             LabelQueryTypes = QueryGenerators(type_name, type_def_dict).generate()
             query_classes.append(LabelQueryTypes)            

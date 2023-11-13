@@ -63,8 +63,8 @@ class AriadneGraphQLSchemaGenerator:
 
 class AdriadneSchemUtils():
 
-    def __init__(self, interim_schema) -> None:
-        self.interim_schema = interim_schema
+    # def __init__(self, interim_schema) -> None:
+    #     self.interim_schema = interim_schema
 
     def get_type_of_field(self, field):
         if hasattr(field, 'of_type'):
@@ -79,34 +79,38 @@ class AdriadneSchemUtils():
             data[directive.name.value] = {}
             for argument in  directive.arguments:
                 data[directive.name.value][argument.name.value] =  argument.value.value
+            data[directive.name.value]['label'] = self.get_type_of_field(field.type).name
         return data
     
+
     def get_field_defintion_str(self, type_):
         body = type_.ast_node.loc.source.body
         return body[type_.ast_node.loc.start: type_.ast_node.loc.end]  
     
-    def get_type_defs_dict(self):
+    def get_type_defs(self, type_: GraphQLObjectType):
+        type_def_dict = {}
+        type_def_dict['def_string'] = self.get_field_defintion_str(type_)
+        type_def_dict['type'] = type_
+        type_def_dict['fields'] = {}
+        
+        # get if there are any relationshis in the fields
+        for field_string, field  in type_.fields.items():
+            field_type = self.get_type_of_field(field.type)
+            type_def_dict['fields'][field_string] = {
+                'field_type_str' : field_type.name,
+                'field_type' : field_type,
+                'directives' : {}
+            }
+            if field.ast_node.directives.__len__() > 0 :
+                directives_dict = self.get_directives_on_field(field)
+                type_def_dict['fields'][field_string]['directives'] = directives_dict
+        return type_def_dict
+    
+    def get_type_defs_dict(self,interim_schema):
         type_defs_dict = {} 
-        for type_name, type_ in self.interim_schema.type_map.items():
+        for type_name, type_ in interim_schema.type_map.items():
             if isinstance(type_, GraphQLObjectType) and  type_.name not in  ["Query",
-                            "Mutation", "Subscription"] and not type_.name.startswith("__")  :
-                
-                type_defs_dict[type_name] = {}
-                type_defs_dict[type_name]['def_string'] = self.get_field_defintion_str(type_)
-                type_defs_dict[type_name]['type'] = type_
-                type_defs_dict[type_name]['fields'] = {}
-                
-                # get if there are any relationshis in the fields
-                for field_string, field  in type_.fields.items():
-                    field_type = self.get_type_of_field(field.type)
-                    type_defs_dict[type_name]['fields'][field_string] = {
-                        'field_type_str' : field_type.name,
-                        'field_type' : field_type,
-                        'directives' : {}
-                    }
-                    if field.ast_node.directives.__len__() > 0 :
-                        directives_dict = self.get_directives_on_field(field)
-                        type_defs_dict[type_name]['fields'][field_string]['directives'] = directives_dict
-
+                            "Mutation", "Subscription"] and not type_.name.startswith("__")  :                
+                type_defs_dict[type_name] = self.get_type_defs(type_)
         return type_defs_dict
     

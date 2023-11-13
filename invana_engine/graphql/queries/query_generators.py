@@ -29,6 +29,11 @@ class QueryGenerators:
     def create_field(self, field):
         field_str = field['field_type_str']
         return getattr(graphene, field_str)()
+    
+    def create_relationship_field(self, directive):
+        # dummy
+        NodeType =  type(directive['label'], (graphene.ObjectType, ), {}) 
+        return graphene.Field(graphene.List(NodeType)) 
 
     def create_node_type(self):
         # create node type
@@ -37,7 +42,9 @@ class QueryGenerators:
             if list(field['directives'].keys()).__len__() ==  0:
                 node_type_fields[field_name] = self.create_field(field)
             else:
-                pass # process the rel    
+                for directive_name, directive in field['directives'].items():
+                    if directive_name == "relationship":
+                        node_type_fields[field_name] = self.create_relationship_field(directive) 
         return type(self.type_name, (graphene.ObjectType, ), node_type_fields) 
 
     def create_order_by(self):
@@ -47,13 +54,11 @@ class QueryGenerators:
             order_by_fields[field_name] = OrderByEnum()
         return type(f"{self.type_name}OrderBy", (graphene.InputObjectType, ), order_by_fields)
     
-
     def create_where_relationship_condition(self, relationship_label, direction, ):
         return type(f"{relationship_label}WhereConditions", (graphene.InputObjectType, ), {
             "id": graphene.String()
         })
 
-    
     def create_where_conditions(self):
         # create where 
         # NodeWhereConditions2 is a hack to avoid the error 
