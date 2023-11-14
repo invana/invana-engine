@@ -9,8 +9,9 @@ import asyncio
 from graphql import GraphQLObjectType , GraphQLField
 import pathlib
 import os 
-
-
+import typing
+from dataclasses import dataclass
+from graphql.type.schema import GraphQLSchema
 
 class AriadneGraphQLSchemaGenerator:
 
@@ -60,55 +61,79 @@ class AriadneGraphQLSchemaGenerator:
         return make_executable_schema(type_def, self.query, self.mutation, self.subscription, *type_defs)
 
 
+@dataclass
+class InvanaGQLFieldRelationshipDirective:
+    node_label: str
+    relation_label: str
+    direction: str
+
+@dataclass
+class InvanaGQLLabelDefinitionField:
+    field_type_str: str
+    field_type: typing.Any
+    directives: typing.Dict[str, typing.Union[InvanaGQLFieldRelationshipDirective, typing.Any]]
+
+@dataclass
+class InvanaGQLLabelDefinition:
+    label: str
+    def_string : str
+    type: GraphQLObjectType
+    fields: typing.Dict[str, InvanaGQLLabelDefinitionField]
+
 
 class AdriadneSchemUtils():
 
     # def __init__(self, interim_schema) -> None:
     #     self.interim_schema = interim_schema
 
+
     def get_type_of_field(self, field):
         if hasattr(field, 'of_type'):
             return self.get_type_of_field(field.of_type)
         return field
     
-    def get_directives_on_field(self, field):
+    def get_directives_on_field(self, field) -> typing.Dict[str, typing.Union[InvanaGQLFieldRelationshipDirective, typing.Any]]:
         directives = field.ast_node.directives
         data = {}
         for directive in directives:
-            _ = directive.name.value
-            data[directive.name.value] = {}
+            datum = {}
             for argument in  directive.arguments:
-                data[directive.name.value][argument.name.value] =  argument.value.value
-            data[directive.name.value]['node_label'] = self.get_type_of_field(field.type).name
-            data[directive.name.value]['relation_label'] = data[directive.name.value]['label']
-            del data[directive.name.value]['label']
+                datum[argument.name.value] =  argument.value.value
+            datum['node_label'] = self.get_type_of_field(field.type).name
+            datum['relation_label'] = datum['label']
+            del datum['label']
+            data[directive.name.value] = InvanaGQLFieldRelationshipDirective(**datum)
         return data
     
-    def get_field_defintion_str(self, type_):
+    def get_field_definition(self, field):
+        field_type = self.get_type_of_field(field.type)
+        field_data = {
+            'field_type_str' : field_type.name,
+            'field_type' : field_type,
+            'directives' : {}
+        }
+        # this will get the relationships 
+        if field.ast_node.directives.__len__() > 0 :
+            field_data['directives'] = self.get_directives_on_field(field)
+        return InvanaGQLLabelDefinitionField(**field_data)
+    
+    def get_type_defintion_str(self, type_):
         body = type_.ast_node.loc.source.body
         return body[type_.ast_node.loc.start: type_.ast_node.loc.end]  
     
-    def get_type_defs(self, type_: GraphQLObjectType):
+    def get_type_defs(self, type_: GraphQLObjectType) -> InvanaGQLLabelDefinition:
         type_def_dict = {}
-        type_def_dict['def_string'] = self.get_field_defintion_str(type_)
+        type_def_dict['def_string'] = self.get_type_defintion_str(type_)
         type_def_dict['type'] = type_
+        type_def_dict['label'] = type_.name
         type_def_dict['fields'] = {}
-        
+
         # get if there are any relationshis in the fields
-        for field_string, field  in type_.fields.items():
-            field_type = self.get_type_of_field(field.type)
-            type_def_dict['fields'][field_string] = {
-                'field_type_str' : field_type.name,
-                'field_type' : field_type,
-                'directives' : {}
-            }
-            # this will get the relationships 
-            if field.ast_node.directives.__len__() > 0 :
-                directives_dict = self.get_directives_on_field(field)
-                type_def_dict['fields'][field_string]['directives'] = directives_dict
-        return type_def_dict
+        for field_name, field  in type_.fields.items():
+            type_def_dict['fields'][field_name] = self.get_field_definition(field)
+        return InvanaGQLLabelDefinition(**type_def_dict)
     
-    def get_type_defs_dict(self,interim_schema):
+    def get_type_defs_dict(self,interim_schema: GraphQLSchema) -> typing.Dict[str, InvanaGQLLabelDefinition]:
         type_defs_dict = {} 
         for type_name, type_ in interim_schema.type_map.items():
             if isinstance(type_, GraphQLObjectType) and  type_.name not in  ["Query",
