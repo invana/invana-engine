@@ -1,6 +1,6 @@
 import graphene
-from .ariadne_generator import AriadneGraphQLSchemaGenerator, AdriadneSchemUtils
-from ..queries.query_generators import QueryGenerators
+from ..helpers.ariadne import AriadneGraphQLSchemaGenerator, AdriadneSchemUtils
+from .queries import QueryGenerators
 from ..queries.client import BasicInfoType
 from ..queries.hello import HelloType
 from ..queries.raw_query import ExecuteQueryType
@@ -8,6 +8,9 @@ from ..subscriptions.execute_query import SubscriptionExample
 
 
 class SchemaGenerator:
+    """
+    """
+
 
     """
     example usage 
@@ -38,7 +41,7 @@ class SchemaGenerator:
 
     """
 
-    def __init__(self, schema_str) -> None:
+    def __init__(self, schema_str: str) -> None:
         self.schema_str = schema_str
         self.interim_schema = AriadneGraphQLSchemaGenerator().create_interim_schema(schema_str)
         self.type_defs_dict = AdriadneSchemUtils().get_type_defs_dict(self.interim_schema)

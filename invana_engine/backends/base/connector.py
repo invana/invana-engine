@@ -3,17 +3,19 @@ import logging
 from .constants import ConnectionStateTypes
 from invana_engine.settings import DEFAULT_QUERY_TIMEOUT
 from .exceptions import InvalidDefaultQueryLanguageException
+import typing
 logger = logging.getLogger(__name__)
 
 
 class ConnectorBase(abc.ABC):
 
-    def __init__(self, connection_uri:str, is_readonly=False,
-                default_timeout=DEFAULT_QUERY_TIMEOUT,
-                database_name=None,
-                username=None,
-                password=None,
-                default_query_language=None,
+
+    def __init__(self, connection_uri:str, is_readonly:  typing.Optional[bool]=False,
+                default_timeout:  typing.Optional[int]=DEFAULT_QUERY_TIMEOUT,
+                database_name:  typing.Optional[str]=None,
+                username: typing.Optional[str]=None,
+                password:  typing.Optional[str]=None,
+                default_query_language:  typing.Optional[str]=None,
                 **kwargs ) -> None:
         self.CONNECTION_STATE = None
         self.connection_uri = connection_uri

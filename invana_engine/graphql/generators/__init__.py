@@ -1,1 +1,1 @@
-from .schema_generator import SchemaGenerator
+from .schema import SchemaGenerator
