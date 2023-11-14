@@ -23,25 +23,25 @@ class InvanaMapType(graphsonV3d0.MapType):
 
     @staticmethod
     def create_node_object(dict_data):
-        _ = dict_data.copy()
-        node_id = get_id(_[T.id])
-        node_label = _[T.label]
-        del _[T.id]
-        del _[T.label]
-        return Node(node_id, node_label, properties=_)
+        properties = dict_data.copy()
+        id = get_id(properties[T.id])
+        label = properties[T.label]
+        del properties[T.id]
+        del properties[T.label]
+        return Node(id=id, label=label, properties=properties)
 
     @staticmethod
     def create_relationship_object(dict_data):
         _ = dict_data.copy()
-        node_id = get_id(_[T.id])
-        node_label = _[T.label]
+        id = get_id(_[T.id])
+        label = _[T.label]
         inv = _[Direction.IN]
         outv = _[Direction.OUT]
         del _[T.id]
         del _[T.label]
         del _[Direction.IN]
         del _[Direction.OUT]
-        return RelationShip(node_id, node_label, outv, inv, properties=_)
+        return RelationShip(id=id, label=label, outv=outv, inv=inv, properties=_)
 
     @classmethod
     def objectify(cls, l, reader):
@@ -57,17 +57,19 @@ class InvanaVertexDeserializer(graphsonV3d0.VertexDeserializer):
 
     @classmethod
     def objectify(cls, d, reader):
-        return Node(reader.toObject(get_id(d["id"])), d.get("label", "vertex"))
+        return Node(id=reader.toObject(get_id(d["id"])), label=d.get("label", "vertex"))
 
 
 class InvanaEdgeDeserializer(graphsonV3d0.EdgeDeserializer):
 
     @classmethod
     def objectify(cls, d, reader):
-        return RelationShip(reader.toObject(get_id(d["id"])),
-                            d.get("label", "edge"),
-                            Node(reader.toObject(d["outV"]), d.get("outVLabel", "vertex")),
-                            Node(reader.toObject(d["inV"]), d.get("inVLabel", "vertex")))
+        return RelationShip(
+            id=reader.toObject(get_id(d["id"])),
+            label=d.get("label", "edge"),
+            inv=Node(id=reader.toObject(d["outV"]), label=d.get("outVLabel", "vertex")),
+            outv=Node(id=reader.toObject(d["inV"]), label=d.get("inVLabel", "vertex"))
+            )
 
 
 class InvanaPathDeserializer(graphsonV3d0.PathDeserializer):

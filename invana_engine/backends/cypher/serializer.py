@@ -7,8 +7,6 @@ class CypherSerializer:
     # https://community.neo4j.com/t/convert-stream-of-records-to-json-in-python-driver/39720/3
 
 
-
-
     def serialize_data_custom(self, index, record):
         """
         A custom serializer.
@@ -69,7 +67,7 @@ class CypherSerializer:
 
     def create_vertex_object(self, node):
         try:
-            return Node(node['_id'], node['_labels'][0], node['_properties']  )
+            return Node(id=node['_id'], label=node['_labels'][0], properties=node['_properties']  )
         except Exception as e :
             logger.debug(f"Failed to create Node object with error : {e.__str__()}")
             return node
@@ -78,10 +76,10 @@ class CypherSerializer:
         try:
             out_v = edge['_start_node']
             in_v = edge['_end_node']
-            return RelationShip(edge['_id'], edge['_labels'][0],
-                            Node(out_v['_id'], out_v['_labels'][0],  out_v['_properties']) ,
-                            Node(in_v['_id'], in_v['_labels'][0],  in_v['_properties']) ,
-                            edge['_properties']  )
+            return RelationShip(id=edge['_id'], label=edge['_labels'][0],
+                            outv=Node(out_v['_id'], out_v['_labels'][0],  out_v['_properties']) ,
+                            inv=Node(in_v['_id'], in_v['_labels'][0],  in_v['_properties']) ,
+                            properties=edge['_properties']  )
         except Exception as e :
             logger.debug(f"Failed to create Relationship object with error : {e.__str__()}")
             return edge

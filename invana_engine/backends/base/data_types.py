@@ -1,70 +1,45 @@
+from dataclasses import dataclass
+from .types import ElementIdType , PropertiesType
+import typing
 
-
-
-class PropertiesObject:
-
-    def __repr__(self):
-        __str = ''
-        for k, v in self.__dict__.items():
-            __str += f'{k}={v} '
-        return __str
-
-    def to_json(self):
-        return self.__dict__
-
+@dataclass
 class GenericData:
-
-    def __init__(self, data) -> None:
-        self.data = data
+    data: dict
     
     def to_json(self):
         return self.data
 
-
+@dataclass
 class ElementBase:
-    id = None
-    label = None
-    type = None
-
-    def __init__(self, *args, **kwargs):
-        self.properties = PropertiesObject()
-
-    def to_json(self):
-        return {"id": self.id, "type": self.type, "label": self.label, "properties": self.properties.__dict__}
+    id: ElementIdType
+    label: str
+    properties: typing.Optional[PropertiesType]
 
 
+@dataclass
 class Node(ElementBase):
-    type = "vertex"
-
-    def __init__(self, _id, label, properties=None):
-        super(Node, self).__init__(_id, label, properties=properties)
-        self.id = _id
-        self.label = label
-        if properties:
-            for k, v in properties.items():
-                setattr(self.properties, k, v)
+    type: str = "vertex"
 
     def __repr__(self):
         return f'<Node:{self.label} id="{self.id}" {self.properties}>'
 
     def __short_repr__(self):
-              return f'{self.label}::{self.id}'
-    
+        return f'<Node:{self.label}-{self.id}>'
 
+    def to_json(self):
+        return {"id": self.id, "type": self.type, "label": self.label, "properties": self.properties}
+
+
+@dataclass
+class UnLabelledNode(Node):
+    label: typing.Optional[str]
+
+
+@dataclass
 class RelationShip(ElementBase):
-    inv = None
-    outv = None
-    type = "edge"
-
-    def __init__(self, _id, label, outv, inv, properties=None):
-        super(RelationShip, self).__init__(_id, label, outv, inv, properties=properties)
-        self.id = _id
-        self.label = label
-        self.inv = inv
-        self.outv = outv
-        if properties:
-            for k, v in properties.items():
-                setattr(self.properties, k, v)
+    inv: typing.Union[ElementIdType, Node, UnLabelledNode]  # to
+    outv: typing.Union[ElementIdType, Node, UnLabelledNode] # from
+    type: str = "edge"
 
     def __repr__(self):
         return f'<RelationShip:{self.label}::{self.id} ' \
@@ -72,13 +47,13 @@ class RelationShip(ElementBase):
                 f' {self.properties}>'
 
     def to_json(self):
-        base_data = super(RelationShip, self).to_json()
+        base_data = {"id": self.id, "type": self.type, "label": self.label, "properties": self.properties}
         base_data['inv'] = self.inv.to_json()
         base_data['outv'] = self.outv.to_json()
         return base_data
 
-# class UnLabelledNode(Node):
-#     pass
-
-# class UnLabelledRelation(RelationShip):
-#     pass
+@dataclass
+class UnLabelledRelationShip(RelationShip):
+    label: typing.Optional[str]
+    inv: typing.Optional[typing.Union[ElementIdType, Node, UnLabelledNode]]  # to
+    outv: typing.Optional[typing.Union[ElementIdType, Node, UnLabelledNode]] # from
