@@ -1,4 +1,5 @@
 import graphene
+from .types import InvanaGQLFieldRelationshipDirective, InvanaGQLLabelDefinition, InvanaGQLLabelDefinitionField
 
 
 OrderByEnum = type("OrderByEnum", (graphene.Enum, ), {"asc": "asc", "desc": "desc"})
@@ -22,12 +23,12 @@ all the types above are generic reusable
 
 class QueryGenerators:
  
-    def __init__(self, type_name, type_def_dict) -> None:
+    def __init__(self, type_name: str, type_def_dict: InvanaGQLLabelDefinition) -> None:
         self.type_name = type_name
         self.type_def_dict = type_def_dict
 
-    def create_field(self, field):
-        field_str = field['field_type_str']
+    def create_field(self, field: InvanaGQLLabelDefinitionField):
+        field_str = field.field_type_str
         return getattr(graphene, field_str)()
     
     def create_relationship_field(self, directive):
@@ -36,25 +37,44 @@ class QueryGenerators:
         return graphene.Field(graphene.List(NodeType)) 
     
     def create_relationship_field_name(self, directive):
-        return f"{directive['relation_label']}__{directive['node_label']}"
+        return f"{directive.relation_label}__{directive.node_label}"
+    
+    def create_relationship_based_fields(self, directive_name:str, directive: InvanaGQLFieldRelationshipDirective):
+       
+        # create relationship field -> returns edges data
+        # create relationship__Node field -> returns nodes data 
+        relation_based_fields = {}
+        # traverse on just relationships -> returns edges data
+        relation_based_fields[directive.relation_label] = graphene.Field(graphene.List(
+            type(directive.node_label, (graphene.ObjectType, ), {})
+        )) 
+
+        # traverse via relationships to Nodes -> returns related nodes data 
+        relation_based_fields[f"{directive.relation_label}__{directive.node_label}"] = graphene.Field(graphene.List(
+            type(directive.node_label, (graphene.ObjectType, ), {})
+        )) 
+        # TODO - add 
+        return relation_based_fields
 
     def create_node_type(self):
         # create node type
         node_type_fields = {}
-        for field_name, field in self.type_def_dict['fields'].items():
-            if list(field['directives'].keys()).__len__() ==  0:
+        for field_name, field in self.type_def_dict.fields.items():
+            if list(field.directives.keys()).__len__() ==  0:
+                # this is property on the node
                 node_type_fields[field_name] = self.create_field(field)
-            else:
-                for directive_name, directive in field['directives'].items():
+            else: # this is a relationship on the if directive_name == "relationship"
+                for directive_name, directive in field.directives.items():
                     if directive_name == "relationship":
-                        node_type_fields[self.create_relationship_field_name(directive)] = self.create_relationship_field(directive) 
+                        relationship_based_fields = self.create_relationship_based_fields(directive_name, directive)
+                        for related_name, related_field,  in relationship_based_fields.items():
+                            node_type_fields[related_name] = related_field
         return type(self.type_name, (graphene.ObjectType, ), node_type_fields) 
-
 
     def create_order_by(self):
         # create order by 
         order_by_fields = {}
-        for field_name, field in self.type_def_dict['fields'].items():
+        for field_name, field in self.type_def_dict.fields.items():
             order_by_fields[field_name] = OrderByEnum()
         return type(f"{self.type_name}OrderBy", (graphene.InputObjectType, ), order_by_fields)
     
@@ -74,18 +94,18 @@ class QueryGenerators:
             "_not": NodeWhereConditions2()
         }
         # fields
-        for field_name, field in self.type_def_dict['fields'].items():
-            if list(field['directives'].keys()).__len__() >  0:
-                for directive_name, directive_data in field['directives'].items():
+        for field_name, field in self.type_def_dict.fields.items():
+            if list(field.directives.keys()).__len__() >  0:
+                for directive_name, directive_data in field.directives.items():
                     if directive_name == "relationship":
                         cls = self.create_where_relationship_condition(
-                                directive_data['node_label'],
-                                directive_data['direction'],
+                                directive_data.node_label,
+                                directive_data.direction,
                             )
                         where_condition_fields[self.create_relationship_field_name(directive_data)] = cls()
-            elif field['field_type_str'] == "String":
+            elif field.field_type_str == "String":
                 where_condition_fields[field_name] = StringFilersExpressions()
-            elif field['field_type_str'] == "Int":
+            elif field.field_type_str == "Int":
                 where_condition_fields[field_name] = IntFilersExpressions()
 
         # traversals 

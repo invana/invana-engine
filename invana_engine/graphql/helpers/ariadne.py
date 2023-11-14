@@ -12,6 +12,7 @@ import os
 import typing
 from dataclasses import dataclass
 from graphql.type.schema import GraphQLSchema
+from ..generators.types import InvanaGQLFieldRelationshipDirective, InvanaGQLLabelDefinition, InvanaGQLLabelDefinitionField
 
 class AriadneGraphQLSchemaGenerator:
 
@@ -60,25 +61,6 @@ class AriadneGraphQLSchemaGenerator:
         # full 
         return make_executable_schema(type_def, self.query, self.mutation, self.subscription, *type_defs)
 
-
-@dataclass
-class InvanaGQLFieldRelationshipDirective:
-    node_label: str
-    relation_label: str
-    direction: str
-
-@dataclass
-class InvanaGQLLabelDefinitionField:
-    field_type_str: str
-    field_type: typing.Any
-    directives: typing.Dict[str, typing.Union[InvanaGQLFieldRelationshipDirective, typing.Any]]
-
-@dataclass
-class InvanaGQLLabelDefinition:
-    label: str
-    def_string : str
-    type: GraphQLObjectType
-    fields: typing.Dict[str, InvanaGQLLabelDefinitionField]
 
 
 class AdriadneSchemUtils():
