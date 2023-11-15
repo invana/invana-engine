@@ -69,15 +69,18 @@ def create_app():
 
     schema_def =  """
 
-        type Person {
-            email: String!
-            first_name: String
-            projects: [Project!]! @relationship(label: "authored_project", direction: OUT)
+        type Movie {
+            title: String
+            actors: [Actor!]! @relationship(label: "ACTED_IN", direction: IN, properties: "ActedIn")
         }
 
-        type Project {
-            name: String!
-            description: String
+        type Actor {
+            name: String
+            movies: [Movie!]! @relationship(label: "ACTED_IN", direction: OUT, properties: "ActedIn")
+        }
+
+        type ActedIn @relationshipType {
+            roles: [String]
         }
 """
 

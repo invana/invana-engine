@@ -16,20 +16,19 @@ class SchemaGenerator:
     schema_str = \"""
 
 
-        type Person {
-            id: ID!
-            label: String!
-            name: String
-            projects: [Project!]! @relationship(label: "authored_project", direction: OUT)
-
+        type Movie {
+            title: String
+            actors: [Actor!]! @relationship(label: "ACTED_IN", direction: IN, properties: "ActedIn")
         }
 
-        type Project {
-            id: ID!
-            label: String!
+        type Actor {
             name: String
+            movies: [Movie!]! @relationship(label: "ACTED_IN", direction: OUT, properties: "ActedIn")
         }
 
+        interface ActedIn @relationshipProperties {
+            roles: [String]
+        }
 
 \"""
     schema_generator = SchemaGenerator()

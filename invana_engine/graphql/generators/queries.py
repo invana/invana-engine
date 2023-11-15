@@ -21,24 +21,24 @@ IntFilersExpressions = type("IntFilersExpressions", (graphene.InputObjectType, )
 all the types above are generic reusable
 """
 
+
 class QueryGenerators:
  
-    def __init__(self, type_name: str, type_def_dict: InvanaGQLLabelDefinition) -> None:
-        self.type_name = type_name
-        self.type_def_dict = type_def_dict
+    def __init__(self,   label_def: InvanaGQLLabelDefinition, schema_defs) -> None:
+        self.schema_defs = schema_defs
+        self.label_def = label_def
+        self.type_name = label_def.label
 
     def create_field(self, field: InvanaGQLLabelDefinitionField):
         field_str = field.field_type_str
         return getattr(graphene, field_str)()
     
-    def create_relationship_field(self, directive):
-        # dummy
-        NodeType =  type(directive['node_label'], (graphene.ObjectType, ), {})
-        return graphene.Field(graphene.List(NodeType)) 
+    # def create_relationship_field(self, directive):
+    #     # dummy
+    #     NodeType =  type(directive['node_label'], (graphene.ObjectType, ), {})
+    #     return graphene.Field(graphene.List(NodeType)) 
     
-    def create_relationship_field_name(self, directive):
-        return f"{directive.relation_label}__{directive.node_label}"
-    
+
     def create_relationship_based_fields(self, directive_name:str, directive: InvanaGQLFieldRelationshipDirective):
        
         # create relationship field -> returns edges data
@@ -59,7 +59,9 @@ class QueryGenerators:
     def create_node_type(self):
         # create node type
         node_type_fields = {}
-        for field_name, field in self.type_def_dict.fields.items():
+        for field_name, field in self.label_def.fields.items():
+            node_type_fields['_id'] = graphene.ID()
+            node_type_fields['_label'] = graphene.String()
             if list(field.directives.keys()).__len__() ==  0:
                 # this is property on the node
                 node_type_fields[field_name] = self.create_field(field)
@@ -74,9 +76,12 @@ class QueryGenerators:
     def create_order_by(self):
         # create order by 
         order_by_fields = {}
-        for field_name, field in self.type_def_dict.fields.items():
+        for field_name, field in self.label_def.fields.items():
             order_by_fields[field_name] = OrderByEnum()
         return type(f"{self.type_name}OrderBy", (graphene.InputObjectType, ), order_by_fields)
+    
+    def create_relationship_field_name(self, directive):
+        return f"{directive.relation_label}__{directive.node_label}"
     
     def create_where_relationship_condition(self, relationship_label, direction, ):
         return type(f"{relationship_label}WhereConditions", (graphene.InputObjectType, ), {
@@ -84,9 +89,12 @@ class QueryGenerators:
         })
 
     def create_where_conditions(self):
+        """
+        """
         # create where 
-        # NodeWhereConditions2 is a hack to avoid the error 
-        # `UnboundLocalError: local variable 'NodeWhereConditions' referenced before assignment`
+        """
+        NodeWhereConditions2 is a hack to avoid the error 
+        `UnboundLocalError: local variable 'NodeWhereConditions' referenced before assignment`"""
         NodeWhereConditions2 = type(f"{self.type_name}WhereConditions",(graphene.InputObjectType, ),{})
         where_condition_fields = {     
             "_and": NodeWhereConditions2(),
@@ -94,7 +102,7 @@ class QueryGenerators:
             "_not": NodeWhereConditions2()
         }
         # fields
-        for field_name, field in self.type_def_dict.fields.items():
+        for field_name, field in self.label_def.fields.items():
             if list(field.directives.keys()).__len__() >  0:
                 for directive_name, directive_data in field.directives.items():
                     if directive_name == "relationship":
@@ -109,21 +117,28 @@ class QueryGenerators:
                 where_condition_fields[field_name] = IntFilersExpressions()
 
         # traversals 
-
-
         return type(f"{self.type_name}WhereConditions",(graphene.InputObjectType,), where_condition_fields)
 
     def generate(self):
-        NodeType = self.create_node_type()
-        NodeOrderBy = self.create_order_by()
-        NodeWhereConditions = self.create_where_conditions()
 
         def resolve_query(self, info: graphene.ResolveInfo, **kwargs):
             return [{
                 "id": "op",
                 "first_name": "my name is good",
-                "email": "me@gmail.com"
+                "email": "me@gmail.com",
+                "authored_project":[
+                    {
+                        "_id": '1',
+                        "_label": "RelLabel",
+                        "description": "Hello world"
+                    }
+                ]
+
             }]
+
+        NodeType = self.create_node_type()
+        NodeOrderBy = self.create_order_by()
+        NodeWhereConditions = self.create_where_conditions()
 
         LabelQueryTypes  = type(self.type_name, (graphene.ObjectType, ), {
             self.type_name : graphene.Field(graphene.List(NodeType), args={
