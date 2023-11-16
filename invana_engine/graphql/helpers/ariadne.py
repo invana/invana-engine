@@ -32,7 +32,7 @@ class AriadneGraphQLSchemaGenerator:
         }
 
         directive @relationship(label: String, direction: RelationDirection!, properties: String ) on FIELD_DEFINITION
-        directive @relationshipType on INTERFACE | OBJECT
+        directive @relationshipProperties on INTERFACE | OBJECT
         """
     type_def_end = """
 
@@ -117,7 +117,7 @@ class AdriadneSchemUtils():
     
     def get_element_type(self, type_: GraphQLObjectType):
         directives =  self.get_directives_on_type(type_)
-        if "relationshipType" in directives:
+        if "relationshipProperties" in directives:
             return "relationship"
         return "node"
 

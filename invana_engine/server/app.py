@@ -79,7 +79,7 @@ def create_app():
             movies: [Movie!]! @relationship(label: "ACTED_IN", direction: OUT, properties: "ActedIn")
         }
 
-        type ActedIn @relationshipType {
+        type ActedIn @relationshipProperties {
             roles: [String]
         }
 """

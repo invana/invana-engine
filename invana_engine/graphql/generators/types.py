@@ -16,6 +16,17 @@ class InvanaGQLLabelDefinitionField:
     field_type: typing.Any
     directives: typing.Dict[str, typing.Union[InvanaGQLFieldRelationshipDirective, typing.Any]]
 
+    def is_relationship_field(self) -> bool:
+        if "relationship" in self.directives:
+            return True
+        return False
+    
+    def get_relationship_data(self) -> bool:
+        return self.directives['relationship']
+    
+    def is_data_field(self)-> bool:
+        return not self.is_relationship_field()
+    
 @dataclass
 class InvanaGQLLabelDefinition:
     label: str
@@ -23,6 +34,12 @@ class InvanaGQLLabelDefinition:
     def_string : str
     type: GraphQLObjectType
     fields: typing.Dict[str, InvanaGQLLabelDefinitionField]
+
+    def get_data_fields(self)-> typing.Dict[str, InvanaGQLLabelDefinitionField]:
+        return {field_name: field for field_name, field in self.fields.items() if field.is_data_field()}
+
+    def get_relationship_fields(self)-> typing.Dict[str, InvanaGQLLabelDefinitionField]:
+        return {field_name: field for field_name, field in self.fields.items() if field.is_relationship_field()}
 
 @dataclass
 class InvanaGQLSchema:

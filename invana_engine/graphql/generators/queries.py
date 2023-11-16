@@ -30,10 +30,23 @@ class QueryGenerators:
         self.schema_defs = schema_defs
         # self.label_def = label_def
         # self.type_name = label_def.label
+        self.schema_types_dict = {"nodes": {}, "relationships": {}}
+
+    def get_type_from_schema_cache(self, type_def: InvanaGQLLabelDefinition ):
+        if type_def.label_type == "relationship":
+            return self.schema_types_dict['relationships'].get(type_def.label)
+        elif type_def.label_type == "node":
+            return self.schema_types_dict['nodes'].get(type_def.label)
+
+    def add_type_to_schema_cache(self, type_def: InvanaGQLLabelDefinition, _type: graphene.ObjectType):
+        if type_def.label_type == "relationship":
+            self.schema_types_dict['relationships'][type_def.label] = _type
+        elif type_def.label_type == "node":
+            self.schema_types_dict['nodes'][type_def.label] = _type
 
     def create_field(self, field: InvanaGQLLabelDefinitionField):
         field_str = field.field_type_str
-        return getattr(graphene, field_str)()
+        return getattr(graphene, field_str)()# TODO - add default etc kwargs from ariadne type object
     
     # def create_relationship_field(self, directive):
     #     # dummy
@@ -41,25 +54,47 @@ class QueryGenerators:
     #     return graphene.Field(graphene.List(NodeType)) 
     
 
-    def create_relationship_based_fields(self, directive_name:str, directive: InvanaGQLFieldRelationshipDirective):
+    def create_relationship_based_fields(self, directive: InvanaGQLFieldRelationshipDirective):
        
         # create relationship field -> returns edges data
         # create relationship__Node field -> returns nodes data 
         relation_based_fields = {}
         # traverse on just relationships -> returns edges data
-        relation_based_fields[directive.relation_label] = graphene.Field(graphene.List(
+        relation_prefix = f"{directive.direction}__".lower()
+        relation_based_fields[f"{relation_prefix}{directive.relation_label}"] = graphene.Field(graphene.List(
             type(directive.node_label, (graphene.ObjectType, ), {})
         )) 
 
-
         # traverse via relationships to Nodes -> returns related nodes data 
-        relation_based_fields[f"{directive.relation_label}__{directive.node_label}"] = graphene.Field(graphene.List(
+        relation_based_fields[f"{relation_prefix}{directive.relation_label}__{directive.node_label}"] = graphene.Field(graphene.List(
             type(directive.node_label, (graphene.ObjectType, ), {})
         )) 
         # TODO - add 
         return relation_based_fields
 
     def create_node_type(self, type_def: InvanaGQLLabelDefinition):
+        if type_def.label_type != "node":
+            raise Exception("Only {}")
+        # create node type
+        node_type_fields = {}
+        for field_name, field in type_def.fields.items():
+            node_type_fields['_id'] = graphene.ID()
+            node_type_fields['_label'] = graphene.String()
+            if field.is_data_field():
+                # this is property on the node
+                node_type_fields[field_name] = self.create_field(field)
+            elif field.is_relationship_field(): 
+                directive = field.get_relationship_data()
+                relationship_based_fields = self.create_relationship_based_fields(directive)
+                for related_name, related_field,  in relationship_based_fields.items():
+                    node_type_fields[related_name] = related_field
+ 
+
+        NodeType =  type(type_def.label, (graphene.ObjectType, ), node_type_fields)
+        self.add_type_to_schema_cache(type_def, NodeType)
+        return NodeType
+
+    def create_relationship_type(self, type_def: InvanaGQLLabelDefinition):
         # create node type
         node_type_fields = {}
         for field_name, field in type_def.fields.items():
@@ -76,7 +111,12 @@ class QueryGenerators:
                             node_type_fields[related_name] = related_field
                     else:
                         raise UnSupportedFieldDirective(f"'{directive_name}' directive is not supported on the field")
-        return type(type_def.label, (graphene.ObjectType, ), node_type_fields) 
+        NodeType =  type(type_def.label, (graphene.ObjectType, ), node_type_fields)
+        self.add_type_to_schema_cache(type_def, NodeType)
+        return NodeType
+
+
+
 
     def create_order_by(self, type_def: InvanaGQLLabelDefinition):
         # create order by 
@@ -141,7 +181,14 @@ class QueryGenerators:
 
             }]
 
-        NodeType = self.create_node_type(type_def)
+        NodeType = self.get_type_from_schema_cache(type_def)
+
+        if type_def.label_type == "node":
+            NodeType = self.create_node_type(type_def) if NodeType is None else NodeType
+        elif type_def.label_type == "relationship":
+            NodeType = self.create_relationship_type(type_def) if NodeType is None else NodeType
+
+
         NodeOrderBy = self.create_order_by(type_def)
         NodeWhereConditions = self.create_where_conditions(type_def)
 
@@ -160,11 +207,16 @@ class QueryGenerators:
     def generate(self):
         #  type_def: InvanaGQLLabelDefinition,
         query_classes = []
+
         for type_name, type_def in self.schema_defs.nodes.items():
             LabelQueryTypes = self.generate_query_object_type_with_filters(type_def)
-            query_classes.append(LabelQueryTypes)            
-        return query_classes
+            query_classes.append(LabelQueryTypes)         
 
+        for type_name, type_def in self.schema_defs.relationships.items():
+            LabelQueryTypes = self.generate_query_object_type_with_filters(type_def)
+            query_classes.append(LabelQueryTypes)         
+            
+        return query_classes
 
 
 
