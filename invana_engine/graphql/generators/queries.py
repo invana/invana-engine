@@ -1,5 +1,7 @@
 import graphene
-from .types import InvanaGQLFieldRelationshipDirective, InvanaGQLLabelDefinition, InvanaGQLLabelDefinitionField
+from .types import InvanaGQLFieldRelationshipDirective, InvanaGQLLabelDefinition, \
+    InvanaGQLLabelDefinitionField, InvanaGQLSchema
+from .exceptions import UnSupportedFieldDirective
 
 
 OrderByEnum = type("OrderByEnum", (graphene.Enum, ), {"asc": "asc", "desc": "desc"})
@@ -24,10 +26,10 @@ all the types above are generic reusable
 
 class QueryGenerators:
  
-    def __init__(self,   label_def: InvanaGQLLabelDefinition, schema_defs) -> None:
+    def __init__(self,   schema_defs: InvanaGQLSchema) -> None:
         self.schema_defs = schema_defs
-        self.label_def = label_def
-        self.type_name = label_def.label
+        # self.label_def = label_def
+        # self.type_name = label_def.label
 
     def create_field(self, field: InvanaGQLLabelDefinitionField):
         field_str = field.field_type_str
@@ -49,6 +51,7 @@ class QueryGenerators:
             type(directive.node_label, (graphene.ObjectType, ), {})
         )) 
 
+
         # traverse via relationships to Nodes -> returns related nodes data 
         relation_based_fields[f"{directive.relation_label}__{directive.node_label}"] = graphene.Field(graphene.List(
             type(directive.node_label, (graphene.ObjectType, ), {})
@@ -56,10 +59,10 @@ class QueryGenerators:
         # TODO - add 
         return relation_based_fields
 
-    def create_node_type(self):
+    def create_node_type(self, type_def: InvanaGQLLabelDefinition):
         # create node type
         node_type_fields = {}
-        for field_name, field in self.label_def.fields.items():
+        for field_name, field in type_def.fields.items():
             node_type_fields['_id'] = graphene.ID()
             node_type_fields['_label'] = graphene.String()
             if list(field.directives.keys()).__len__() ==  0:
@@ -71,14 +74,16 @@ class QueryGenerators:
                         relationship_based_fields = self.create_relationship_based_fields(directive_name, directive)
                         for related_name, related_field,  in relationship_based_fields.items():
                             node_type_fields[related_name] = related_field
-        return type(self.type_name, (graphene.ObjectType, ), node_type_fields) 
+                    else:
+                        raise UnSupportedFieldDirective(f"'{directive_name}' directive is not supported on the field")
+        return type(type_def.label, (graphene.ObjectType, ), node_type_fields) 
 
-    def create_order_by(self):
+    def create_order_by(self, type_def: InvanaGQLLabelDefinition):
         # create order by 
         order_by_fields = {}
-        for field_name, field in self.label_def.fields.items():
+        for field_name, field in type_def.fields.items():
             order_by_fields[field_name] = OrderByEnum()
-        return type(f"{self.type_name}OrderBy", (graphene.InputObjectType, ), order_by_fields)
+        return type(f"{type_def.label}OrderBy", (graphene.InputObjectType, ), order_by_fields)
     
     def create_relationship_field_name(self, directive):
         return f"{directive.relation_label}__{directive.node_label}"
@@ -88,21 +93,21 @@ class QueryGenerators:
             "id": graphene.String()
         })
 
-    def create_where_conditions(self):
+    def create_where_conditions(self, type_def: InvanaGQLLabelDefinition):
         """
         """
         # create where 
         """
         NodeWhereConditions2 is a hack to avoid the error 
         `UnboundLocalError: local variable 'NodeWhereConditions' referenced before assignment`"""
-        NodeWhereConditions2 = type(f"{self.type_name}WhereConditions",(graphene.InputObjectType, ),{})
+        NodeWhereConditions2 = type(f"{type_def.label}WhereConditions",(graphene.InputObjectType, ),{})
         where_condition_fields = {     
             "_and": NodeWhereConditions2(),
             "_or": NodeWhereConditions2(),
             "_not": NodeWhereConditions2()
         }
         # fields
-        for field_name, field in self.label_def.fields.items():
+        for field_name, field in type_def.fields.items():
             if list(field.directives.keys()).__len__() >  0:
                 for directive_name, directive_data in field.directives.items():
                     if directive_name == "relationship":
@@ -117,9 +122,9 @@ class QueryGenerators:
                 where_condition_fields[field_name] = IntFilersExpressions()
 
         # traversals 
-        return type(f"{self.type_name}WhereConditions",(graphene.InputObjectType,), where_condition_fields)
+        return type(f"{type_def.label}WhereConditions",(graphene.InputObjectType,), where_condition_fields)
 
-    def generate(self):
+    def generate_query_object_type_with_filters(self, type_def: InvanaGQLLabelDefinition):
 
         def resolve_query(self, info: graphene.ResolveInfo, **kwargs):
             return [{
@@ -136,24 +141,29 @@ class QueryGenerators:
 
             }]
 
-        NodeType = self.create_node_type()
-        NodeOrderBy = self.create_order_by()
-        NodeWhereConditions = self.create_where_conditions()
+        NodeType = self.create_node_type(type_def)
+        NodeOrderBy = self.create_order_by(type_def)
+        NodeWhereConditions = self.create_where_conditions(type_def)
 
-        LabelQueryTypes  = type(self.type_name, (graphene.ObjectType, ), {
-            self.type_name : graphene.Field(graphene.List(NodeType), args={
+        LabelQueryTypes  = type(type_def.label, (graphene.ObjectType, ), {
+            type_def.label : graphene.Field(graphene.List(NodeType), args={
                 "limit" : graphene.Argument(graphene.Int, description="limits the result count"),
                 "offset" : graphene.Argument(graphene.Int, description="skips x results"),
                 "dedup" : graphene.Argument(graphene.Boolean, description="dedups the result"),
                 "order_by" : graphene.Argument(NodeOrderBy , description="order the result by"),
                 "where": graphene.Argument(NodeWhereConditions)
             }),
-            f"resolve_{self.type_name}" : resolve_query
+            f"resolve_{type_def.label}" : resolve_query
         })
         return LabelQueryTypes
 
-
-
+    def generate(self):
+        #  type_def: InvanaGQLLabelDefinition,
+        query_classes = []
+        for type_name, type_def in self.schema_defs.nodes.items():
+            LabelQueryTypes = self.generate_query_object_type_with_filters(type_def)
+            query_classes.append(LabelQueryTypes)            
+        return query_classes
 
 
 

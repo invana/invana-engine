@@ -70,9 +70,7 @@ class SchemaGenerator:
         mutation_classes =[]
         subscription_classes = []
 
-        for type_name, type_def in self.schema_defs.nodes.items():
-            LabelQueryTypes = QueryGenerators( type_def, self.schema_defs).generate()
-            query_classes.append(LabelQueryTypes)            
+        query_classes = QueryGenerators(self.schema_defs).generate()
 
         Query = self.generate_query_types(*query_classes)
         Mutation = self.generate_mutation_types(*mutation_classes)
