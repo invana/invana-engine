@@ -68,19 +68,32 @@ def create_app():
 
 
     schema_def =  """
+    
+        type ShortFilm {
+            title: String
+            # actors: [Actor!]! @relationship(label: "ACTED_IN", direction: IN, properties: "ActedIn")        
+        }
 
         type Movie {
             title: String
-            actors: [Actor!]! @relationship(label: "ACTED_IN", direction: IN, properties: "ActedIn")
+            # actors: [Actor!]! @relationship(label: "ACTED_IN", direction: IN, properties: "ActedIn")
         }
 
         type Actor {
             name: String
             movies: [Movie!]! @relationship(label: "ACTED_IN", direction: OUT, properties: "ActedIn")
+            shortFilms: [ShortFilm!]! @relationship(label: "ACTED_IN", direction: OUT, properties: "ActedIn")
+            likes: [ShortFilm!]! @relationship(label: "likes", direction: OUT, properties: "Liked")
+            likes2: [Movie!]! @relationship(label: "likes", direction: OUT, properties: "Liked")
+
         }
 
         type ActedIn @relationshipProperties {
             roles: [String]
+        }
+
+        type Liked @relationshipProperties {
+            date: [String]
         }
 """
 

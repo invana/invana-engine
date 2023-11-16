@@ -2,7 +2,7 @@ import graphene
 from .types import InvanaGQLFieldRelationshipDirective, InvanaGQLLabelDefinition, \
     InvanaGQLLabelDefinitionField, InvanaGQLSchema
 from .exceptions import UnSupportedFieldDirective
-
+import typing
 
 OrderByEnum = type("OrderByEnum", (graphene.Enum, ), {"asc": "asc", "desc": "desc"})
 
@@ -54,67 +54,83 @@ class QueryGenerators:
     #     return graphene.Field(graphene.List(NodeType)) 
     
 
-    def create_relationship_based_fields(self, directive: InvanaGQLFieldRelationshipDirective):
+    # def create_relationship_based_fields(self, 
+    #             directive: InvanaGQLFieldRelationshipDirective,
+    #             type_def: InvanaGQLLabelDefinition
+    #             ):
        
-        # create relationship field -> returns edges data
-        # create relationship__Node field -> returns nodes data 
-        relation_based_fields = {}
-        # traverse on just relationships -> returns edges data
-        relation_prefix = f"{directive.direction}__".lower()
-        relation_based_fields[f"{relation_prefix}{directive.relation_label}"] = graphene.Field(graphene.List(
-            type(directive.node_label, (graphene.ObjectType, ), {})
-        )) 
+    #     # related_fields = type_def.get_related_fields()
+    #     # create relationship field -> returns edges data
+    #     # create in_relationship__Node field -> returns nodes data 
+    #     relation_based_fields = {}
+    #     # for direction, field in related_fields.items():
 
-        # traverse via relationships to Nodes -> returns related nodes data 
-        relation_based_fields[f"{relation_prefix}{directive.relation_label}__{directive.node_label}"] = graphene.Field(graphene.List(
-            type(directive.node_label, (graphene.ObjectType, ), {})
-        )) 
-        # TODO - add 
-        return relation_based_fields
+    #     # traverse on just relationships -> returns edges data
+    #     relation_prefix = f"{directive.direction}__".lower()
+    #     relation_based_fields[f"{relation_prefix}{directive.relationship_label}"] = \
+    #                                 graphene.Field(graphene.List(
+    #                                     type(directive.node_label, (graphene.ObjectType, ), {})
+    #                                 )) 
 
+    #     # traverse via relationships to Nodes -> returns related nodes data 
+    #     relation_based_fields[f"{relation_prefix}{directive.relationship_label}__{directive.node_label}"] = graphene.Field(graphene.List(
+    #         type(directive.node_label, (graphene.ObjectType, ), {})
+    #     )) 
+    #     # TODO - add 
+    #     return relation_based_fields
+
+
+    def create_relationship_fields(self,  relationship_directives: typing.List[InvanaGQLFieldRelationshipDirective]):    
+        classes = [type(relationship_directive.node_label, (graphene.ObjectType, ), {}) 
+                   for relationship_directive in relationship_directives]    
+        return graphene.Field(graphene.List(*classes)) 
+        
     def create_node_type(self, type_def: InvanaGQLLabelDefinition):
-        if type_def.label_type != "node":
-            raise Exception("Only {}")
-        # create node type
-        node_type_fields = {}
-        for field_name, field in type_def.fields.items():
-            node_type_fields['_id'] = graphene.ID()
-            node_type_fields['_label'] = graphene.String()
-            if field.is_data_field():
-                # this is property on the node
-                node_type_fields[field_name] = self.create_field(field)
-            elif field.is_relationship_field(): 
-                directive = field.get_relationship_data()
-                relationship_based_fields = self.create_relationship_based_fields(directive)
-                for related_name, related_field,  in relationship_based_fields.items():
-                    node_type_fields[related_name] = related_field
  
-
-        NodeType =  type(type_def.label, (graphene.ObjectType, ), node_type_fields)
-        self.add_type_to_schema_cache(type_def, NodeType)
-        return NodeType
-
-    def create_relationship_type(self, type_def: InvanaGQLLabelDefinition):
         # create node type
         node_type_fields = {}
-        for field_name, field in type_def.fields.items():
-            node_type_fields['_id'] = graphene.ID()
-            node_type_fields['_label'] = graphene.String()
-            if list(field.directives.keys()).__len__() ==  0:
-                # this is property on the node
-                node_type_fields[field_name] = self.create_field(field)
-            else: # this is a relationship on the if directive_name == "relationship"
-                for directive_name, directive in field.directives.items():
-                    if directive_name == "relationship":
-                        relationship_based_fields = self.create_relationship_based_fields(directive_name, directive)
-                        for related_name, related_field,  in relationship_based_fields.items():
-                            node_type_fields[related_name] = related_field
-                    else:
-                        raise UnSupportedFieldDirective(f"'{directive_name}' directive is not supported on the field")
+        
+        data_fields = type_def.get_data_fields()
+
+        # 1. create actual fields 
+        for field_name, field in data_fields.items():
+            node_type_fields['id'] = graphene.ID()
+            node_type_fields['label'] = graphene.String()
+            node_type_fields[field_name] = self.create_field(field)
+
+        # 2. create relationship fields
+ 
+        related_fields = type_def.get_related_fields()
+        for field_name, relationship_directives in related_fields.items():
+            node_type_fields[field_name] = self.create_relationship_fields(relationship_directives)
+
+
         NodeType =  type(type_def.label, (graphene.ObjectType, ), node_type_fields)
         self.add_type_to_schema_cache(type_def, NodeType)
         return NodeType
 
+
+    # def create_relationship_type(self, type_def: InvanaGQLLabelDefinition):
+    #     # create node type
+    #     node_type_fields = {}
+
+    #     for field_name, field in type_def.fields.items():
+    #         node_type_fields['_id'] = graphene.ID()
+    #         node_type_fields['_label'] = graphene.String()
+    #         if list(field.directives.keys()).__len__() ==  0:
+    #             # this is property on the node
+    #             node_type_fields[field_name] = self.create_field(field)
+    #         else: # this is a relationship on the if directive_name == "relationship"
+    #             for directive_name, directive in field.directives.items():
+    #                 if directive_name == "relationship":
+    #                     relationship_based_fields = self.create_relationship_based_fields(directive_name, directive)
+    #                     for related_name, related_field,  in relationship_based_fields.items():
+    #                         node_type_fields[related_name] = related_field
+    #                 else:
+    #                     raise UnSupportedFieldDirective(f"'{directive_name}' directive is not supported on the field")
+    #     NodeType =  type(type_def.label, (graphene.ObjectType, ), node_type_fields)
+    #     self.add_type_to_schema_cache(type_def, NodeType)
+    #     return NodeType
 
 
 
@@ -126,7 +142,7 @@ class QueryGenerators:
         return type(f"{type_def.label}OrderBy", (graphene.InputObjectType, ), order_by_fields)
     
     def create_relationship_field_name(self, directive):
-        return f"{directive.relation_label}__{directive.node_label}"
+        return f"{directive.relationship_label}__{directive.node_label}"
     
     def create_where_relationship_condition(self, relationship_label, direction, ):
         return type(f"{relationship_label}WhereConditions", (graphene.InputObjectType, ), {
@@ -186,7 +202,7 @@ class QueryGenerators:
         if type_def.label_type == "node":
             NodeType = self.create_node_type(type_def) if NodeType is None else NodeType
         elif type_def.label_type == "relationship":
-            NodeType = self.create_relationship_type(type_def) if NodeType is None else NodeType
+            NodeType = self.create_node_type(type_def) if NodeType is None else NodeType
 
 
         NodeOrderBy = self.create_order_by(type_def)

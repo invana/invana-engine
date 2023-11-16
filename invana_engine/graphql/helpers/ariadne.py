@@ -78,7 +78,7 @@ class AdriadneSchemUtils():
         return field
     
 
-    def get_field_definition(self, field):
+    def get_field_definition(self,field_name: str,  field: GraphQLField) -> InvanaGQLLabelDefinitionField:
         field_type = self.get_type_of_field(field.type)
         field_data = {
             'field_type_str' : field_type.name,
@@ -87,23 +87,30 @@ class AdriadneSchemUtils():
         }
         # this will get the relationships 
         if field.ast_node.directives.__len__() > 0 :
-            field_data['directives'] = self.get_directives_on_field(field)
+            field_data['directives'] = self.get_directives_on_field(field_name, field)
         return InvanaGQLLabelDefinitionField(**field_data)
-    
-    def get_type_defintion_str(self, type_):
+
+
+    def get_type_defintion_str(self, type_: GraphQLObjectType):
         body = type_.ast_node.loc.source.body
         return body[type_.ast_node.loc.start: type_.ast_node.loc.end]  
     
-    def get_directives_on_field(self, field) -> typing.Dict[str, typing.Union[InvanaGQLFieldRelationshipDirective, typing.Any]]:
+    def get_directives_on_field(self, field_name:str, field: GraphQLField) -> \
+                typing.Dict[str, typing.Union[InvanaGQLFieldRelationshipDirective, typing.Any]]:
         directives = field.ast_node.directives
         data = {}
+
         for directive in directives:
             datum = {}
+            datum['field_name'] = field_name
             for argument in  directive.arguments:
-                datum[argument.name.value] =  argument.value.value
+                # key =f"relationship_{argument.name.value}" if  argument.name.value  == "properties" else  argument.name.value
+                datum[ argument.name.value] =  argument.value.value
             datum['node_label'] = self.get_type_of_field(field.type).name
-            datum['relation_label'] = datum['label']
+            datum['relationship_label'] = datum['label']
             del datum['label']
+            if "direction" in datum:
+                datum['direction'] = datum['direction'].lower()
             data[directive.name.value] = InvanaGQLFieldRelationshipDirective(**datum)
         return data
     
@@ -131,7 +138,7 @@ class AdriadneSchemUtils():
 
         # get if there are any relationshis in the fields
         for field_name, field  in type_.fields.items():
-            type_def_dict['fields'][field_name] = self.get_field_definition(field)
+            type_def_dict['fields'][field_name] = self.get_field_definition(field_name, field)
         return InvanaGQLLabelDefinition(**type_def_dict)
     
     def seperate_nodes_and_relationships(self, schema_items_dict) -> typing.Dict[str, InvanaGQLLabelDefinition]:
