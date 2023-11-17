@@ -90,7 +90,7 @@ class QueryGenerators:
             relationship_directives: typing.List[InvanaGQLFieldRelationshipDirective]
         ):
         fields = {}
-        print('field_name.split("__").count("__")' , field_name, field_name.split("__"), field_name.split("__").count("__"))
+
         if field_name.split("__").__len__() == 3:
             # individual relation to node map; "_oute__ACTED_IN__Movie"
             for relationship_directive in relationship_directives:
