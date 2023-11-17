@@ -40,9 +40,9 @@ class InvanaGQLLabelDefinitionField:
 class InvanaGQLLabelDefinition:
     label: str
     label_type: str
+    fields: typing.Dict[str, InvanaGQLLabelDefinitionField]
     def_string : str
     type: GraphQLObjectType
-    fields: typing.Dict[str, InvanaGQLLabelDefinitionField]
 
     def get_data_fields(self)-> typing.Dict[str, InvanaGQLLabelDefinitionField]:
         return {field_name: field for field_name, field in self.fields.items() if field.is_data_field()}

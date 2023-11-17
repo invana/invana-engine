@@ -80,10 +80,48 @@ class QueryGenerators:
     #     return relation_based_fields
 
 
-    def create_relationship_fields(self,  relationship_directives: typing.List[InvanaGQLFieldRelationshipDirective]):    
-        classes = [type(relationship_directive.node_label, (graphene.ObjectType, ), {}) 
-                   for relationship_directive in relationship_directives]    
-        return graphene.Field(graphene.List(*classes)) 
+    def create_node_with_name(self, node_name):
+        # TODO - get from cached
+        return type(node_name, (graphene.ObjectType, ), {}) 
+
+    def create_relationship_field(self, 
+            type_def_label: str,
+            field_name:str, 
+            relationship_directives: typing.List[InvanaGQLFieldRelationshipDirective]
+        ):
+        fields = {}
+        print('field_name.split("__").count("__")' , field_name, field_name.split("__"), field_name.split("__").count("__"))
+        if field_name.split("__").__len__() == 3:
+            # individual relation to node map; "_oute__ACTED_IN__Movie"
+            for relationship_directive in relationship_directives:
+                fields[relationship_directive.field_name] = graphene.Field(
+                    graphene.List(self.create_node_with_name(relationship_directive.node_label))
+                )
+
+            object_type = type(relationship_directive.node_label, (graphene.ObjectType, ), fields) 
+        elif field_name.split("__").__len__() == 2:
+            # individual relation to node map # "_oute__ACTED_IN"
+            for relationship_directive in relationship_directives:
+                fields[relationship_directive.field_name] = graphene.Field(
+                    graphene.List(self.create_node_with_name(relationship_directive.node_label))
+                )
+
+            # TODO - add filters
+            object_type = type(f"{type_def_label}{field_name}", (graphene.ObjectType, ), fields) 
+        elif field_name in ["_bothe", "_ine", "_oute"]:
+            # add traversal
+            for relationship_directive in relationship_directives:
+                fields[relationship_directive.field_name] = graphene.Field(
+                    graphene.List(self.create_node_with_name(relationship_directive.node_label))
+                )
+
+            # TODO - add filters
+            object_type = type(f"{type_def_label}{field_name}", (graphene.ObjectType, ), fields) 
+        return graphene.Field(graphene.List(object_type)) 
+ 
+ 
+
+        return graphene.Field(graphene.List(*object_type)) 
         
     def create_node_type(self, type_def: InvanaGQLLabelDefinition):
  
@@ -102,7 +140,10 @@ class QueryGenerators:
  
         related_fields = type_def.get_related_fields()
         for field_name, relationship_directives in related_fields.items():
-            node_type_fields[field_name] = self.create_relationship_fields(relationship_directives)
+            node_type_fields[field_name] = self.create_relationship_field(
+                type_def.label,
+                field_name, relationship_directives)
+
 
 
         NodeType =  type(type_def.label, (graphene.ObjectType, ), node_type_fields)
@@ -199,12 +240,7 @@ class QueryGenerators:
 
         NodeType = self.get_type_from_schema_cache(type_def)
 
-        if type_def.label_type == "node":
-            NodeType = self.create_node_type(type_def) if NodeType is None else NodeType
-        elif type_def.label_type == "relationship":
-            NodeType = self.create_node_type(type_def) if NodeType is None else NodeType
-
-
+        NodeType = self.create_node_type(type_def) if NodeType is None else NodeType
         NodeOrderBy = self.create_order_by(type_def)
         NodeWhereConditions = self.create_where_conditions(type_def)
 
