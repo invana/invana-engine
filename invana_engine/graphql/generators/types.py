@@ -50,7 +50,6 @@ class InvanaGQLLabelDefinition:
     def get_relationship_fields(self)-> typing.Dict[str, InvanaGQLLabelDefinitionField]:
         return {field_name: field for field_name, field in self.fields.items() if field.is_relationship_field()}
  
-
     def get_fields_grouped_by_relationship_label(self, direction: str="both") -> typing.Dict[str, InvanaGQLFieldRelationshipDirective]:
         relationship_fields = self.get_relationship_fields()
         if direction in ["in", "out"]:
@@ -60,9 +59,7 @@ class InvanaGQLLabelDefinition:
             field_relationships = [field.get_relationship_data() for _, field in relationship_fields.items()]
 
         fields_dict = {}
-
-
-        # 1. grouped by relationship label
+        # 1. grouped by relationship label "_oute__ACTED_IN"
         for field_relationship in field_relationships:
             key = f'_{direction}e__{field_relationship.relationship_label}'
             if fields_dict.get(key) and field_relationship not in fields_dict.get(key):
@@ -70,16 +67,15 @@ class InvanaGQLLabelDefinition:
             else:
                 fields_dict[key] = [field_relationship]
 
-
-        # 2. individual traversal
+        # 2. individual traversal "_oute__ACTED_IN__Movie" and "_oute__ACTED_IN__ShortFilm"
         if direction != "both":
             for relationship in field_relationships:
                 # 2. inividual relationship label
                 key = f"_{relationship.direction}e__{relationship.relationship_label}__{relationship.node_label}"
-                fields_dict[key] = [field_relationship]
+                fields_dict[key] = [relationship]
  
-        # 3. generic in/out/both
-        all_types = []
+        # 3. generic in/out/both "_oute"
+        all_types = [] 
         for field_name, field  in fields_dict.items():
             all_types.extend(field) 
         all_types=  list(set(all_types))
@@ -88,17 +84,14 @@ class InvanaGQLLabelDefinition:
  
         return fields_dict
 
-
     def get_related_fields(self):
         # seperate the in and out relationships
-
         related_fields = {}
         related_fields.update(self.get_fields_grouped_by_relationship_label(direction="both"))
         related_fields.update(self.get_fields_grouped_by_relationship_label(direction="in"))
         related_fields.update(self.get_fields_grouped_by_relationship_label(direction="out"))
         return related_fields
  
-
 
 @dataclass
 class InvanaGQLSchema:

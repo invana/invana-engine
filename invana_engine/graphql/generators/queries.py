@@ -121,7 +121,7 @@ class QueryGenerators:
  
  
 
-        return graphene.Field(graphene.List(*object_type)) 
+        # return graphene.Field(graphene.List(*object_type)) 
         
     def create_node_type(self, type_def: InvanaGQLLabelDefinition):
  
@@ -139,11 +139,11 @@ class QueryGenerators:
         # 2. create relationship fields
  
         related_fields = type_def.get_related_fields()
+        print("===")
         for field_name, relationship_directives in related_fields.items():
             node_type_fields[field_name] = self.create_relationship_field(
                 type_def.label,
                 field_name, relationship_directives)
-
 
 
         NodeType =  type(type_def.label, (graphene.ObjectType, ), node_type_fields)
