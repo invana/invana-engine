@@ -20,7 +20,7 @@ class InvanaGQLFieldRelationshipDirective:
     #     return f"<RelationshipDirective "
 
 @dataclass
-class InvanaGQLLabelDefinitionField:
+class InvanaGQLLabelFieldDefinition:
     field_type_str: str
     field_type: typing.Any
     directives: typing.Dict[str, typing.Union[InvanaGQLFieldRelationshipDirective, typing.Any]]
@@ -40,17 +40,29 @@ class InvanaGQLLabelDefinitionField:
 class InvanaGQLLabelDefinition:
     label: str
     label_type: str
-    fields: typing.Dict[str, InvanaGQLLabelDefinitionField]
+    fields: typing.Dict[str, InvanaGQLLabelFieldDefinition]
     def_string : str
     type: GraphQLObjectType
 
-    def get_data_fields(self)-> typing.Dict[str, InvanaGQLLabelDefinitionField]:
+    def get_data_fields(self)-> typing.Dict[str, InvanaGQLLabelFieldDefinition]:
         return {field_name: field for field_name, field in self.fields.items() if field.is_data_field()}
 
-    def get_relationship_fields(self)-> typing.Dict[str, InvanaGQLLabelDefinitionField]:
+    def get_relationship_fields(self)-> typing.Dict[str, InvanaGQLLabelFieldDefinition]:
         return {field_name: field for field_name, field in self.fields.items() if field.is_relationship_field()}
  
     def get_fields_grouped_by_relationship_label(self, direction: str="both") -> typing.Dict[str, InvanaGQLFieldRelationshipDirective]:
+        """_summary_
+
+        Args:
+            direction (str, optional): _description_. Defaults to "both".
+
+        Returns:
+            {
+                '_bothe__ACTED_IN': [InvanaGQLFieldRelati...'ActedIn'), InvanaGQLFieldRelati...'ActedIn')], 
+                '_bothe__likes': [InvanaGQLFieldRelati...s='Liked')], 
+                '_bothe': [InvanaGQLFieldRelati...'ActedIn'), InvanaGQLFieldRelati...s='Liked'), InvanaGQLFieldRelati...'ActedIn')]
+            }
+        """
         relationship_fields = self.get_relationship_fields()
         if direction in ["in", "out"]:
             field_relationships = [field.get_relationship_data() for _, field in relationship_fields.items() \
