@@ -92,28 +92,35 @@ class QueryGenerators:
             relationship_directives: typing.List[InvanaGQLFieldRelationshipDirective]
         ) ->  graphene.Field:
         fields = {}
+        args = {}
 
         if field_name.split("__").__len__() == 3:
             # individual relation to node map; "_oute__ACTED_IN__Movie"
-            for relationship_directive in relationship_directives:
-                fields[relationship_directive.field_name] = self.create_node_type_field_by_name(relationship_directive.node_label)
-                fields[f'resolve_{relationship_directive.field_name}'] = resolve_relationship_field_resolver
-            object_type = type(relationship_directive.node_label, (graphene.ObjectType, ), fields) 
+
+            # for relationship_directive in relationship_directives:
+            #     fields[relationship_directive.field_name] = self.create_node_type_field_by_name(relationship_directive.node_label)
+            #     fields[f'resolve_{relationship_directive.field_name}'] = resolve_relationship_field_resolver
+            # object_type = type(relationship_directive.node_label, (graphene.ObjectType, ), fields) 
+            return self.create_node_type_field_by_name(relationship_directives[0].node_label)  # TODO - add 
+
         elif field_name.split("__").__len__() == 2:
             # individual relation to node map # "_oute__ACTED_IN"
             for relationship_directive in relationship_directives:
-                fields[relationship_directive.field_name] = self.create_node_type_field_by_name(relationship_directive.node_label)
-                fields[f'resolve_{relationship_directive.field_name}'] = resolve_relationship_field_resolver
-            # TODO - add filters
+                fields[relationship_directive.node_label] = self.create_node_type_field_by_name(relationship_directive.node_label)
+                # fields[f'resolve_{relationship_directive.node_label}'] = resolve_relationship_field_resolver
             object_type = type(f"{type_def_label}{field_name}", (graphene.ObjectType, ), fields) 
+            return graphene.Field(graphene.List(object_type))  # TODO - add 
+
         elif field_name in ["_bothe", "_ine", "_oute"]:
             # add traversal
             for relationship_directive in relationship_directives:
                 fields[relationship_directive.field_name] = self.create_node_type_field_by_name(relationship_directive.node_label)
-                fields[f'resolve_{relationship_directive.field_name}'] = resolve_relationship_field_resolver
-            # TODO - add filters
+                # fields[f'resolve_{relationship_directive.field_name}'] = resolve_relationship_field_resolver
             object_type = type(f"{type_def_label}{field_name}", (graphene.ObjectType, ), fields) 
-        return graphene.Field(graphene.List(object_type)) 
+            return graphene.Field(graphene.List(object_type))  # TODO - add 
+
+        # args =  self.create_node_type_args(type_def)
+
 
     def create_node_data_type(self, type_def: InvanaGQLLabelDefinition, extra_fields=None):
         # create node type
@@ -145,7 +152,8 @@ class QueryGenerators:
             "limit" : graphene.Argument(graphene.Int, description="limits the result count"),
             "offset" : graphene.Argument(graphene.Int, description="skips x results"),
             "dedup" : graphene.Argument(graphene.Boolean, description="dedups the result"),
-            "order_by" : graphene.Argument(self.create_where_order_by(type_def) , description="order the result by"),
+            "order_by" : graphene.Argument(self.create_where_order_by(type_def),
+                                            description="order the result by"),
             "where": graphene.Argument(self.create_where_conditions(type_def))
         }
     

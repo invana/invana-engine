@@ -72,7 +72,7 @@ def create_app():
         type ShortFilm {
             title: String
             published_date: Date
-            extended_to: [Movie!]! @relationship(label: "extended_to", direction: OUT, properties: "ActedIn")        
+            extended_to: [Movie!]! @relationship(label: "extended_to", direction: OUT, properties: "ExtendedAt")        
         }
 
         type Movie {
@@ -97,6 +97,10 @@ def create_app():
         }
 
         type Liked @relationshipProperties {
+            date: [String]
+        }
+
+        type ExtendedAt @relationshipProperties {
             date: [String]
         }
 """
