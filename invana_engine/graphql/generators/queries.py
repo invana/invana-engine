@@ -100,7 +100,9 @@ class QueryGenerators:
             for relationship_directive in relationship_directives:
                 if self.schema_defs.nodes[relationship_directive.node_label] not in target_label_type_defs:
                     target_label_type_defs.append(self.schema_defs.nodes[relationship_directive.node_label])
-                fields[relationship_directive.node_label] = self.create_node_type_field_by_name(relationship_directive.node_label)
+                fields[relationship_directive.node_label] = self.create_node_type_field_by_name(
+                    relationship_directive.node_label
+                )
                 # TODO - add resolver if needed; fields[f'resolve_{relationship_directive.node_label}'] = resolve_relationship_field_resolver
             object_type = type(f"{type_def.label}{field_name}", (graphene.ObjectType, ), fields) 
             node_type_fields[field_name] =  graphene.Field(graphene.List(object_type),
@@ -213,25 +215,18 @@ class QueryGenerators:
         node_fields[f"resolve_{type_def.label}"]  = default_node_type_resolve_query
         return node_fields
 
-    
-    def create_schema_node_fields(self, extra_fields=None) \
-          -> typing.Dict[str,typing.Union[graphene.ObjectType, typing.Callable]]:
-
-        node_query_classes = [] 
-        for type_name, type_def in self.schema_defs.nodes.items():
-            node_fields = self.create_node_type_with_resolver( type_def)
-            node_query_classes.append(type(type_def.label, (graphene.ObjectType, ), node_fields))         
-        return node_query_classes
-
     def generate(self):
         #  type_def: InvanaGQLLabelDefinition,
         query_classes = []
-        query_classes.extend(self.create_schema_node_fields())
 
+        # for type_name, type_def in self.schema_defs.nodes.items():
+        #     node_fields = self.create_node_type_with_resolver( type_def)
+        #     query_classes.append(type(type_def.label, (graphene.ObjectType, ), node_fields))         
  
-        # for type_name, type_def in self.schema_defs.relationships.items():
-        #     LabelQueryTypes = self.create_schema_node_fields(type_def)
-        #     query_classes.append(LabelQueryTypes)         
+
+        for type_name, type_def in self.schema_defs.relationships.items():
+            node_fields = self.create_node_type_with_resolver(type_def)
+            query_classes.append(type(type_def.label, (graphene.ObjectType, ), node_fields))         
             
         return query_classes
  

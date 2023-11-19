@@ -83,7 +83,6 @@ class AdriadneSchemUtils():
             field_data['directives'] = self.get_directives_on_field(field_name, field)
         return InvanaGQLLabelFieldDefinition(**field_data)
 
-
     def get_type_defintion_str(self, type_: GraphQLObjectType):
         body = type_.ast_node.loc.source.body
         return body[type_.ast_node.loc.start: type_.ast_node.loc.end]  
@@ -128,22 +127,14 @@ class AdriadneSchemUtils():
         type_def_dict['label_type'] = self.get_element_type(type_)
         type_def_dict['label'] = type_.name
         type_def_dict['fields'] = {}
+        type_def_dict['schema'] = None
 
         # get if there are any relationshis in the fields
         for field_name, field  in type_.fields.items():
             type_def_dict['fields'][field_name] = self.get_field_definition(field_name, field)
         return InvanaGQLLabelDefinition(**type_def_dict)
-    
-    def seperate_nodes_and_relationships(self, schema_items_dict) -> typing.Dict[str, InvanaGQLLabelDefinition]:
-        schema :InvanaGQLSchema  = {"nodes": {},"relationships": {}}
-        for label, label_def in schema_items_dict.items():
-            if label_def.label_type == "relationship":
-                schema['relationships'][label] = label_def
-            else:
-                schema['nodes'][label] = label_def
-        return InvanaGQLSchema(**schema)
 
-    def get_schema_defs(self,interim_schema: GraphQLSchema) -> InvanaGQLSchema:
+    def create_invana_schema(self,interim_schema: GraphQLSchema) -> InvanaGQLSchema:
         schema_items_dict = {} 
         for type_name, type_ in interim_schema.type_map.items():
             if (isinstance(type_, GraphQLObjectType) or isinstance(type_, GraphQLInterfaceType)) \
@@ -151,6 +142,19 @@ class AdriadneSchemUtils():
                     and not type_.name.startswith("__")  :                
                 schema_items_dict[type_name] = self.get_type_defs(type_)
 
-        # seperate types to relationships and nodes 
-        return self.seperate_nodes_and_relationships(schema_items_dict)
-    
+        # create chema instance 
+        schema :InvanaGQLSchema  = {"nodes": {},"relationships": {}}
+        for label, label_def in schema_items_dict.items():
+            if label_def.label_type == "relationship":
+                schema['relationships'][label] = label_def
+            else:
+                schema['nodes'][label] = label_def
+        schema_instance =  InvanaGQLSchema(**schema)
+
+        # attache schema to all the labelDefinitions
+        for label, label_def in schema_instance.relationships.items():
+            setattr(label_def, 'schema', schema_instance)
+        for label, label_def in schema_instance.nodes.items():
+            setattr(label_def, 'schema', schema_instance)
+
+        return schema_instance

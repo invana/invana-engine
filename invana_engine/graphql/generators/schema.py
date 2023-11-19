@@ -44,7 +44,7 @@ class SchemaGenerator:
     def __init__(self, schema_str: str) -> None:
         self.schema_str = schema_str
         self.interim_schema = AriadneGraphQLSchemaGenerator().create_interim_schema(schema_str)
-        self.schema_defs = AdriadneSchemUtils().get_schema_defs(self.interim_schema)
+        self.schema_defs = AdriadneSchemUtils().create_invana_schema(self.interim_schema)
     
     def generate_query_types(self, *type_def_classes):
         return type("Query", (
