@@ -96,7 +96,7 @@ class InvanaGQLLabelDefinition:
  
         return fields_dict
 
-    def get_related_fields(self):
+    def get_related_data_fields(self):
         # seperate the in and out relationships
         related_fields = {}
         related_fields.update(self.get_fields_grouped_by_relationship_label(direction="both"))
