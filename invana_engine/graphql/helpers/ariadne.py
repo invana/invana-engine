@@ -6,7 +6,7 @@ import typing
 from dataclasses import dataclass
 from graphql.type.schema import GraphQLSchema
 from ..generators.types import InvanaGQLFieldRelationshipDirective, InvanaGQLLabelDefinition,\
-      InvanaGQLLabelFieldDefinition, InvanaGQLSchema
+      InvanaGQLDataFieldDefinition, InvanaGQLSchema
 
 class AriadneGraphQLSchemaGenerator:
 
@@ -71,7 +71,7 @@ class AdriadneSchemUtils():
         return field
     
 
-    def get_field_definition(self,field_name: str,  field: GraphQLField) -> InvanaGQLLabelFieldDefinition:
+    def get_field_definition(self,field_name: str,  field: GraphQLField) -> InvanaGQLDataFieldDefinition:
         field_type = self.get_type_of_field(field.type)
         field_data = {
             'field_type_str' : field_type.name,
@@ -81,7 +81,7 @@ class AdriadneSchemUtils():
         # this will get the relationships 
         if field.ast_node.directives.__len__() > 0 :
             field_data['directives'] = self.get_directives_on_field(field_name, field)
-        return InvanaGQLLabelFieldDefinition(**field_data)
+        return InvanaGQLDataFieldDefinition(**field_data)
 
     def get_type_defintion_str(self, type_: GraphQLObjectType):
         body = type_.ast_node.loc.source.body

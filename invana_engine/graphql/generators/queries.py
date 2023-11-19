@@ -1,6 +1,6 @@
 import graphene
 from .types import InvanaGQLFieldRelationshipDirective, InvanaGQLLabelDefinition, \
-    InvanaGQLLabelFieldDefinition, InvanaGQLSchema
+    InvanaGQLDataFieldDefinition, InvanaGQLSchema
 from .exceptions import UnSupportedFieldDirective
 import typing
 from .resolvers import default_node_type_resolve_query, resolve_relationship_field_resolver
@@ -85,7 +85,7 @@ class QueryGenerators:
         # traversals 
         return type(f"{type_defs_label}WhereConditions",(graphene.InputObjectType,), where_condition_fields)
  
-    def create_property_field(self, field: InvanaGQLLabelFieldDefinition):
+    def create_property_field(self, field: InvanaGQLDataFieldDefinition):
         field_str = field.field_type_str
         return getattr(graphene, field_str)()# TODO - add default etc kwargs from ariadne type object
  

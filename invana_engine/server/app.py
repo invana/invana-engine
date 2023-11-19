@@ -69,11 +69,44 @@ def create_app():
 
     schema_def =  """
     
-        type ShortFilm {
-            title: String
-            published_date: Date
-            extended_to: [Movie!]! @relationship(label: "extended_to", direction: OUT, properties: "ExtendedAt")        
-        }
+        # type ShortFilm {
+        #     title: String
+        #     published_date: Date
+        #     extended_to: [Movie!]! @relationship(label: "extended_to", direction: OUT, properties: "ExtendedAt")        
+        # }
+
+        # type Movie {
+        #     title: String
+        #     published_date: Date
+        #     actors: [Actor!]! @relationship(label: "ACTED_IN", direction: IN, properties: "ActedIn")
+        # }
+
+        
+        # type Actor {
+        #     first_name: String
+        #     last_name: String
+        #     screen_name: String
+        #     movies: [Movie!]! @relationship(label: "ACTED_IN", direction: OUT, properties: "ActedIn")
+        #     shortFilms: [ShortFilm!]! @relationship(label: "ACTED_IN", direction: OUT, properties: "ActedIn")
+        #     # likes: [ShortFilm!]! @relationship(label: "likes", direction: OUT, properties: "Liked")
+        #     # likes2: [Movie!]! @relationship(label: "likes", direction: OUT, properties: "Liked")
+        # }
+
+        # type ActedIn @relationshipProperties {
+        #     roles: [String]
+        # }
+
+        # type Liked @relationshipProperties {
+        #     date: [String]
+        # }
+
+        # type ExtendedAt @relationshipProperties {
+        #     date: [String]
+        # }
+
+
+
+
 
         type Movie {
             title: String
@@ -87,22 +120,17 @@ def create_app():
             last_name: String
             screen_name: String
             movies: [Movie!]! @relationship(label: "ACTED_IN", direction: OUT, properties: "ActedIn")
-            shortFilms: [ShortFilm!]! @relationship(label: "ACTED_IN", direction: OUT, properties: "ActedIn")
-            # likes: [ShortFilm!]! @relationship(label: "likes", direction: OUT, properties: "Liked")
-            # likes2: [Movie!]! @relationship(label: "likes", direction: OUT, properties: "Liked")
+            likess: [Movie!]! @relationship(label: "HAS_LIKED", direction: OUT, properties: "Liked")
         }
 
         type ActedIn @relationshipProperties {
             roles: [String]
         }
 
-        type Liked @relationshipProperties {
+        type Likes @relationshipProperties {
             date: [String]
         }
 
-        type ExtendedAt @relationshipProperties {
-            date: [String]
-        }
 """
 
     routes = [
