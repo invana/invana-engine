@@ -111,10 +111,9 @@ def create_app():
         type Movie {
             title: String
             published_date: Date
-            actors: [Actor!]! @relationship(label: "ACTED_IN", direction: IN, properties: "ActedIn")
+            # actors: [Actor!]! @relationship(label: "ACTED_IN", direction: IN, properties: "ActedIn")
         }
 
-        
         type Actor {
             first_name: String
             last_name: String
@@ -127,7 +126,7 @@ def create_app():
             roles: [String]
         }
 
-        type Likes @relationshipProperties {
+        type Liked @relationshipProperties {
             date: [String]
         }
 

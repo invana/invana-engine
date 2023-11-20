@@ -1,6 +1,6 @@
 import graphene
 from .types import InvanaGQLFieldRelationshipDirective, InvanaGQLLabelDefinition, \
-    InvanaGQLDataFieldDefinition, InvanaGQLSchema
+    InvanaGQLLabelFieldDefinition, InvanaGQLSchema
 from .exceptions import UnSupportedFieldDirective
 import typing
 from .resolvers import default_node_type_resolve_query, resolve_relationship_field_resolver
@@ -85,7 +85,7 @@ class QueryGenerators:
         # traversals 
         return type(f"{type_defs_label}WhereConditions",(graphene.InputObjectType,), where_condition_fields)
  
-    def create_property_field(self, field: InvanaGQLDataFieldDefinition):
+    def create_property_field(self, field: InvanaGQLLabelFieldDefinition):
         field_str = field.field_type_str
         return getattr(graphene, field_str)()# TODO - add default etc kwargs from ariadne type object
  
@@ -118,7 +118,7 @@ class QueryGenerators:
         # 1. create actual fields 
         for field_name, field in data_fields.items():
             node_type_fields['id'] = graphene.ID()
-            node_type_fields['label'] = graphene.String()
+            node_type_fields['label'] = graphene.String(default_value=type_def.label)
             node_type_fields[field_name] = self.create_property_field(field)
 
         # 2. creating relationships fields
@@ -129,7 +129,7 @@ class QueryGenerators:
             target_label = relationship_directives[0].node_label # traverse towards label
             node_type_fields[field_name] = self.create_node_type_field(self.schema_defs.nodes[target_label])
             
-            
+        
         # 2.2. relationships grouped by direction and edge label
         #  ex: "bothe__related_to", 
         node_type_fields.update(
@@ -219,14 +219,12 @@ class QueryGenerators:
         #  type_def: InvanaGQLLabelDefinition,
         query_classes = []
 
-        # for type_name, type_def in self.schema_defs.nodes.items():
-        #     node_fields = self.create_node_type_with_resolver( type_def)
-        #     query_classes.append(type(type_def.label, (graphene.ObjectType, ), node_fields))         
+        for type_name, type_def in self.schema_defs.nodes.items():
+            node_fields = self.create_node_type_with_resolver( type_def)
+            query_classes.append(type(type_def.label, (graphene.ObjectType, ), node_fields))         
  
-
         for type_name, type_def in self.schema_defs.relationships.items():
             node_fields = self.create_node_type_with_resolver(type_def)
             query_classes.append(type(type_def.label, (graphene.ObjectType, ), node_fields))         
             
         return query_classes
- 
