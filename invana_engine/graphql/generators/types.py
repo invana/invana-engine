@@ -54,6 +54,11 @@ class InvanaGQLLabelDefinition:
 
     def get_data_fields(self)-> typing.Dict[str, InvanaGQLLabelFieldDefinition]:
         return {field_name: field for field_name, field in self.fields.items() if field.is_data_field()}
+    
+    def get_inv_and_outv_fields(self):
+        if self.label_type == "node":
+            raise Exception("only label_type='relationship' will have inv and outv fields ")
+        
 
     def get_relationship_fields(self)-> typing.Dict[str, InvanaGQLLabelFieldDefinition]:
         """all the fields that has relationship directives

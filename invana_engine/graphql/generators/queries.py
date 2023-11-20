@@ -3,7 +3,8 @@ from .types import InvanaGQLFieldRelationshipDirective, InvanaGQLLabelDefinition
     InvanaGQLLabelFieldDefinition, InvanaGQLSchema
 from .exceptions import UnSupportedFieldDirective
 import typing
-from .resolvers import default_node_type_resolve_query, resolve_relationship_field_resolver
+from .resolvers import default_node_type_search_resolve_query, resolve_relationship_field_resolver,\
+    default_node_type_search_by_id_resolve_query
 
 OrderByEnum = type("OrderByEnum", (graphene.Enum, ), {"asc": "asc", "desc": "desc"})
 
@@ -129,7 +130,7 @@ class QueryGenerators:
         # direction relationship to node ex: "oute__related_to__Node"
         for field_name, relationship_directives in type_def.directed_relationship_to_node("both").items():
             target_label = relationship_directives[0].node_label # traverse towards label
-            node_type_fields[field_name] = self.create_node_type_field(self.schema_defs.nodes[target_label])
+            node_type_fields[field_name] = self.create_node_type_search_field(self.schema_defs.nodes[target_label])
             
         
         # 2.2. relationships grouped by direction and edge label
@@ -198,27 +199,47 @@ class QueryGenerators:
             "where": graphene.Argument(self.create_where_conditions(type_defs))
         }
     
-    def create_node_type_field(self, type_def: InvanaGQLLabelDefinition, extra_args=None ):
+    def create_node_type_search_field(self, type_def: InvanaGQLLabelDefinition, extra_args=None ):
         NodeDataType = self.create_node_data_type(type_def)
         args =  self.create_node_type_args([type_def])
         if extra_args:
             args.update(extra_args)
-        return graphene.Field(graphene.List(NodeDataType), args=args)
-    
+        return graphene.Field(graphene.List(NodeDataType), args=args, description=f"Search {type_def.label} {type_def.label_type} ")
+
     def create_node_type_field_by_name(self, node_name: str, extra_args=None):
         # TODO - get from cached
-        return  self.create_node_type_field( self.schema_defs.nodes[node_name], extra_args=extra_args)
+        return  self.create_node_type_search_field( self.schema_defs.nodes[node_name], extra_args=extra_args)
  
-    def create_node_type_with_resolver(self, 
+    def create_node_type_search_field_with_resolver(self, 
                         type_def: InvanaGQLLabelDefinition,
                         extra_args=None) -> typing.Dict[str, typing.Union[graphene.Field, typing.Callable]]:
         # extra_fields = {} if extra_fields is None else extra_fields
-        node_fields = {}
-        node_fields[type_def.label] =  self.create_node_type_field(type_def, extra_args=extra_args)
-        node_fields[f"resolve_{type_def.label}"]  = default_node_type_resolve_query
-        return node_fields
+        fields = {}
+        fields[type_def.label] =  self.create_node_type_search_field(type_def, extra_args=extra_args)
+        fields[f"resolve_{type_def.label}"]  = default_node_type_search_resolve_query
+        # node_fields[f'{type_def.label}_by_id'] = self.create_node_type_search_by_id_field(type_def, extra_args=extra_args)
+        return fields
+        
+    def create_node_type_search_by_id_field(self, type_def: InvanaGQLLabelDefinition, extra_args=None ):
+        NodeDataType = self.create_node_data_type(type_def)
+        args =  {
+            'id':  graphene.Argument(graphene.ID, description="id of the node/relationship"),
+        }
+        if extra_args:
+            args.update(extra_args)
+        return graphene.Field(NodeDataType, args=args, description=f"Search {type_def.label} by id ")
     
-    def create_entire_graph_node_type_with_resolver(self):
+    def create_node_type_search_by_id_field_with_resolver(self, 
+                        type_def: InvanaGQLLabelDefinition,
+                        extra_args=None) -> typing.Dict[str, typing.Union[graphene.Field, typing.Callable]]:
+        extra_args = {} if extra_args is None else extra_args
+ 
+        fields = {}
+        fields[f'{type_def.label}_by_id'] = self.create_node_type_search_by_id_field(type_def, extra_args=extra_args)
+        fields[f"resolve_{type_def.label}_by_id"]  = default_node_type_search_by_id_resolve_query
+        return fields
+    
+    def create_entire_graph_search_with_resolver(self):
         node_fields = {}
         # add over all arguments 
         # add fields
@@ -227,10 +248,8 @@ class QueryGenerators:
         #        on all fields 
         #        on label_type, labels
 
-
-
         node_fields["_graph"] =  graphene.Field(graphene.List(graphene.String)) # TODO - this is mocked
-        node_fields[f"resolve__graph"]  = default_node_type_resolve_query
+        node_fields[f"resolve__graph"]  = default_node_type_search_resolve_query
         return node_fields
 
     def generate(self):
@@ -238,15 +257,22 @@ class QueryGenerators:
         query_classes = []
 
         for type_name, type_def in self.schema_defs.nodes.items():
-            node_fields = self.create_node_type_with_resolver( type_def)
+            # label search
+            node_fields = self.create_node_type_search_field_with_resolver( type_def)
             query_classes.append(type(type_def.label, (graphene.ObjectType, ), node_fields))         
+            # label search by id 
+            node_fields = self.create_node_type_search_by_id_field_with_resolver( type_def)
+            query_classes.append(type(f'{type_def.label}_by_id', (graphene.ObjectType, ), node_fields))         
  
         for type_name, type_def in self.schema_defs.relationships.items():
-            node_fields = self.create_node_type_with_resolver(type_def)
+            # label search 
+            node_fields = self.create_node_type_search_field_with_resolver(type_def)
             query_classes.append(type(type_def.label, (graphene.ObjectType, ), node_fields))         
-            
-
-        node_fields = self.create_entire_graph_node_type_with_resolver()
+            # label search by id
+            node_fields = self.create_node_type_search_by_id_field_with_resolver( type_def)
+            query_classes.append(type(f'{type_def.label}_by_id', (graphene.ObjectType, ), node_fields))         
+ 
+        node_fields = self.create_entire_graph_search_with_resolver()
         query_classes.append(type("_graph", (graphene.ObjectType, ), node_fields))         
 
         return query_classes

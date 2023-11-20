@@ -14,6 +14,7 @@ Unified graph data modelling and management toolkit.
 - [ ] Vendor agnostic GraphQL API
 - [ ] graph data modelling - schema reader and editor
 - [ ] Interactive Search - filter and traverse through data.
+- [ ] Start your Query from Node or Relationship or a combination of both.
 <!-- - [ ] Query streaming  -->
 - [ ] Extendable to support any graph database
 <!-- - [ ] Support for large scale queries with Apache Spark -->
