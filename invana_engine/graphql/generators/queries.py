@@ -177,8 +177,7 @@ class QueryGenerators:
                 type_def.generic_directed_relationships("both")
             )
         )
-        
-        
+                
         if extra_fields:
             node_type_fields.update(extra_fields)
 
@@ -214,6 +213,14 @@ class QueryGenerators:
         node_fields[type_def.label] =  self.create_node_type_field(type_def, extra_args=extra_args)
         node_fields[f"resolve_{type_def.label}"]  = default_node_type_resolve_query
         return node_fields
+    
+    def create_entire_graph_node_type_with_resolver(self):
+        node_fields = {}
+        # add over all arguments 
+        # add fields
+        node_fields["_graph"] =  graphene.Field(graphene.List(graphene.String)) # TODO - this is mocked
+        node_fields[f"resolve__graph"]  = default_node_type_resolve_query
+        return node_fields
 
     def generate(self):
         #  type_def: InvanaGQLLabelDefinition,
@@ -227,4 +234,8 @@ class QueryGenerators:
             node_fields = self.create_node_type_with_resolver(type_def)
             query_classes.append(type(type_def.label, (graphene.ObjectType, ), node_fields))         
             
+
+        node_fields = self.create_entire_graph_node_type_with_resolver()
+        query_classes.append(type("_graph", (graphene.ObjectType, ), node_fields))         
+
         return query_classes
