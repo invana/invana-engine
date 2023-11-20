@@ -5,7 +5,7 @@ from graphql import GraphQLObjectType , GraphQLField, GraphQLInterfaceType
 import typing
 from dataclasses import dataclass
 from graphql.type.schema import GraphQLSchema
-from ..generators.types import InvanaGQLFieldRelationshipDirective, InvanaGQLLabelDefinition,\
+from ..generators.gql_types import InvanaGQLFieldRelationshipDirective, InvanaGQLLabelDefinition,\
       InvanaGQLLabelFieldDefinition, InvanaGQLSchema
 
 class AriadneGraphQLSchemaGenerator:
@@ -47,16 +47,13 @@ class AriadneGraphQLSchemaGenerator:
         self.mutation = MutationType()
         self.query = QueryType()
 
-
     def create_interim_schema(self, type_def):
         # schema is created by adding dummy Query, Mutation , Subscription
         return self.create_schema(self.type_def_base + type_def + self.type_def_end)
 
-
     def create_schema(self, type_def, *type_defs):
         # full 
         return make_executable_schema(type_def, self.query, self.mutation, self.subscription, *type_defs)
-
 
 
 class AdriadneSchemUtils():
@@ -134,7 +131,7 @@ class AdriadneSchemUtils():
             type_def_dict['fields'][field_name] = self.get_field_definition(field_name, field)
         return InvanaGQLLabelDefinition(**type_def_dict)
 
-    def create_invana_schema(self,interim_schema: GraphQLSchema) -> InvanaGQLSchema:
+    def create_invana_schema(self,schema_str:str, interim_schema: GraphQLSchema) -> InvanaGQLSchema:
         schema_items_dict = {} 
         for type_name, type_ in interim_schema.type_map.items():
             if (isinstance(type_, GraphQLObjectType) or isinstance(type_, GraphQLInterfaceType)) \
@@ -143,7 +140,7 @@ class AdriadneSchemUtils():
                 schema_items_dict[type_name] = self.get_type_defs(type_)
 
         # create chema instance 
-        schema :InvanaGQLSchema  = {"nodes": {},"relationships": {}}
+        schema :InvanaGQLSchema  = {"nodes": {},"relationships": {}, "schema_definition_str": schema_str}
         for label, label_def in schema_items_dict.items():
             if label_def.label_type == "relationship":
                 schema['relationships'][label] = label_def

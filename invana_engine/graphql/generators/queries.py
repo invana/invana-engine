@@ -1,5 +1,5 @@
 import graphene
-from .types import InvanaGQLFieldRelationshipDirective, InvanaGQLLabelDefinition, \
+from .gql_types import InvanaGQLFieldRelationshipDirective, InvanaGQLLabelDefinition, \
     InvanaGQLLabelFieldDefinition, InvanaGQLSchema
 from .exceptions import UnSupportedFieldDirective
 import typing
