@@ -73,6 +73,7 @@ class InvanaGQLLabelDefinition:
 
         related_node_labels = self.get_related_nodes_by_relationship(self.label)
         for field_name, field in related_node_labels.items():
+            # TODO - fix the directions and the field names 
             pass
             # for directive in directives:
             #     datum = {}

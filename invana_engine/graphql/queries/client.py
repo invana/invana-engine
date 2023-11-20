@@ -18,17 +18,17 @@ class ClientInfoType(graphene.ObjectType):
 
 
 class BasicInfoType(graphene.ObjectType):
-    _hello = graphene.String()
+    # _hello = graphene.String()
     _version = graphene.String()
     _client = graphene.Field(ClientInfoType)
 
     def resolve__version(self, info: graphene.ResolveInfo) -> str:
         return __VERSION__
 
-    def resolve__hello(self, info):
-        request = info.context["request"]
-        user_agent = request.headers.get("user-agent", "guest")
-        return "Hello, %s!" % user_agent
+    # def resolve__hello(self, info):
+    #     request = info.context["request"]
+    #     user_agent = request.headers.get("user-agent", "guest")
+    #     return "Hello, %s!" % user_agent
         
     def resolve__client(self, info):
         # return get_client_info()

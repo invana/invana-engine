@@ -110,7 +110,7 @@ class QueryGenerators:
         return node_type_fields
 
 
-    def create_node_data_type(self, type_def: InvanaGQLLabelDefinition, extra_fields=None):
+    def create_node_data_type_fields(self, type_def: InvanaGQLLabelDefinition, extra_fields=None):
         # create node type
         node_type_fields = {}
         data_fields = type_def.get_data_fields()
@@ -120,6 +120,8 @@ class QueryGenerators:
             node_type_fields['id'] = graphene.ID()
             node_type_fields['label'] = graphene.String(default_value=type_def.label)
             node_type_fields[field_name] = self.create_property_field(field)
+
+        
 
         # 2. creating relationships fields
 
@@ -180,9 +182,11 @@ class QueryGenerators:
                 
         if extra_fields:
             node_type_fields.update(extra_fields)
+        return node_type_fields
 
+    def create_node_data_type(self, type_def: InvanaGQLLabelDefinition, extra_fields=None):
+        node_type_fields = self.create_node_data_type_fields(type_def, extra_fields=extra_fields)
         return  type(type_def.label, (graphene.ObjectType, ), node_type_fields)
- 
 
     def create_node_type_args(self, type_defs: typing.List[InvanaGQLLabelDefinition] ):
         return {
@@ -218,6 +222,13 @@ class QueryGenerators:
         node_fields = {}
         # add over all arguments 
         # add fields
+
+        # where filters
+        #        on all fields 
+        #        on label_type, labels
+
+
+
         node_fields["_graph"] =  graphene.Field(graphene.List(graphene.String)) # TODO - this is mocked
         node_fields[f"resolve__graph"]  = default_node_type_resolve_query
         return node_fields
