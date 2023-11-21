@@ -105,9 +105,6 @@ def create_app():
         # }
 
 
-
-
-
         type Movie {
             title: String
             published_date: Date

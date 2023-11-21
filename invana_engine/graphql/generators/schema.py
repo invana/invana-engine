@@ -5,6 +5,7 @@ from ..queries.client import BasicInfoType
 from ..queries.hello import HelloType
 from ..queries.raw_query import ExecuteQueryType
 from ..subscriptions.execute_query import SubscriptionExample
+from ..schema_types import GraphSchemeQuery
 
 
 class SchemaGenerator:
@@ -71,6 +72,7 @@ class SchemaGenerator:
         subscription_classes = []
 
         query_classes = QueryGenerators(self.schema_defs).generate()
+        query_classes.append(GraphSchemeQuery) # adding schema
 
         Query = self.generate_query_types(*query_classes)
         Mutation = self.generate_mutation_types(*mutation_classes)
