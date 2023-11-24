@@ -61,12 +61,12 @@ class PropertyField:
     # def is_data_field(self)-> bool:
     #     return not self.is_relationship_field()
 
-@dataclass
-class InvanaGQLRelationshipDefinition:
-    label: str
-    fields : typing.Dict[str, PropertyField]
-    def_string : str
-    schema: 'GraphSchema' # this is the entire schema data; just incase needed
+# @dataclass
+# class InvanaGQLRelationshipDefinition:
+#     label: str
+#     fields : typing.Dict[str, PropertyField]
+#     def_string : str
+#     schema: 'GraphSchema' # this is the entire schema data; just incase needed
 
 
     
@@ -151,9 +151,9 @@ class NodeSchema:
             direction (str): _description_
         """
         relationship_fields = self.get_relationship_fields()
-        if direction in ["in", "out"]:
+        if direction.lower() in ["in", "out"]:
             return  [field for _, field in relationship_fields.items() \
-                    if field.direction == direction]
+                    if field.direction.lower() == direction]
         return [field for _, field in relationship_fields.items()]
 
     def directed_relationship_to_node(self, direction):
@@ -168,7 +168,6 @@ class NodeSchema:
         #     raise Exception("directed_relationship_to_node direction cannot be 'both', because"
         #                     "each relationship will have a direction to a Node")
         field_relationships = self.get_relationship_fields_by_direction(direction)
-            
         fields_dict = {}
         for relationship_field in field_relationships:
             # 2. inividual relationship label
@@ -208,7 +207,7 @@ class NodeSchema:
         all_types = [] 
         for field_name, field  in fields_dict.items():
             all_types.extend(field) 
-        # all_types=  list(set(all_types))
+
         if all_types.__len__() > 0:
             fields_dict[f"_{direction}e"] = all_types
         return fields_dict

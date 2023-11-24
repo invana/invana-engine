@@ -111,10 +111,17 @@ def create_app():
             # actors: [Actor!]! @relationship(label: "ACTED_IN", direction: IN, properties: "ActedIn")
         }
 
+        type ShortMovie {
+            title: String
+            published_date: Date
+            # actors: [Actor!]! @relationship(label: "ACTED_IN", direction: IN, properties: "ActedIn")
+        }
+
         type Actor {
             first_name: String
             last_name: String
             screen_name: String
+            shortmovies: [ShortMovie!]! @relationship(label: "ACTED_IN", direction: OUT, properties: "ActedIn")
             movies: [Movie!]! @relationship(label: "ACTED_IN", direction: OUT, properties: "ActedIn")
             likess: [Movie!]! @relationship(label: "HAS_LIKED", direction: IN, properties: "Liked")
         }

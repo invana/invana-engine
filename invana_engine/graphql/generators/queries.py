@@ -77,8 +77,6 @@ class QueryGenerators:
                     where_condition_fields[field_name] = IntFilersExpressions()
 
             for field_name, field in type_def.relationship_fields.items():
-                # for directive_name, directive_data in field.directives.items():
-                #     if directive_name == "relationship":
                 cls = self.create_where_relationship_condition(
                         field.other_node_label,
                         field.direction,
@@ -125,17 +123,20 @@ class QueryGenerators:
             node_type_fields['label'] = graphene.String(default_value=type_def.label)
             node_type_fields[field_name] = self.create_property_field(field)
 
-        
-
-        # 2. creating relationships fields
+        # 2. create relationships fields 
+        for field_name, field in type_def.relationship_fields.items():
+            node_type_fields[field_name] = self.create_node_type_search_field(
+                self.schema_defs.nodes[field.other_node_label]
+            )
 
         # 2.1. inidividual directions
+        # there is no bothe for this case, # TODO - may be add bothe if there relationship exits both ways  
         # direction relationship to node ex: "oute__related_to__Node"
         for field_name, relationship_field in type_def.directed_relationship_to_node("both").items():
             # target_label = relationship_directives[0].node_label # traverse towards label
             node_type_fields[field_name] = self.create_node_type_search_field(
                 self.schema_defs.nodes[relationship_field.other_node_label]
-                )
+            )
             
         
         # 2.2. relationships grouped by direction and edge label
@@ -147,6 +148,7 @@ class QueryGenerators:
             )
         )
         #  ex: "oute__related_to", 
+ 
         node_type_fields.update(
             self.create_relationship_fields_for_grouped_target_nodes(
                 type_def,
