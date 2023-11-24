@@ -58,10 +58,6 @@ class AriadneGraphQLSchemaGenerator:
 
 class AdriadneSchemUtils():
 
-    # def __init__(self, interim_schema) -> None:
-    #     self.interim_schema = interim_schema
-
-
     def get_type_of_field(self, field):
         if hasattr(field, 'of_type'):
             return self.get_type_of_field(field.of_type)
@@ -71,27 +67,16 @@ class AdriadneSchemUtils():
                 typing.Dict[str, typing.Union[RelationshipField, typing.Any]]:
         directives = field.ast_node.directives
         data = {}
-
         for directive in directives:
             datum = {}
             for argument in  directive.arguments:
-                # key =f"relationship_{argument.name.value}" if  argument.name.value  == "properties" else  argument.name.value
                 datum[ argument.name.value] =  argument.value.value
-            # datum['node_label'] = self.get_type_of_field(field.type).name
-            # datum['relationship_label'] = datum['label']
-            # del datum['label']
-            # if "direction" in datum:
-            #     datum['direction'] = datum['direction'].lower()
             data[directive.name.value] = datum
-        # datum['field_name'] = field_name
         return data
-    
 
     def get_type_defintion_str(self, type_: GraphQLObjectType):
         body = type_.ast_node.loc.source.body
         return body[type_.ast_node.loc.start: type_.ast_node.loc.end]  
-    
-
     
     def get_directives_on_type(self, type_: GraphQLObjectType):
         directives = type_.ast_node.directives
@@ -106,8 +91,7 @@ class AdriadneSchemUtils():
         if "relationshipProperties" in directives:
             return "relationship"
         return "node"
-
-
+    
     def get_type_defs(self, type_: GraphQLObjectType) -> NodeSchema:
         type_def_dict = {}
         type_def_dict['def_string'] = self.get_type_defintion_str(type_)
@@ -116,7 +100,6 @@ class AdriadneSchemUtils():
         type_def_dict['label'] = type_.name
         type_def_dict['data_fields'] = {}
         type_def_dict['relationship_fields'] = {}
-
         type_def_dict['schema'] = None
 
         # get if there are any relationshis in the fields
@@ -124,15 +107,14 @@ class AdriadneSchemUtils():
             # this will get the relationships 
             field_type = self.get_type_of_field(field.type)
             field_data = {
-                    "field_name": field_name,
-                    "directives": {}
+                "field_name": field_name,
+                "directives": {}
             }
-            # this will get the relationships 
             if field.ast_node.directives.__len__() > 0 :
                 field_data['directives'] = self.get_directives_on_field(field_name, field)
 
             if "relationship" in field_data['directives']:
-                # this is relationshipfiel 
+                # this is for relationship field 
                 relationship_data = field_data['directives']['relationship']
                 field_data.update({
                     "direction": relationship_data['direction'],
@@ -140,16 +122,14 @@ class AdriadneSchemUtils():
                     "other_node_label": field_type.name
                 })
                 type_def_dict['relationship_fields'][field_name] = RelationshipField(**field_data)
-
             else:
+                # this is for data field
                 field_data.update({
                     'field_type_str' : field_type.name,
                     'field_type' : field_type,
                     'directives' : {}
                 })
                 type_def_dict['data_fields'][field_name] = PropertyField(**field_data)
-
-
         return NodeSchema(**type_def_dict)
 
     def create_invana_schema(self,schema_str:str, interim_schema: GraphQLSchema) -> GraphSchema:
