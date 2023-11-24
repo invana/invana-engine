@@ -1,6 +1,6 @@
 import graphene
-from .gql_types import InvanaGQLFieldRelationshipDirective, InvanaGQLLabelDefinition, \
-    InvanaGQLLabelFieldDefinition, InvanaGQLSchema
+from .gql_types import RelationshipField, NodeSchema, \
+    PropertyField, GraphSchema
 from .exceptions import UnSupportedFieldDirective
 import typing
 from .resolvers import default_node_type_search_resolve_query, resolve_relationship_field_resolver,\
@@ -36,15 +36,15 @@ class CacheManager:
 
 class QueryGenerators:
  
-    def __init__(self, schema_defs: InvanaGQLSchema) -> None:
+    def __init__(self, schema_defs: GraphSchema) -> None:
         self.schema_defs = schema_defs
         self.schema_types_dict = {"nodes": {}, "relationships": {}}
  
-    def create_where_order_by(self, type_defs: typing.List[InvanaGQLLabelDefinition]):
+    def create_where_order_by(self, type_defs: typing.List[NodeSchema]):
         # create order by 
         order_by_fields = {}
         for type_def in type_defs:
-            for field_name, field in type_def.fields.items():
+            for field_name, field in type_def.data_fields.items():
                 order_by_fields[field_name] = OrderByEnum()
         return type(f"{''.join([type_def.label for type_def in type_defs])}OrderBy", (graphene.InputObjectType, ), order_by_fields)
     
@@ -53,7 +53,7 @@ class QueryGenerators:
             "id": graphene.String()
         })
 
-    def create_where_conditions(self, type_defs: typing.List[InvanaGQLLabelDefinition]):
+    def create_where_conditions(self, type_defs: typing.List[NodeSchema]):
         """
         """
         # create where 
@@ -69,40 +69,43 @@ class QueryGenerators:
         }
         # fields
         for type_def in type_defs:
-            for field_name, field in type_def.fields.items():
-                if list(field.directives.keys()).__len__() >  0:
-                    for directive_name, directive_data in field.directives.items():
-                        if directive_name == "relationship":
-                            cls = self.create_where_relationship_condition(
-                                    directive_data.node_label,
-                                    directive_data.direction,
-                                )
-                            where_condition_fields[f"{directive_data.relationship_label}__{directive_data.node_label}"] = cls()
-                elif field.field_type_str == "String":
+
+            for field_name, field in type_def.data_fields.items():
+                if field.field_type_str == "String":
                     where_condition_fields[field_name] = StringFilersExpressions()
                 elif field.field_type_str == "Int":
                     where_condition_fields[field_name] = IntFilersExpressions()
 
+            for field_name, field in type_def.relationship_fields.items():
+                # for directive_name, directive_data in field.directives.items():
+                #     if directive_name == "relationship":
+                cls = self.create_where_relationship_condition(
+                        field.other_node_label,
+                        field.direction,
+                    )
+                where_condition_fields[f"{field.relationship_label}__{field.other_node_label}"] = cls()
+
         # traversals 
         return type(f"{type_defs_label}WhereConditions",(graphene.InputObjectType,), where_condition_fields)
  
-    def create_property_field(self, field: InvanaGQLLabelFieldDefinition):
+    def create_property_field(self, field: PropertyField):
         field_str = field.field_type_str
         return getattr(graphene, field_str)()# TODO - add default etc kwargs from ariadne type object
  
     def create_relationship_fields_for_grouped_target_nodes(self, 
-                    type_def: InvanaGQLLabelDefinition,
-                    relationships_grouped: typing.Dict[str, typing.List[InvanaGQLFieldRelationshipDirective]]):
+                    type_def: NodeSchema,
+                    relationships_grouped: typing.Dict[str, typing.List[RelationshipField]]):
         node_type_fields = {}
-        for field_name, relationship_directives in relationships_grouped.items():
+ 
+        for field_name, relationship_fields in relationships_grouped.items():
             fields = {}
             # TODO - add edge properties
             target_label_type_defs = [] # relation going to which Node
-            for relationship_directive in relationship_directives:
-                if self.schema_defs.nodes[relationship_directive.node_label] not in target_label_type_defs:
-                    target_label_type_defs.append(self.schema_defs.nodes[relationship_directive.node_label])
-                fields[relationship_directive.node_label] = self.create_node_type_field_by_name(
-                    relationship_directive.node_label
+            for relationship_field in relationship_fields:
+                if self.schema_defs.nodes[relationship_field.other_node_label] not in target_label_type_defs:
+                    target_label_type_defs.append(self.schema_defs.nodes[relationship_field.other_node_label])
+                fields[relationship_field.other_node_label] = self.create_node_type_field_by_name(
+                    relationship_field.other_node_label
                 )
                 # TODO - add resolver if needed; fields[f'resolve_{relationship_directive.node_label}'] = resolve_relationship_field_resolver
             object_type = type(f"{type_def.label}{field_name}", (graphene.ObjectType, ), fields) 
@@ -111,13 +114,13 @@ class QueryGenerators:
         return node_type_fields
 
 
-    def create_node_data_type_fields(self, type_def: InvanaGQLLabelDefinition, extra_fields=None):
+    def create_node_data_type_fields(self, type_def: NodeSchema, extra_fields=None):
         # create node type
         node_type_fields = {}
-        data_fields = type_def.get_data_fields()
+        # data_fields = type_def.get_data_fields()
 
         # 1. create actual fields 
-        for field_name, field in data_fields.items():
+        for field_name, field in type_def.data_fields.items():
             node_type_fields['id'] = graphene.ID()
             node_type_fields['label'] = graphene.String(default_value=type_def.label)
             node_type_fields[field_name] = self.create_property_field(field)
@@ -128,9 +131,11 @@ class QueryGenerators:
 
         # 2.1. inidividual directions
         # direction relationship to node ex: "oute__related_to__Node"
-        for field_name, relationship_directives in type_def.directed_relationship_to_node("both").items():
-            target_label = relationship_directives[0].node_label # traverse towards label
-            node_type_fields[field_name] = self.create_node_type_search_field(self.schema_defs.nodes[target_label])
+        for field_name, relationship_field in type_def.directed_relationship_to_node("both").items():
+            # target_label = relationship_directives[0].node_label # traverse towards label
+            node_type_fields[field_name] = self.create_node_type_search_field(
+                self.schema_defs.nodes[relationship_field.other_node_label]
+                )
             
         
         # 2.2. relationships grouped by direction and edge label
@@ -185,11 +190,11 @@ class QueryGenerators:
             node_type_fields.update(extra_fields)
         return node_type_fields
 
-    def create_node_data_type(self, type_def: InvanaGQLLabelDefinition, extra_fields=None):
+    def create_node_data_type(self, type_def: NodeSchema, extra_fields=None):
         node_type_fields = self.create_node_data_type_fields(type_def, extra_fields=extra_fields)
         return  type(type_def.label, (graphene.ObjectType, ), node_type_fields)
 
-    def create_node_type_args(self, type_defs: typing.List[InvanaGQLLabelDefinition] ):
+    def create_node_type_args(self, type_defs: typing.List[NodeSchema] ):
         return {
             "limit" : graphene.Argument(graphene.Int, description="limits the result count"),
             "offset" : graphene.Argument(graphene.Int, description="skips x results"),
@@ -199,7 +204,7 @@ class QueryGenerators:
             "where": graphene.Argument(self.create_where_conditions(type_defs))
         }
     
-    def create_node_type_search_field(self, type_def: InvanaGQLLabelDefinition, extra_args=None ):
+    def create_node_type_search_field(self, type_def: NodeSchema, extra_args=None ):
         NodeDataType = self.create_node_data_type(type_def)
         args =  self.create_node_type_args([type_def])
         if extra_args:
@@ -211,7 +216,7 @@ class QueryGenerators:
         return  self.create_node_type_search_field( self.schema_defs.nodes[node_name], extra_args=extra_args)
  
     def create_node_type_search_field_with_resolver(self, 
-                        type_def: InvanaGQLLabelDefinition,
+                        type_def: NodeSchema,
                         extra_args=None) -> typing.Dict[str, typing.Union[graphene.Field, typing.Callable]]:
         # extra_fields = {} if extra_fields is None else extra_fields
         fields = {}
@@ -220,7 +225,7 @@ class QueryGenerators:
         # node_fields[f'{type_def.label}_by_id'] = self.create_node_type_search_by_id_field(type_def, extra_args=extra_args)
         return fields
         
-    def create_node_type_search_by_id_field(self, type_def: InvanaGQLLabelDefinition, extra_args=None ):
+    def create_node_type_search_by_id_field(self, type_def: NodeSchema, extra_args=None ):
         NodeDataType = self.create_node_data_type(type_def)
         args =  {
             'id':  graphene.Argument(graphene.ID, description="id of the node/relationship"),
@@ -230,7 +235,7 @@ class QueryGenerators:
         return graphene.Field(NodeDataType, args=args, description=f"Search {type_def.label} by id ")
     
     def create_node_type_search_by_id_field_with_resolver(self, 
-                        type_def: InvanaGQLLabelDefinition,
+                        type_def: NodeSchema,
                         extra_args=None) -> typing.Dict[str, typing.Union[graphene.Field, typing.Callable]]:
         extra_args = {} if extra_args is None else extra_args
  
@@ -253,7 +258,7 @@ class QueryGenerators:
         return node_fields
 
     def generate(self):
-        #  type_def: InvanaGQLLabelDefinition,
+        #  type_def: NodeSchema,
         query_classes = []
 
         for type_name, type_def in self.schema_defs.nodes.items():

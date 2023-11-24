@@ -10,65 +10,100 @@ class InvanaGQLDirections:
 
 
 # GraphDirections = "out" | "in" | "both"
+@dataclass
+class RelationshipPath:
+    label: str
+    source_node_label : str # lambda: NodeLabelType
+    target_node_label : str # lambda: NodeLabelType
+
 
 @dataclass(frozen=True)
-class InvanaGQLFieldRelationshipDirective:
-    node_label: str # return data Node
+class RelationshipField:
     field_name: str # field on which this directive is added 
-    relationship_label: str # relationship label
     direction: InvanaGQLDirections
-    properties: str # relationship properties
+    other_node_label: str
+    relationship_label: str
+    directives: typing.Dict[str,   typing.Dict]
+
+    def has_relationship_name(self, rel_name) -> str:
+        return self.directives['relationship'].properties == rel_name
+    
+    def get_relationship_data(self) -> 'RelationshipField':
+        return self.directives['relationship']
+    
+    @property
+    def path(self) -> RelationshipPath:
+        return RelationshipPath(
+            label= self.relationship_label,
+            source_node_label=None, 
+            target_node_label=None
+        )
+        # path : RelationshipPath
+    # relationship_label: str # relationship label
+    # properties: str # relationship properties
+    # node_label: str # return data Node
 
     # def __repr__(self) -> str:
     #     return f"<RelationshipDirective "
 
 @dataclass
-class InvanaGQLLabelFieldDefinition:
+class PropertyField:
+    field_name: str
     field_type_str: str
     field_type: typing.Any
-    directives: typing.Dict[str, typing.Union[InvanaGQLFieldRelationshipDirective, typing.Any]]
+    directives: typing.Dict[str,  typing.Dict]
 
-    def is_relationship_field(self) -> bool:
-        if "relationship" in self.directives:
-            return True
-        return False
-    
-    def has_relationship_name(self, rel_name) -> str:
-        return self.directives['relationship'].properties == rel_name
-    
-    def get_relationship_data(self) -> InvanaGQLFieldRelationshipDirective:
-        return self.directives['relationship']
-    
-    def is_data_field(self)-> bool:
-        return not self.is_relationship_field()
-    
+    # def is_relationship_field(self) -> bool:
+    #     if "relationship" in self.directives:
+    #         return True
+    #     return False
 
+    # def is_data_field(self)-> bool:
+    #     return not self.is_relationship_field()
+
+@dataclass
+class InvanaGQLRelationshipDefinition:
+    label: str
+    fields : typing.Dict[str, PropertyField]
+    def_string : str
+    schema: 'GraphSchema' # this is the entire schema data; just incase needed
+
+
+    
 @dataclass(frozen=False)
-class InvanaGQLLabelDefinition:
+class NodeSchema:
     label: str
     label_type: str
-    fields: typing.Dict[str, InvanaGQLLabelFieldDefinition]
+    data_fields: typing.Dict[str, PropertyField]
+    relationship_fields : typing.Dict[str, RelationshipField]
     def_string : str
     type: GraphQLObjectType
-    schema: 'InvanaGQLSchema'
+    schema: 'GraphSchema' # this is the entire schema data; just incase needed
 
-    def get_data_fields(self)-> typing.Dict[str, InvanaGQLLabelFieldDefinition]:
-        return {field_name: field for field_name, field in self.fields.items() if field.is_data_field()}
+    # def get_data_fields(self)-> typing.Dict[str, PropertyField]:
+    #     # return {field_name: field for field_name, field in self.data_fields.items()}
+    #     return self.data_fields
+    
+    @property
+    def all_fields(self):
+        return {**self.data_fields, **self.relationship_fields}
+
     
     def get_inv_and_outv_fields(self):
         if self.label_type == "node":
             raise Exception("only label_type='relationship' will have inv and outv fields ")
         
 
-    def get_relationship_fields(self)-> typing.Dict[str, InvanaGQLLabelFieldDefinition]:
+    def get_relationship_fields(self)-> typing.Dict[str, RelationshipField]:
         """all the fields that has relationship directives
 
         Returns:
-            typing.Dict[str, InvanaGQLLabelFieldDefinition]: _description_
+            typing.Dict[str, PropertyField]: _description_
         """
 
         if self.label_type == "node":
-            return {field_name: field for field_name, field in self.fields.items() if field.is_relationship_field()}
+            return self.relationship_fields
+            # return {field_name: field for field_name, field in self.fields.items() if field.is_relationship_field()}
         return self.get_relationship_fields_reciprocal()
 
     def get_relationship_fields_reciprocal(self):
@@ -80,27 +115,6 @@ class InvanaGQLLabelDefinition:
         for field_name, field in related_node_labels.items():
             # TODO - fix the directions and the field names 
             pass
-            # for directive in directives:
-            #     datum = {}
-            #     datum['field_name'] = field_name
-            #     for argument in  directive.arguments:
-            #         # key =f"relationship_{argument.name.value}" if  argument.name.value  == "properties" else  argument.name.value
-            #         datum[ argument.name.value] =  argument.value.value
-            #     datum['node_label'] = self.get_type_of_field(field.type).name
-            #     datum['relationship_label'] = datum['label']
-            #     del datum['label']
-            #     if "direction" in datum:
-            #         datum['direction'] = datum['direction'].lower()
-            #     data[directive.name.value] = InvanaGQLFieldRelationshipDirective(**datum)
-            # field_data = {
-            #     'field_type_str' : field_type.name,
-            #     'field_type' : field_type,
-            #     'directives' : {}
-            # }
-            # # this will get the relationships 
-            # if field.ast_node.directives.__len__() > 0 :
-            #     field_data['directives'] = self.get_directives_on_field(field_name, field)
-            # return InvanaGQLLabelFieldDefinition(**field_data)
         return related_node_labels
 
     def get_relationships_by_label(self, rel_label) -> bool:
@@ -114,9 +128,9 @@ class InvanaGQLLabelDefinition:
             bool: _description_
         """
         related_fields = {}
-        for field_name, field in self.fields.items():
-            if field.is_relationship_field() and field.has_relationship_name(rel_label):
-                related_fields[field_name] = field
+        for field_name, field in self.relationship_fields.items():
+            # if field.has_relationship_name(rel_label):
+            related_fields[field_name] = field
         return related_fields
             
     def get_related_nodes_by_relationship(self, rel_label: str):
@@ -137,17 +151,11 @@ class InvanaGQLLabelDefinition:
         Args:
             direction (str): _description_
         """
-
-        # if self.label_type == "node":
         relationship_fields = self.get_relationship_fields()
-        # else:
-        #     relationship_fields = self.get_relationship_fields_reciprocal()
-        #     print("===")
-
         if direction in ["in", "out"]:
-            return  [field.get_relationship_data() for _, field in relationship_fields.items() \
-                    if field.get_relationship_data().direction == direction]
-        return [field.get_relationship_data() for _, field in relationship_fields.items()]
+            return  [field for _, field in relationship_fields.items() \
+                    if field.direction == direction]
+        return [field for _, field in relationship_fields.items()]
 
     def directed_relationship_to_node(self, direction):
         """
@@ -163,10 +171,10 @@ class InvanaGQLLabelDefinition:
         field_relationships = self.get_relationship_fields_by_direction(direction)
             
         fields_dict = {}
-        for relationship in field_relationships:
+        for relationship_field in field_relationships:
             # 2. inividual relationship label
-            key = f"_{relationship.direction}e__{relationship.relationship_label}__{relationship.node_label}"
-            fields_dict[key] = [relationship]
+            key = f"_{relationship_field.direction.lower()}e__{relationship_field.relationship_label}__{relationship_field.other_node_label}"
+            fields_dict[key] = relationship_field
         return fields_dict
          
 
@@ -197,18 +205,18 @@ class InvanaGQLLabelDefinition:
             direction (_type_): out, in, both
         """
         fields_dict = self.directed_relationships_grouped_by_edge_label(direction)
-
         all_types = [] 
         for field_name, field  in fields_dict.items():
             all_types.extend(field) 
-        all_types=  list(set(all_types))
+        # all_types=  list(set(all_types))
         if all_types.__len__() > 0:
-            fields_dict[f"_{direction}e"] =all_types
+            fields_dict[f"_{direction}e"] = all_types
         return fields_dict
          
 
 @dataclass
-class InvanaGQLSchema:
-    nodes : typing.Dict[str, InvanaGQLLabelDefinition]
-    relationships : typing.Dict[str, InvanaGQLLabelDefinition]
+class GraphSchema:
+    nodes : typing.Dict[str, NodeSchema]
+    relationships : typing.Dict[str, NodeSchema]
     schema_definition_str: str # graphql schema string representation
+    

@@ -1,7 +1,7 @@
 import typing
 import graphene
 from .generators.resolvers import resolve_graph_schema
-from .generators.gql_types import InvanaGQLSchema
+from .generators.gql_types import GraphSchema
 from importlib import import_module
 
 PropertyCardinalityEnum = type( "PropertyCardinalityEnum",  (graphene.Enum,), {
@@ -32,15 +32,11 @@ class DataPropertyField(graphene.ObjectType):
     default_value =  graphene.String()
     description = graphene.String()
 
-
-
 class RelationshipPath(graphene.ObjectType):
     relationship_label = graphene.String()
     source_node = graphene.Field(lambda: NodeLabelSchema)
     # target_node_label = graphene.Field(getattr(import_module(__name__), 'NodeLabelSchema'))
     target_node = graphene.Field(lambda: NodeLabelSchema)
-
-
 
 class NodeLabelSchema(graphene.ObjectType):
     label =  graphene.Field(graphene.String)
@@ -100,4 +96,4 @@ class GraphSchemeQuery(graphene.ObjectType):
 # class Schema:
 #     node_aggregates : typing.Dict[str, NodeSchemaAggregate]
 #     relationship_aggregates : typing.Dict[str, RelSchemaAggregate]
-#     gql_schema: InvanaGQLSchema
+#     gql_schema: GraphSchema

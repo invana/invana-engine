@@ -116,7 +116,7 @@ def create_app():
             last_name: String
             screen_name: String
             movies: [Movie!]! @relationship(label: "ACTED_IN", direction: OUT, properties: "ActedIn")
-            likess: [Movie!]! @relationship(label: "HAS_LIKED", direction: OUT, properties: "Liked")
+            likess: [Movie!]! @relationship(label: "HAS_LIKED", direction: IN, properties: "Liked")
         }
 
         type ActedIn @relationshipProperties {
@@ -124,7 +124,7 @@ def create_app():
         }
 
         type Liked @relationshipProperties {
-            date: [String]
+            date: Date
         }
 
 """
