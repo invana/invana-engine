@@ -73,7 +73,7 @@ class InvanaGQLRelationshipDefinition:
 @dataclass(frozen=False)
 class NodeSchema:
     label: str
-    label_type: str
+    # label_type: str
     data_fields: typing.Dict[str, PropertyField]
     relationship_fields : typing.Dict[str, RelationshipField]
     def_string : str
@@ -101,21 +101,20 @@ class NodeSchema:
             typing.Dict[str, PropertyField]: _description_
         """
 
-        if self.label_type == "node":
-            return self.relationship_fields
-            # return {field_name: field for field_name, field in self.fields.items() if field.is_relationship_field()}
-        return self.get_relationship_fields_reciprocal()
+        return self.relationship_fields
+        # return {field_name: field for field_name, field in self.fields.items() if field.is_relationship_field()}
+        # return self.get_relationship_fields_reciprocal()
 
-    def get_relationship_fields_reciprocal(self):
-        """
-        This is used by relationship label_type to get the reciprocal relationships
-        """
+    # def get_relationship_fields_reciprocal(self):
+    #     """
+    #     This is used by relationship label_type to get the reciprocal relationships
+    #     """
 
-        related_node_labels = self.get_related_nodes_by_relationship(self.label)
-        for field_name, field in related_node_labels.items():
-            # TODO - fix the directions and the field names 
-            pass
-        return related_node_labels
+    #     related_node_labels = self.get_related_nodes_by_relationship(self.label)
+    #     for field_name, field in related_node_labels.items():
+    #         # TODO - fix the directions and the field names 
+    #         pass
+    #     return related_node_labels
 
     def get_relationships_by_label(self, rel_label) -> bool:
         """
@@ -193,6 +192,7 @@ class NodeSchema:
                 fields_dict[key].append(field_relationship)
             else:
                 fields_dict[key] = [field_relationship]
+
         return fields_dict
     
 
@@ -219,4 +219,3 @@ class GraphSchema:
     nodes : typing.Dict[str, NodeSchema]
     relationships : typing.Dict[str, NodeSchema]
     schema_definition_str: str # graphql schema string representation
-    

@@ -96,7 +96,7 @@ class AdriadneSchemUtils():
         type_def_dict = {}
         type_def_dict['def_string'] = self.get_type_defintion_str(type_)
         type_def_dict['type'] = type_
-        type_def_dict['label_type'] = self.get_element_type(type_)
+        # type_def_dict['label_type'] = self.get_element_type(type_)
         type_def_dict['label'] = type_.name
         type_def_dict['data_fields'] = {}
         type_def_dict['relationship_fields'] = {}
@@ -143,11 +143,7 @@ class AdriadneSchemUtils():
         # create chema instance 
         schema :GraphSchema  = {"nodes": {},"relationships": {}, "schema_definition_str": schema_str}
         for label, label_def in schema_items_dict.items():
-            if label_def.label_type == "relationship":
-                # TODO - 
-                schema['relationships'][label] = label_def
-            else:
-                schema['nodes'][label] = label_def
+            schema['nodes'][label] = label_def
         schema_instance =  GraphSchema(**schema)
 
         # attache schema to all the labelDefinitions
