@@ -1,21 +1,18 @@
 from dataclasses import dataclass
 import typing
 from graphql import GraphQLObjectType
-import graphene
+
 
 class InvanaGQLDirections:
     OUT = "out"
     IN = "in"
     BOTH =  "both"    
 
-
-# GraphDirections = "out" | "in" | "both"
 @dataclass
 class RelationshipPath:
     label: str
     source_node_label : str # lambda: NodeLabelType
     target_node_label : str # lambda: NodeLabelType
-
 
 @dataclass(frozen=True)
 class RelationshipField:
@@ -38,37 +35,14 @@ class RelationshipField:
             source_node_label=None, 
             target_node_label=None
         )
-        # path : RelationshipPath
-    # relationship_label: str # relationship label
-    # properties: str # relationship properties
-    # node_label: str # return data Node
-
-    # def __repr__(self) -> str:
-    #     return f"<RelationshipDirective "
-
+ 
 @dataclass
 class PropertyField:
     field_name: str
     field_type_str: str
     field_type: typing.Any
     directives: typing.Dict[str,  typing.Dict]
-
-    # def is_relationship_field(self) -> bool:
-    #     if "relationship" in self.directives:
-    #         return True
-    #     return False
-
-    # def is_data_field(self)-> bool:
-    #     return not self.is_relationship_field()
-
-# @dataclass
-# class InvanaGQLRelationshipDefinition:
-#     label: str
-#     fields : typing.Dict[str, PropertyField]
-#     def_string : str
-#     schema: 'GraphSchema' # this is the entire schema data; just incase needed
-
-
+ 
 
 @dataclass(frozen=False)
 class RelationshipSchema:
@@ -95,12 +69,10 @@ class NodeSchema:
     def all_fields(self):
         return {**self.data_fields, **self.relationship_fields}
 
-    
     def get_inv_and_outv_fields(self):
         if self.label_type == "node":
             raise Exception("only label_type='relationship' will have inv and outv fields ")
         
-
     def get_relationship_fields(self)-> typing.Dict[str, RelationshipField]:
         """all the fields that has relationship directives
 
