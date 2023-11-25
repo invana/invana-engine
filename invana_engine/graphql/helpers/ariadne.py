@@ -8,7 +8,10 @@ from graphql.type.schema import GraphQLSchema
 from ..generators.gql_types import RelationshipField, NodeSchema,\
       PropertyField, GraphSchema, RelationshipSchema
 
-class AriadneGraphQLSchemaGenerator:
+class AriadneInterimSchemaGenerator:
+    """
+    Used to generate temporary graphql instance from user graphql definition
+    """
 
  
     type_def_base = """
@@ -56,7 +59,10 @@ class AriadneGraphQLSchemaGenerator:
         return make_executable_schema(type_def, self.query, self.mutation, self.subscription, *type_defs)
 
 
-class AdriadneSchemUtils():
+class GraphSchemaTypesGeneratorUtil():
+    """
+    take interim schema as input and outputs  `..generators.gql_types.GraphSchema`
+    """
 
     def get_type_of_field(self, field):
         if hasattr(field, 'of_type'):

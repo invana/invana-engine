@@ -1,5 +1,5 @@
 import graphene
-from ..helpers.ariadne import AriadneGraphQLSchemaGenerator, AdriadneSchemUtils
+from ..helpers.ariadne import AriadneInterimSchemaGenerator, GraphSchemaTypesGeneratorUtil
 from .queries import QueryGenerators
 from ..queries.client import BasicInfoType
 from ..queries.hello import HelloType
@@ -44,8 +44,8 @@ class SchemaGenerator:
 
     def __init__(self, schema_str: str) -> None:
         self.schema_str = schema_str
-        self.interim_schema = AriadneGraphQLSchemaGenerator().create_interim_schema(schema_str)
-        self.schema_defs = AdriadneSchemUtils().create_invana_schema(schema_str, self.interim_schema)
+        self.interim_schema = AriadneInterimSchemaGenerator().create_interim_schema(schema_str)
+        self.schema_defs = GraphSchemaTypesGeneratorUtil().create_invana_schema(schema_str, self.interim_schema)
     
     def generate_query_types(self, *type_def_classes):
         return type("Query", (
