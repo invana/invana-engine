@@ -2,7 +2,7 @@ from graphql import GraphQLObjectType , GraphQLField, GraphQLInterfaceType
 import typing
 from dataclasses import dataclass
 from graphql.type.schema import GraphQLSchema
-from ..generators.gql_types import RelationshipField, NodeSchema,\
+from ..generators.dataclasses import RelationshipField, NodeSchema,\
       PropertyField, GraphSchema, RelationshipSchema
 
 

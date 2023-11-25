@@ -1,7 +1,7 @@
 import typing
 import graphene
 from .generators.resolvers import resolve_graph_schema
-from .generators.gql_types import GraphSchema
+from .generators.dataclasses import GraphSchema
 from importlib import import_module
 
 PropertyCardinalityEnum = type( "PropertyCardinalityEnum",  (graphene.Enum,), {

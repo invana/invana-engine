@@ -1,5 +1,5 @@
 import graphene
-from .gql_types import RelationshipField, NodeSchema, \
+from .dataclasses import RelationshipField, NodeSchema, \
     PropertyField, GraphSchema
 from .exceptions import UnSupportedFieldDirective
 import typing
@@ -31,7 +31,6 @@ class CacheManager:
     def __init__(self) -> None:
         self.node_types = {}
         self.rel_types = {}
-
 
 
 class QueryGenerators:
