@@ -14,6 +14,15 @@ class FieldCardinality:
     SET = "SET"
     LIST = "LIST"
 
+
+class RelationshipMultiplicity:
+    SIMPLE = "SIMPLE"
+    MULTI = "MULTI"
+    MANY2ONE = "MANY2ONE"
+    ONE2MANY = "ONE2MANY"
+    ONE2ONE = "ONE2ONE"
+
+
 @dataclass
 class RelationshipPath:
     label: str
@@ -51,7 +60,6 @@ class RelationshipField:
             kwargs['target_node_label'] =self.other_node_label 
         else:
             raise Exception("direction cannot be out")
-        
         return RelationshipPath(**kwargs)
  
     def to_json(self):
@@ -81,13 +89,23 @@ class RelationshipSchema:
     def_string : str # gql definition strin
     type: GraphQLObjectType
     schema: 'GraphSchema' # this is the entire schema data; just incase needed
+    multiplicity: str = RelationshipMultiplicity.MULTI
 
     @property
     def paths(self) -> typing.List[RelationshipPath]:
-        return [] # TODO - 
+        paths = []
+        for node in self.schema.nodes:
+            paths.extend(node.relationship_paths)
+        return paths
 
     def to_json(self):
-        return {k: str(v) for k, v in asdict(self).items()}
+        return {
+            "label": self.label,
+            "properties": [ field.to_json() for k, field in self.data_fields.items()],
+            "multiplicity": self.multiplicity,
+            "relationship_paths": self.paths
+        }
+        # return {k: str(v) for k, v in asdict(self).items()}
 
 @dataclass(frozen=False)
 class NodeSchema:
@@ -239,7 +257,7 @@ class GraphSchema:
     def to_json(self):
         return {
             "nodes": [node.to_json() for node in self.nodes],
-            "relationships": [],
+            "relationships": [relationship.to_json() for relationship in self.relationships],
             "schema_definition_str": self.schema_definition_str
         }
         # return {k: str(v) for k, v in asdict(self).items()}
