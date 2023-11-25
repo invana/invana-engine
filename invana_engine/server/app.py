@@ -126,11 +126,11 @@ def create_app():
             likess: [Movie!]! @relationship(label: "HAS_LIKED", direction: IN, properties: "Liked")
         }
 
-        type ActedIn @relationshipProperties {
+        interface ActedIn @relationshipProperties {
             roles: [String]
         }
 
-        type Liked @relationshipProperties {
+        interface Liked @relationshipProperties {
             date: Date
         }
 

@@ -69,7 +69,18 @@ class PropertyField:
 #     schema: 'GraphSchema' # this is the entire schema data; just incase needed
 
 
-    
+
+@dataclass(frozen=False)
+class RelationshipSchema:
+    label: str
+    data_fields: typing.Dict[str, PropertyField]
+    def_string : str # gql definition strin
+    type: GraphQLObjectType
+    schema: 'GraphSchema' # this is the entire schema data; just incase needed
+
+    def paths(self) -> typing.List[RelationshipPath]:
+        return []
+
 @dataclass(frozen=False)
 class NodeSchema:
     label: str
@@ -80,10 +91,6 @@ class NodeSchema:
     type: GraphQLObjectType
     schema: 'GraphSchema' # this is the entire schema data; just incase needed
 
-    # def get_data_fields(self)-> typing.Dict[str, PropertyField]:
-    #     # return {field_name: field for field_name, field in self.data_fields.items()}
-    #     return self.data_fields
-    
     @property
     def all_fields(self):
         return {**self.data_fields, **self.relationship_fields}
@@ -100,22 +107,8 @@ class NodeSchema:
         Returns:
             typing.Dict[str, PropertyField]: _description_
         """
-
         return self.relationship_fields
-        # return {field_name: field for field_name, field in self.fields.items() if field.is_relationship_field()}
-        # return self.get_relationship_fields_reciprocal()
-
-    # def get_relationship_fields_reciprocal(self):
-    #     """
-    #     This is used by relationship label_type to get the reciprocal relationships
-    #     """
-
-    #     related_node_labels = self.get_related_nodes_by_relationship(self.label)
-    #     for field_name, field in related_node_labels.items():
-    #         # TODO - fix the directions and the field names 
-    #         pass
-    #     return related_node_labels
-
+ 
     def get_relationships_by_label(self, rel_label) -> bool:
         """
         Checks if the current node label has relationship to 

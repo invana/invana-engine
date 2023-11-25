@@ -6,7 +6,7 @@ import typing
 from dataclasses import dataclass
 from graphql.type.schema import GraphQLSchema
 from ..generators.gql_types import RelationshipField, NodeSchema,\
-      PropertyField, GraphSchema
+      PropertyField, GraphSchema, RelationshipSchema
 
 class AriadneGraphQLSchemaGenerator:
 
@@ -74,10 +74,6 @@ class AdriadneSchemUtils():
             data[directive.name.value] = datum
         return data
 
-    def get_type_defintion_str(self, type_: GraphQLObjectType):
-        body = type_.ast_node.loc.source.body
-        return body[type_.ast_node.loc.start: type_.ast_node.loc.end]  
-    
     def get_directives_on_type(self, type_: GraphQLObjectType):
         directives = type_.ast_node.directives
         data = {}
@@ -86,17 +82,22 @@ class AdriadneSchemUtils():
             data[directive.name.value] = True #TODO - fix this later for directives with values
         return data
     
+    def get_type_defintion_str(self, type_: GraphQLObjectType):
+        body = type_.ast_node.loc.source.body
+        return body[type_.ast_node.loc.start: type_.ast_node.loc.end]  
+    
     def get_element_type(self, type_: GraphQLObjectType):
         directives =  self.get_directives_on_type(type_)
         if "relationshipProperties" in directives:
             return "relationship"
         return "node"
     
-    def get_type_defs(self, type_: GraphQLObjectType) -> NodeSchema:
+    def get_type_defs(self, type_: GraphQLObjectType) -> typing.Union[NodeSchema, RelationshipSchema]:
+        
+        label_type = self.get_element_type(type_)
         type_def_dict = {}
         type_def_dict['def_string'] = self.get_type_defintion_str(type_)
         type_def_dict['type'] = type_
-        # type_def_dict['label_type'] = self.get_element_type(type_)
         type_def_dict['label'] = type_.name
         type_def_dict['data_fields'] = {}
         type_def_dict['relationship_fields'] = {}
@@ -130,7 +131,10 @@ class AdriadneSchemUtils():
                     'directives' : {}
                 })
                 type_def_dict['data_fields'][field_name] = PropertyField(**field_data)
-        return NodeSchema(**type_def_dict)
+
+        if label_type == "relationship":
+            del type_def_dict['relationship_fields']
+        return NodeSchema(**type_def_dict) if label_type == "node" else RelationshipSchema(**type_def_dict)
 
     def create_invana_schema(self,schema_str:str, interim_schema: GraphQLSchema) -> GraphSchema:
         schema_items_dict = {} 
@@ -143,7 +147,10 @@ class AdriadneSchemUtils():
         # create chema instance 
         schema :GraphSchema  = {"nodes": {},"relationships": {}, "schema_definition_str": schema_str}
         for label, label_def in schema_items_dict.items():
-            schema['nodes'][label] = label_def
+            if isinstance(label_def, NodeSchema):
+                schema['nodes'][label] = label_def
+            elif isinstance(label_def, RelationshipSchema):
+                schema['relationships'][label] = label_def
         schema_instance =  GraphSchema(**schema)
 
         # attache schema to all the labelDefinitions
