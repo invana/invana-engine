@@ -73,7 +73,8 @@ class GraphSchemaTypesGeneratorUtil():
                 field_data.update({
                     "direction": relationship_data['direction'],
                     "relationship_label": relationship_data['label'],
-                    "other_node_label": field_type.name
+                    "other_node_label": field_type.name,
+                    "this_nodel_label": type_.name
                 })
                 type_def_dict['relationship_fields'][field_name] = RelationshipField(**field_data)
             else:
@@ -98,18 +99,18 @@ class GraphSchemaTypesGeneratorUtil():
                 schema_items_dict[type_name] = self.get_type_defs(type_)
 
         # create chema instance 
-        schema :GraphSchema  = {"nodes": {},"relationships": {}, "schema_definition_str": schema_str}
+        schema :GraphSchema  = {"nodes": [],"relationships": [], "schema_definition_str": schema_str}
         for label, label_def in schema_items_dict.items():
             if isinstance(label_def, NodeSchema):
-                schema['nodes'][label] = label_def
+                schema['nodes'].append(label_def)
             elif isinstance(label_def, RelationshipSchema):
-                schema['relationships'][label] = label_def
+                schema['relationships'].append(label_def)
         schema_instance =  GraphSchema(**schema)
 
         # attache schema to all the labelDefinitions
-        for label, label_def in schema_instance.relationships.items():
+        for label_def in schema_instance.relationships:
             setattr(label_def, 'schema', schema_instance)
-        for label, label_def in schema_instance.nodes.items():
+        for label_def in schema_instance.nodes:
             setattr(label_def, 'schema', schema_instance)
 
         return schema_instance

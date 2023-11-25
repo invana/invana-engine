@@ -1,12 +1,18 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 import typing
 from graphql import GraphQLObjectType
 
 
 class RelationshipDirections:
-    OUT = "out"
-    IN = "in"
-    BOTH =  "both"    
+    OUT = "OUT"
+    IN = "IN"
+    BOTH =  "BOTH"    
+
+
+class FieldCardinality:
+    SINGLE = "SINGLE"
+    SET = "SET"
+    LIST = "LIST"
 
 @dataclass
 class RelationshipPath:
@@ -14,35 +20,59 @@ class RelationshipPath:
     source_node_label : str # lambda: NodeLabelType
     target_node_label : str # lambda: NodeLabelType
 
+    def to_json(self):
+        return {k: str(v) for k, v in asdict(self).items()}
+
 @dataclass(frozen=True)
 class RelationshipField:
     field_name: str # field on which this directive is added 
     direction: RelationshipDirections
     other_node_label: str
+    this_nodel_label: str
     relationship_label: str
     directives: typing.Dict[str,   typing.Dict]
 
-    def has_relationship_name(self, rel_name) -> str:
-        return self.directives['relationship'].properties == rel_name
+    # def has_relationship_name(self, rel_name) -> str:
+    #     return self.directives['relationship'].properties == rel_name
     
     def get_relationship_data(self) -> 'RelationshipField':
         return self.directives['relationship']
     
     @property
     def path(self) -> RelationshipPath:
-        return RelationshipPath(
-            label= self.relationship_label,
-            source_node_label=None, 
-            target_node_label=None
-        )
+        kwargs = {
+            "label": self.relationship_label
+        }
+        if self.direction == RelationshipDirections.IN:
+            kwargs['source_node_label'] = self.other_node_label
+            kwargs['target_node_label'] = self.this_nodel_label
+        elif self.direction == RelationshipDirections.OUT:
+            kwargs['source_node_label'] =  self.this_nodel_label
+            kwargs['target_node_label'] =self.other_node_label 
+        else:
+            raise Exception("direction cannot be out")
+        
+        return RelationshipPath(**kwargs)
  
+    def to_json(self):
+        return {k: str(v) for k, v in asdict(self).items()}
+
 @dataclass
 class PropertyField:
     field_name: str
     field_type_str: str
     field_type: typing.Any
     directives: typing.Dict[str,  typing.Dict]
- 
+    cardinality: FieldCardinality = FieldCardinality.SINGLE
+
+    def to_json(self):
+        return {
+            "name": self.field_name,
+            "data_type": self.field_type_str,
+            "cardinality": self.cardinality
+        }
+        # return {k: str(v) for k, v in asdict(self).items()}
+
 
 @dataclass(frozen=False)
 class RelationshipSchema:
@@ -52,18 +82,41 @@ class RelationshipSchema:
     type: GraphQLObjectType
     schema: 'GraphSchema' # this is the entire schema data; just incase needed
 
+    @property
     def paths(self) -> typing.List[RelationshipPath]:
-        return []
+        return [] # TODO - 
+
+    def to_json(self):
+        return {k: str(v) for k, v in asdict(self).items()}
 
 @dataclass(frozen=False)
 class NodeSchema:
     label: str
-    # label_type: str
     data_fields: typing.Dict[str, PropertyField]
     relationship_fields : typing.Dict[str, RelationshipField]
     def_string : str
     type: GraphQLObjectType
     schema: 'GraphSchema' # this is the entire schema data; just incase needed
+
+    def to_json(self, ):
+        return {
+            "label": self.label,
+            "properties": [ field.to_json() for k, field in self.data_fields.items()],
+            "property_keys": self.property_keys,
+            "relationship_paths": self.relationship_paths
+        }
+    
+    @property
+    def relationship_paths(self):
+        return [field.path.to_json() for field_name, field in self.relationship_fields.items()]
+        # for path in paths:
+        #     path['source_node'] = self.schema.get_node_schema(path['source_node_label']).to_json(),
+        #     path['target_node'] = self.schema.get_node_schema(path['target_node_label']).to_json(),
+        # return paths
+    
+    @property
+    def property_keys(self):
+        return [ field.field_name for field_name, field in self.data_fields.items()]
 
     @property
     def all_fields(self):
@@ -116,7 +169,7 @@ class NodeSchema:
             direction (str): _description_
         """
         relationship_fields = self.get_relationship_fields()
-        if direction.lower() in ["in", "out"]:
+        if direction  in ["IN", "OUT"]:
             return  [field for _, field in relationship_fields.items() \
                     if field.direction.lower() == direction]
         return [field for _, field in relationship_fields.items()]
@@ -140,7 +193,6 @@ class NodeSchema:
             fields_dict[key] = relationship_field
         return fields_dict
          
-
     def directed_relationships_grouped_by_edge_label(self, direction):
         """
         Create relationships grouped by relationship label. ex: "_oute__ACTED_IN"
@@ -180,6 +232,20 @@ class NodeSchema:
 
 @dataclass
 class GraphSchema:
-    nodes : typing.Dict[str, NodeSchema]
-    relationships : typing.Dict[str, NodeSchema]
+    nodes : typing.List[NodeSchema]
+    relationships : typing.List[NodeSchema]
     schema_definition_str: str # graphql schema string representation
+
+    def to_json(self):
+        return {
+            "nodes": [node.to_json() for node in self.nodes],
+            "relationships": [],
+            "schema_definition_str": self.schema_definition_str
+        }
+        # return {k: str(v) for k, v in asdict(self).items()}
+
+    def get_node_schema(self, label) -> NodeSchema:
+        return list(filter(lambda node : node.label == label, self.nodes))[0]
+    
+    def get_relationship_schema(self, label) -> RelationshipSchema:
+        return list(filter(lambda relationship : relationship.label == label, self.relationships))[0]

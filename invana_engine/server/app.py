@@ -150,8 +150,9 @@ def create_app():
     # schema = example_schema()
     # schema = generate_schema_dynamically()
 
-    schema =  SchemaGenerator(schema_def).get_schema() 
-    schema = schema.graphql_schema
+    schema_generator =  SchemaGenerator(schema_def)
+    schema = schema_generator.get_schema().graphql_schema
+
     # app.mount("/graph", GraphQL(schema.graphql_schema, debug=True,
     #                              websocket_handler=GraphQLTransportWSHandler(),
     #                              explorer=ExplorerGraphiQL(explorer_plugin=True ), 
@@ -162,6 +163,7 @@ def create_app():
                             )) 
 
     app.state.graph = InvanaGraph()
+    app.state.graph_schema = schema_generator.graph_schema
     return app
 
 

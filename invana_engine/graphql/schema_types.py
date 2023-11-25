@@ -33,10 +33,12 @@ class DataPropertyField(graphene.ObjectType):
     description = graphene.String()
 
 class RelationshipPath(graphene.ObjectType):
-    relationship_label = graphene.String()
-    source_node = graphene.Field(lambda: NodeLabelSchema)
-    # target_node_label = graphene.Field(getattr(import_module(__name__), 'NodeLabelSchema'))
-    target_node = graphene.Field(lambda: NodeLabelSchema)
+    label = graphene.String()
+    # source_node = graphene.Field(lambda: NodeLabelSchema)
+    # target_node = graphene.Field(lambda: NodeLabelSchema)
+    source_node_label = graphene.String() 
+    target_node_label = graphene.String()
+
 
 class NodeLabelSchema(graphene.ObjectType):
     label =  graphene.Field(graphene.String)
@@ -56,7 +58,6 @@ class GraphSchema(graphene.ObjectType):
 
 class GraphSchemeQuery(graphene.ObjectType):
     _schema = graphene.Field(GraphSchema)
-
     resolve__schema = resolve_graph_schema
 
 # @dataclass

@@ -14,10 +14,5 @@ def resolve_relationship_field_resolver(self, info: graphene.ResolveInfo, **kwar
 
 
 def resolve_graph_schema(self, info:graphene.ResolveInfo, **kwargs):
-    return {
-        "nodes": [{
-            "label": "TestLabel",
-            "properties": []
-        }],
-        "relationships": []
-    }
+    graph_schema = info.context['request'].app.state.graph_schema
+    return graph_schema.to_json()

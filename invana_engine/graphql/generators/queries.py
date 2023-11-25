@@ -37,7 +37,7 @@ class QueryGenerators:
  
     def __init__(self, graph_schema: GraphSchema) -> None:
         self.graph_schema = graph_schema
-        self.schema_types_dict = {"nodes": {}, "relationships": {}}
+        # self.schema_types_dict = {"nodes": {}, "relationships": {}}
  
     def create_where_order_by(self, type_defs: typing.List[NodeSchema]):
         # create order by 
@@ -99,8 +99,8 @@ class QueryGenerators:
             # TODO - add edge properties
             target_label_type_defs = [] # relation going to which Node
             for relationship_field in relationship_fields:
-                if self.graph_schema.nodes[relationship_field.other_node_label] not in target_label_type_defs:
-                    target_label_type_defs.append(self.graph_schema.nodes[relationship_field.other_node_label])
+                if self.graph_schema.get_node_schema(relationship_field.other_node_label) not in target_label_type_defs:
+                    target_label_type_defs.append(self.graph_schema.get_node_schema(relationship_field.other_node_label))
                 fields[relationship_field.other_node_label] = self.create_node_type_field_by_name(
                     relationship_field.other_node_label
                 )
@@ -125,7 +125,7 @@ class QueryGenerators:
         # 2. create relationships fields 
         for field_name, field in type_def.relationship_fields.items():
             node_type_fields[field_name] = self.create_node_type_search_field(
-                self.graph_schema.nodes[field.other_node_label]
+                self.graph_schema.get_node_schema(field.other_node_label)
             )
 
         # 2.1. inidividual directions
@@ -134,7 +134,7 @@ class QueryGenerators:
         for field_name, relationship_field in type_def.directed_relationship_to_node("both").items():
             # target_label = relationship_directives[0].node_label # traverse towards label
             node_type_fields[field_name] = self.create_node_type_search_field(
-                self.graph_schema.nodes[relationship_field.other_node_label]
+                self.graph_schema.get_node_schema(relationship_field.other_node_label)
             )
             
         
@@ -214,7 +214,7 @@ class QueryGenerators:
 
     def create_node_type_field_by_name(self, node_name: str, extra_args=None):
         # TODO - get from cached
-        return  self.create_node_type_search_field( self.graph_schema.nodes[node_name], extra_args=extra_args)
+        return  self.create_node_type_search_field( self.graph_schema.get_node_schema(node_name), extra_args=extra_args)
  
     def create_node_type_search_field_with_resolver(self, 
                         type_def: NodeSchema,
@@ -257,7 +257,7 @@ class QueryGenerators:
         #  type_def: NodeSchema,
         query_classes = []
 
-        for type_name, type_def in self.graph_schema.nodes.items():
+        for type_def in self.graph_schema.nodes:
             # label search
             node_fields = self.create_node_type_search_field_with_resolver( type_def)
             query_classes.append(type(type_def.label, (graphene.ObjectType, ), node_fields))         
