@@ -127,10 +127,6 @@ class NodeSchema:
     @property
     def relationship_paths(self):
         return [field.path.to_json() for field_name, field in self.relationship_fields.items()]
-        # for path in paths:
-        #     path['source_node'] = self.schema.get_node_schema(path['source_node_label']).to_json(),
-        #     path['target_node'] = self.schema.get_node_schema(path['target_node_label']).to_json(),
-        # return paths
     
     @property
     def property_keys(self):
@@ -140,62 +136,20 @@ class NodeSchema:
     def all_fields(self):
         return {**self.data_fields, **self.relationship_fields}
 
-    def get_inv_and_outv_fields(self):
-        if self.label_type == "node":
-            raise Exception("only label_type='relationship' will have inv and outv fields ")
-        
-    def get_relationship_fields(self)-> typing.Dict[str, RelationshipField]:
-        """all the fields that has relationship directives
-
-        Returns:
-            typing.Dict[str, PropertyField]: _description_
-        """
-        return self.relationship_fields
- 
-    def get_relationships_by_label(self, rel_label) -> bool:
-        """
-        Checks if the current node label has relationship to 
-
-        Args:
-            rel_label (_type_): _description_
-
-        Returns:
-            bool: _description_
-        """
-        related_fields = {}
-        for field_name, field in self.relationship_fields.items():
-            # if field.has_relationship_name(rel_label):
-            related_fields[field_name] = field
-        return related_fields
-            
-    def get_related_nodes_by_relationship(self, rel_label: str):
-        """
-        Returns all the NodeLabelDefinition that has this the relationship rel_label 
-
-        Args:
-            rel_label (str): _description_
-        """
-        related_node_fields = {}
-        for node_label , node in self.schema.nodes.items():
-            related_node_fields.update(node.get_relationships_by_label(rel_label)) 
-        return related_node_fields
-
     def get_relationship_fields_by_direction(self, direction: str):
         """_summary_
 
         Args:
             direction (str): _description_
         """
-        relationship_fields = self.get_relationship_fields()
         if direction  in ["IN", "OUT"]:
-            return  [field for _, field in relationship_fields.items() \
+            return  [field for _, field in self.relationship_fields.items() \
                     if field.direction.lower() == direction]
-        return [field for _, field in relationship_fields.items()]
+        return [field for _, field in self.relationship_fields.items()]
 
     def directed_relationship_to_node(self, direction):
         """
         Create relationships grouped by relationship label. ex: "out__related_to__Node
-
 
         Args:
             direction (_type_): out, in, both
@@ -226,7 +180,6 @@ class NodeSchema:
                 fields_dict[key].append(field_relationship)
             else:
                 fields_dict[key] = [field_relationship]
-
         return fields_dict
     
 
@@ -239,12 +192,13 @@ class NodeSchema:
             direction (_type_): out, in, both
         """
         fields_dict = self.directed_relationships_grouped_by_edge_label(direction)
-        all_types = [] 
+        node_types = [] 
         for field_name, field  in fields_dict.items():
-            all_types.extend(field) 
+            node_types.extend(field) 
 
-        if all_types.__len__() > 0:
-            fields_dict[f"_{direction}e"] = all_types
+        # create this if there are any node related 
+        if node_types.__len__() > 0:
+            fields_dict[f"_{direction}e"] = node_types
         return fields_dict
          
 

@@ -10,9 +10,6 @@ from ..schema_types import GraphSchemeQuery
 
 
 class SchemaGenerator:
-    """
-    """
-
 
     """
     example usage 
