@@ -70,13 +70,13 @@ class QueryGenerators(NodeGenerator, RelationshipGenerator):
             node_fields = self.create_node_type_search_by_id_field_with_resolver( type_def)
             query_classes.append(type(f'{type_def.label}_by_id', (graphene.ObjectType, ), node_fields))         
  
-        for type_def in self.graph_schema.relationships:
-            # label search 
-            node_fields = self.create_relationship_type_search_field_with_resolver(type_def)
-            query_classes.append(type(type_def.label, (graphene.ObjectType, ), node_fields))         
-            # label search by id
-            node_fields = self.create_relationship_type_search_by_id_field_with_resolver( type_def)
-            query_classes.append(type(f'{type_def.label}_by_id', (graphene.ObjectType, ), node_fields))         
+        # for type_def in self.graph_schema.relationships:
+        #     # label search 
+        #     node_fields = self.create_relationship_type_search_field_with_resolver(type_def)
+        #     query_classes.append(type(type_def.label, (graphene.ObjectType, ), node_fields))         
+        #     # label search by id
+        #     node_fields = self.create_relationship_type_search_by_id_field_with_resolver( type_def)
+        #     query_classes.append(type(f'{type_def.label}_by_id', (graphene.ObjectType, ), node_fields))         
  
         node_fields = self.create_entire_graph_search_with_resolver()
         query_classes.append(type("_graph", (graphene.ObjectType, ), node_fields))         
