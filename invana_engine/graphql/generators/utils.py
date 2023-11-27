@@ -29,6 +29,8 @@ class GeneratorBase:
     #     elif getattr(self, "relationship_schema"):
     #         return self.relationship_schema.schema
     #     return 
+    def __init__(self, graph_schema: GraphSchema) -> None:
+        self.graph_schema = graph_schema
 
     def create_where_order_by(self, type_defs: typing.List[NodeSchema]):
         # create order by 
@@ -93,11 +95,14 @@ class GeneratorBase:
             "where": graphene.Argument(self.create_where_conditions(type_defs))
         }
     
+    def create_properties_type(self, type_def: typing.Union[NodeSchema, RelationshipSchema]):
+        fields = {}
+        for field_name, field in type_def.data_fields.items():
+            fields[field_name] = self.create_property_field(field)
+        return type(f"{type_def.label}Properties",(graphene.ObjectType,), fields)
+
 
 class NodeGenerator(GeneratorBase):
-
-    def __init__(self, node_schema: NodeSchema) -> None:
-        self.node_schema = node_schema
 
     def create_relationship_fields_for_node(self, 
                     type_def: NodeSchema,
@@ -126,7 +131,8 @@ class NodeGenerator(GeneratorBase):
                     self.graph_schema.get_node_schema(relationship_field.other_node_label)
                 )
                 # TODO - add resolver if needed; fields[f'resolve_{relationship_directive.node_label}'] = resolve_relationship_field_resolver
-            object_type = type(f"{type_def.label}{field_name}", (graphene.ObjectType, ), fields) 
+            field_name = field_name.lstrip("_")
+            object_type = type(f"{type_def.label}_{field_name}", (graphene.ObjectType, ), fields) 
             node_type_fields[field_name] =  graphene.Field(graphene.List(object_type),
                                         args=self.create_node_type_args(target_label_type_defs))
         return node_type_fields
@@ -136,11 +142,12 @@ class NodeGenerator(GeneratorBase):
         fields = {}
         # data_fields = type_def.get_data_fields()
 
+        fields['Id'] = graphene.ID()
+        fields['Label'] = graphene.String(default_value=type_def.label)
+        fields['Properties'] = graphene.Field(self.create_properties_type(type_def))
         # 1. create actual fields 
-        for field_name, field in type_def.data_fields.items():
-            fields['id'] = graphene.ID()
-            fields['label'] = graphene.String(default_value=type_def.label)
-            fields[field_name] = self.create_property_field(field)
+        # for field_name, field in type_def.data_fields.items():
+        #     fields[field_name] = self.create_property_field(field)
 
         # 2. create relationship fields
         relationship_fields = {}
@@ -203,9 +210,6 @@ class NodeGenerator(GeneratorBase):
     
 class RelationshipGenerator(GeneratorBase):
 
-    def __init__(self, relationship_schema: RelationshipSchema) -> None:
-        self.relationship_schema = relationship_schema
-
     def create_relationship_data_type(self, type_def: RelationshipSchema, extra_fields=None):
         relationship_type_fields = self.create_relationship_data_type_fields(type_def, extra_fields=extra_fields)
         return  type(type_def.label, (graphene.ObjectType, ), relationship_type_fields)
@@ -213,12 +217,11 @@ class RelationshipGenerator(GeneratorBase):
     def create_relationship_data_type_fields(self, type_def: RelationshipSchema,  extra_fields=None):
         fields = {}
         # data_fields = type_def.get_data_fields()
+        fields['Id'] = graphene.ID()
+        fields['Label'] = graphene.String(default_value=type_def.label)
 
         # 1. create actual fields 
-        for field_name, field in type_def.data_fields.items():
-            fields['id'] = graphene.ID()
-            fields['label'] = graphene.String(default_value=type_def.label)
-            fields[field_name] = self.create_property_field(field)
+        fields['Properties'] = graphene.Field(self.create_properties_type(type_def))
 
         # 2. create relationship fields
         relationship_fields = {}

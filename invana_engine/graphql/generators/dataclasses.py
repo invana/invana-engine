@@ -161,7 +161,7 @@ class NodeSchema:
         fields_dict = {}
         for relationship_field in field_relationships:
             # 2. inividual relationship label
-            key = f"_{relationship_field.direction.lower()}e__{relationship_field.relationship_label}__{relationship_field.other_node_label}"
+            key = f"{relationship_field.direction.lower()}e__{relationship_field.relationship_label}__{relationship_field.other_node_label}"
             fields_dict[key] = relationship_field
         return fields_dict
          
@@ -175,7 +175,7 @@ class NodeSchema:
         field_relationships = self.get_relationship_fields_by_direction(direction)
         fields_dict = {}
         for field_relationship in field_relationships:
-            key = f'_{direction}e__{field_relationship.relationship_label}'
+            key = f'{direction}e__{field_relationship.relationship_label}'
             if fields_dict.get(key) and field_relationship not in fields_dict.get(key):
                 fields_dict[key].append(field_relationship)
             else:
@@ -197,7 +197,7 @@ class NodeSchema:
 
         # create this if there are any node related 
         if node_types.__len__() > 0:
-            fields_dict[f"_{direction}e"] = node_types
+            fields_dict[f"{direction}e"] = node_types
         return fields_dict
          
 

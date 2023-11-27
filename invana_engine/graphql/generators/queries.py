@@ -9,8 +9,6 @@ from .resolvers import default_node_type_search_resolve_query, resolve_relations
 
 class QueryGenerators(NodeGenerator, RelationshipGenerator):
  
-    def __init__(self, graph_schema: GraphSchema) -> None:
-        self.graph_schema = graph_schema
 
 
     def create_node_type_search_field_with_resolver(self, 
