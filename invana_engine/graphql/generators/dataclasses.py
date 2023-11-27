@@ -182,7 +182,6 @@ class NodeSchema:
                 fields_dict[key] = [field_relationship]
         return fields_dict
     
-
     def generic_directed_relationships(self, direction):
         """
         Create relationships grouped by relationship label. ex: "_oute

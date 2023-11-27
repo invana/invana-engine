@@ -44,7 +44,7 @@ class GeneratorBase:
             "id": graphene.String()
         })
     
-    def create_where_conditions(self, type_defs: typing.List[NodeSchema]):
+    def create_where_conditions(self, type_defs: typing.List[typing.Union[NodeSchema, RelationshipSchema]]):
         """
         """
         # create where 
@@ -67,12 +67,14 @@ class GeneratorBase:
                 elif field.field_type_str == "Int":
                     where_condition_fields[field_name] = IntFilersExpressions()
 
-            for field_name, field in type_def.relationship_fields.items():
-                cls = self._create_where_relationship_condition(
-                        field.other_node_label,
-                        field.direction,
-                    )
-                where_condition_fields[f"{field.relationship_label}__{field.other_node_label}"] = cls()
+            # add the relationships fields if this is NodeSchema
+            if isinstance(type_def, NodeSchema):
+                for field_name, field in type_def.relationship_fields.items():
+                    cls = self._create_where_relationship_condition(
+                            field.other_node_label,
+                            field.direction,
+                        )
+                    where_condition_fields[f"{field.relationship_label}__{field.other_node_label}"] = cls()
 
         # traversals 
         return type(f"{type_defs_label}WhereConditions",(graphene.InputObjectType,), where_condition_fields)
@@ -190,7 +192,15 @@ class NodeGenerator(GeneratorBase):
             args.update(extra_args)
         return graphene.Field(graphene.List(NodeDataType), args=args, description=f"Search {type_def.label} node ")
 
-
+    def create_node_type_search_by_id_field(self, type_def: NodeSchema, extra_args=None ):
+        NodeDataType = self.create_node_data_type(type_def)
+        args =  {
+            'id':  graphene.Argument(graphene.ID, description="id of the node"),
+        }
+        if extra_args:
+            args.update(extra_args)
+        return graphene.Field(NodeDataType, args=args, description=f"Search {type_def.label} by id ")
+    
 class RelationshipGenerator(GeneratorBase):
 
     def __init__(self, relationship_schema: RelationshipSchema) -> None:
@@ -209,8 +219,31 @@ class RelationshipGenerator(GeneratorBase):
             fields['id'] = graphene.ID()
             fields['label'] = graphene.String(default_value=type_def.label)
             fields[field_name] = self.create_property_field(field)
+
+        # 2. create relationship fields
+        relationship_fields = {}
+
+        # 2.0 actual fields defined in the graphql definition
+        # relationship_fields.update(type_def.paths)
+        
         
         if extra_fields:
             fields.update(extra_fields)
         return fields
+    
+    def create_relationship_type_search_field(self, type_def: RelationshipSchema, extra_args=None ):
+        NodeDataType = self.create_relationship_data_type(type_def)
+        args =  self.create_node_type_args([type_def])
+        if extra_args:
+            args.update(extra_args)
+        return graphene.Field(graphene.List(NodeDataType), args=args, description=f"Search {type_def.label} node ")
+
+    def create_relationship_type_search_by_id_field(self, type_def: RelationshipSchema, extra_args=None ):
+        NodeDataType = self.create_relationship_data_type(type_def)
+        args =  {
+            'id':  graphene.Argument(graphene.ID, description="id of the relationship"),
+        }
+        if extra_args:
+            args.update(extra_args)
+        return graphene.Field(NodeDataType, args=args, description=f"Search {type_def.label} by id ")
     
