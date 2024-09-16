@@ -1,5 +1,5 @@
 import graphene
-from .dataclasses import  NodeSchema, RelationshipSchema, GraphSchema
+from .dataclasses import  NodeSchema, RelationshipSchema, InvanaGraphSchema
 # from .exceptions import UnSupportedFieldDirective
 from .utils import NodeGenerator, RelationshipGenerator
 import typing

@@ -1,7 +1,7 @@
 import graphene
 import typing
 from .dataclasses import RelationshipField, NodeSchema, RelationshipSchema, \
-    PropertyField, GraphSchema
+    PropertyField, InvanaGraphSchema
 
 
 
@@ -23,13 +23,13 @@ IntFilersExpressions = type("IntFilersExpressions", (graphene.InputObjectType, )
 class GeneratorBase:
 
     # @property
-    # def graph_schema(self) -> GraphSchema:
+    # def graph_schema(self) -> InvanaGraphSchema:
     #     if getattr(self, "node_schema"):
     #         return self.node_schema.schema
     #     elif getattr(self, "relationship_schema"):
     #         return self.relationship_schema.schema
     #     return 
-    def __init__(self, graph_schema: GraphSchema) -> None:
+    def __init__(self, graph_schema: InvanaGraphSchema) -> None:
         self.graph_schema = graph_schema
 
     def create_where_order_by(self, type_defs: typing.List[NodeSchema]):
@@ -85,11 +85,11 @@ class GeneratorBase:
         field_str = field.field_type_str
         return getattr(graphene, field_str)()# TODO - add default etc kwargs from ariadne type object
     
-    def create_node_type_args(self, type_defs: typing.List[NodeSchema] ):
+    def create_type_args(self, type_defs: typing.List[NodeSchema] ):
         return {
-            "limit" : graphene.Argument(graphene.Int, description="limits the result count"),
-            "offset" : graphene.Argument(graphene.Int, description="skips x results"),
-            "dedup" : graphene.Argument(graphene.Boolean, description="dedups the result"),
+            "limit" : graphene.Argument(graphene.Int, description="limits the result count", default_value=20),
+            "offset" : graphene.Argument(graphene.Int, description="skips x results", default_value=0),
+            "dedup" : graphene.Argument(graphene.Boolean, description="dedups the result", default_value=False),
             "order_by" : graphene.Argument(self.create_where_order_by(type_defs),
                                             description="order the result by"),
             "where": graphene.Argument(self.create_where_conditions(type_defs))
@@ -134,7 +134,7 @@ class NodeGenerator(GeneratorBase):
             field_name = field_name.lstrip("_")
             object_type = type(f"{type_def.label}_{field_name}", (graphene.ObjectType, ), fields) 
             node_type_fields[field_name] =  graphene.Field(graphene.List(object_type),
-                                        args=self.create_node_type_args(target_label_type_defs))
+                                        args=self.create_type_args(target_label_type_defs))
         return node_type_fields
 
     def create_node_data_type_fields(self, type_def: NodeSchema, extra_fields=None):
@@ -194,7 +194,7 @@ class NodeGenerator(GeneratorBase):
 
     def create_node_type_search_field(self, type_def: NodeSchema, extra_args=None ):
         NodeDataType = self.create_node_data_type(type_def)
-        args =  self.create_node_type_args([type_def])
+        args =  self.create_type_args([type_def])
         if extra_args:
             args.update(extra_args)
         return graphene.Field(graphene.List(NodeDataType), args=args, description=f"Search {type_def.label} node ")
@@ -236,7 +236,7 @@ class RelationshipGenerator(GeneratorBase):
     
     def create_relationship_type_search_field(self, type_def: RelationshipSchema, extra_args=None ):
         NodeDataType = self.create_relationship_data_type(type_def)
-        args =  self.create_node_type_args([type_def])
+        args =  self.create_type_args([type_def])
         if extra_args:
             args.update(extra_args)
         return graphene.Field(graphene.List(NodeDataType), args=args, description=f"Search {type_def.label} node ")

@@ -3,12 +3,12 @@ import typing
 from dataclasses import dataclass
 from graphql.type.schema import GraphQLSchema
 from ..generators.dataclasses import RelationshipField, NodeSchema,\
-      PropertyField, GraphSchema, RelationshipSchema
+      PropertyField, InvanaGraphSchema, RelationshipSchema
 
 
 class GraphSchemaTypesGeneratorUtil():
     """
-    take interim schema as input and outputs  `..generators.gql_types.GraphSchema`
+    take interim schema as input and outputs  `..generators.gql_types.InvanaGraphSchema`
     """
 
     def get_type_of_field(self, field):
@@ -90,7 +90,7 @@ class GraphSchemaTypesGeneratorUtil():
             del type_def_dict['relationship_fields']
         return NodeSchema(**type_def_dict) if label_type == "node" else RelationshipSchema(**type_def_dict)
 
-    def create_schema_instance(self,schema_str:str, interim_schema: GraphQLSchema) -> GraphSchema:
+    def create_schema_instance(self,schema_str:str, interim_schema: GraphQLSchema) -> InvanaGraphSchema:
         schema_items_dict = {} 
         for type_name, type_ in interim_schema.type_map.items():
             if (isinstance(type_, GraphQLObjectType) or isinstance(type_, GraphQLInterfaceType)) \
@@ -99,13 +99,13 @@ class GraphSchemaTypesGeneratorUtil():
                 schema_items_dict[type_name] = self.get_type_defs(type_)
 
         # create chema instance 
-        schema :GraphSchema  = {"nodes": [],"relationships": [], "schema_definition_str": schema_str}
+        schema :InvanaGraphSchema  = {"nodes": [],"relationships": [], "schema_definition_str": schema_str}
         for label, label_def in schema_items_dict.items():
             if isinstance(label_def, NodeSchema):
                 schema['nodes'].append(label_def)
             elif isinstance(label_def, RelationshipSchema):
                 schema['relationships'].append(label_def)
-        schema_instance =  GraphSchema(**schema)
+        schema_instance =  InvanaGraphSchema(**schema)
 
         # attache schema to all the labelDefinitions
         for label_def in schema_instance.relationships:

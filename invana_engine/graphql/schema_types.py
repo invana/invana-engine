@@ -1,7 +1,7 @@
 import typing
 import graphene
 from .generators.resolvers import resolve_graph_schema
-from .generators.dataclasses import GraphSchema
+from .generators.dataclasses import InvanaGraphSchema
 from importlib import import_module
 
 PropertyCardinalityEnum = type( "PropertyCardinalityEnum",  (graphene.Enum,), {
@@ -52,49 +52,10 @@ class RelationshipLabelSchema(graphene.ObjectType):
     multiplicity = RelationshipMultiplicityEnum()
     relationship_paths = graphene.List(RelationshipPath)
 
-class GraphSchema(graphene.ObjectType):
+class InvanaGraphSchema(graphene.ObjectType):
     nodes = graphene.Field(graphene.List(NodeLabelSchema))
     relationships = graphene.Field(graphene.List(RelationshipLabelSchema))
 
 class GraphSchemeQuery(graphene.ObjectType):
-    _schema = graphene.Field(GraphSchema)
+    _schema = graphene.Field(InvanaGraphSchema)
     resolve__schema = resolve_graph_schema
-
-# @dataclass
-# class RelLabelSchema:
-#     """
-#     label format: {self.inv.label}__{self.label}__{self.outv.label}
-#     """
-#     label: str # relationship label, ex: Actor__acted_in__Movie
-#     properties: typing.Dict[str, typing.Union[graphene.ObjectType, graphene.List[graphene.ObjectType]]]
-#     incoming_node: NodeLabelSchema # target/to node  
-#     outgoing_node: NodeLabelSchema # source/from node 
-#     # field_on_node: str # this is the field on type definition in which relationship is defined. ex: movies
-
-# @dataclass
-# class NodeSchemaAggregate:
-#     label: str
-#     properties: typing.Dict[str, typing.Union[graphene.ObjectType, graphene.List[graphene.ObjectType]]]
-#     out_edges : typing.List[RelLabelSchema] # outgoing relationship schemas
-#     in_edges: typing.List[RelLabelSchema] # incoming relationship schemas
-#     both_edges : typing.List[RelLabelSchema] # both outgoing and incoming relationship schemas
-#     # indexes/contraints
-
-# @dataclass
-# class RelationshipLabelSchema:
-#     """
-#     label format: self.label
-#     """
-#     label: graphene
-#     properties: typing.Dict[str, typing.Union[graphene.ObjectType, graphene.List[graphene.ObjectType]]]
-#     out_nodes : typing.List[NodeLabelSchema] # outgoing node schemas
-#     in_nodes : typing.List[NodeLabelSchema] # incoming node schemas
-#     both_nodes : typing.List[NodeLabelSchema] # both outgoing and incoming node schemas
-#     # indexes/contraints
-
-
-
-# class Schema:
-#     node_aggregates : typing.Dict[str, NodeSchemaAggregate]
-#     relationship_aggregates : typing.Dict[str, RelSchemaAggregate]
-#     gql_schema: GraphSchema

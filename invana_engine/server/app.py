@@ -29,6 +29,7 @@ from ..graphql.generators import SchemaGenerator
 from invana_engine import InvanaGraph
 from ariadne.asgi.handlers import GraphQLTransportWSHandler
 from ariadne.explorer import ExplorerGraphiQL, ExplorerApollo
+from graphql import GraphQLSchema
 import logging
 
 
@@ -151,13 +152,13 @@ def create_app():
     # schema = generate_schema_dynamically()
 
     schema_generator =  SchemaGenerator(schema_def)
-    schema = schema_generator.get_schema().graphql_schema
+    graphql_schema: GraphQLSchema = schema_generator.get_schema().graphql_schema
 
     # app.mount("/graph", GraphQL(schema.graphql_schema, debug=True,
     #                              websocket_handler=GraphQLTransportWSHandler(),
     #                              explorer=ExplorerGraphiQL(explorer_plugin=True ), 
     #                              ))  # Graphiql IDE
-    app.mount("/graph", GraphQL(schema, debug=True,
+    app.mount("/graph", GraphQL(graphql_schema, debug=True,
                                 explorer=ExplorerApollo( ), 
                                 websocket_handler=GraphQLTransportWSHandler(),
                             )) 

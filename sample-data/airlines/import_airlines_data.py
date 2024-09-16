@@ -2,6 +2,8 @@
 This script will import airlines data from Kevin Lawrence's book
 https://github.com/krlawrence/graph/tree/master/sample-data
 
+cd sample-data/airlines
+python import_airlines_data.py
 """
 import sys
 sys.path.append("../../")

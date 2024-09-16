@@ -42,9 +42,13 @@ class SchemaGenerator:
 
     def __init__(self, schema_str: str) -> None:
         self.schema_str = schema_str
-        self.interim_schema = AriadneInterimSchemaGenerator().create_interim_schema(schema_str)
-        self.graph_schema = GraphSchemaTypesGeneratorUtil().create_schema_instance(schema_str, self.interim_schema)
-    
+        self.graph_schema = self.generate_graph_schema()
+
+    def generate_graph_schema(self):
+        
+        interim_schema = AriadneInterimSchemaGenerator().create_interim_schema(self.schema_str)
+        return  GraphSchemaTypesGeneratorUtil().create_schema_instance(self.schema_str, interim_schema)
+        
     def generate_query_types(self, *type_def_classes):
         return type("Query", (
             BasicInfoType, 

@@ -88,7 +88,7 @@ class RelationshipSchema:
     data_fields: typing.Dict[str, PropertyField]
     def_string : str # gql definition strin
     type: GraphQLObjectType
-    schema: 'GraphSchema' # this is the entire schema data; just incase needed
+    schema: 'InvanaGraphSchema' # this is the entire schema data; just incase needed
     multiplicity: str = RelationshipMultiplicity.MULTI
 
     @property
@@ -114,7 +114,7 @@ class NodeSchema:
     relationship_fields : typing.Dict[str, RelationshipField]
     def_string : str
     type: GraphQLObjectType
-    schema: 'GraphSchema' # this is the entire schema data; just incase needed
+    schema: 'InvanaGraphSchema' # this is the entire schema data; just incase needed
 
     def to_json(self, ):
         return {
@@ -202,7 +202,7 @@ class NodeSchema:
          
 
 @dataclass
-class GraphSchema:
+class InvanaGraphSchema:
     nodes : typing.List[NodeSchema]
     relationships : typing.List[NodeSchema]
     schema_definition_str: str # graphql schema string representation

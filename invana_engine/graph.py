@@ -1,5 +1,4 @@
 
-from .backends import GremlinConnector, CypherConnector
 from invana_engine import settings
 import importlib
 
@@ -24,7 +23,8 @@ class InvanaGraph:
                                     password=getattr(settings,"GRAPH_BACKEND_AUTH_PASSWORD"),
                                     traversal_source=getattr(settings, "GRAPH_BACKEND_GREMLIN_TRAVERSAL_SOURCE")
                                     )
-    
+        
+     
 
     def get_backend_class(self, backend_cls_str):
         backend_module_str = "invana_engine.backends"

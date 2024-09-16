@@ -23,7 +23,6 @@ class ConnectorBase(abc.ABC):
         self.database_name = database_name
         self.username = username
         self.password = password
-
         self.default_query_language = default_query_language
         self.validate_query_language(self.default_query_language)
         self.default_timeout = default_timeout

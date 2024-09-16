@@ -2,7 +2,7 @@ from neo4j import GraphDatabase, RoutingControl
 
 # https://neo4j.com/docs/api/python-driver/current/
 URI = "neo4j://localhost:17687"
-AUTH = ("neo4j", "testsecret")
+AUTH = ("neo4j", "supersecret")
 
 
 """"
