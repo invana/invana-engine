@@ -41,7 +41,8 @@
                 "GRAPH_BACKEND": "JanusGraphConnector",
                 "GRAPH_BACKEND_URL": "ws://localhost:8182/gremlin"
             },
-            "justMyCode": true
+            "justMyCode": true,
+            "console": "integratedTerminal"
         },
         {
             "name": "GraphQL App: Neo4j",
@@ -57,12 +58,13 @@
             ],
             "env": {
                 "GRAPH_BACKEND": "CypherConnector",
-                "GRAPH_BACKEND_URL": "neo4j://localhost:17687",
+                "GRAPH_BACKEND_URL": "neo4j://localhost:27687",
                 "GRAPH_BACKEND_DATABASE_NAME": "neo4j",
                 "GRAPH_BACKEND_AUTH_USERNAME": "neo4j",
                 "GRAPH_BACKEND_AUTH_PASSWORD": "supersecret"
             },
-            "justMyCode": true
+            "justMyCode": true,
+            "console": "integratedTerminal"
         }
     ]
 }

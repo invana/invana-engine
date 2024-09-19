@@ -53,7 +53,7 @@ uvicorn invana_engine.server.app:app --port=8200 --host=0.0.0.0 --loop=asyncio
 ### 2. with neo4j database
 ```
 # start neo4j instance 
-docker run -d -p 7474:7474 -p 7687:7687 -e NEO4J_AUTH=neo4j/supersecret neo4j 
+docker run -d -p 27474:7474 -p 27687:7687 -e NEO4J_AUTH=neo4j/supersecret neo4j 
 
 
 export GRAPH_BACKEND=CypherConnector

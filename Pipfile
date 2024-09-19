@@ -13,6 +13,7 @@ typing-extensions = "*"
 starlette-graphene3 = "*"
 neo4j = "*"
 ariadne = "*"
+gremlinpython = "*"
 
 [dev-packages]
 pytest = "*"
