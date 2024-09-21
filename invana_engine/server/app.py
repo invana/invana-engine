@@ -158,7 +158,7 @@ def create_app():
     #                              websocket_handler=GraphQLTransportWSHandler(),
     #                              explorer=ExplorerGraphiQL(explorer_plugin=True ), 
     #                              ))  # Graphiql IDE
-    app.mount("/graph", GraphQL(graphql_schema, debug=True,
+    app.mount("/graphql", GraphQL(graphql_schema, debug=True,
                                 explorer=ExplorerApollo( ), 
                                 websocket_handler=GraphQLTransportWSHandler(),
                             )) 

@@ -41,7 +41,7 @@ existing functionality. Checkout how to add new graph db support by extending [i
 ### 1. with gremlin supported databases
 ```
 # start janusgraph instance 
-docker run -it -p 8182:8182 -d janusgraph/janusgraph
+docker run -it -p 28182:8182 -d janusgraph/janusgraph
 
 # start invana engine
 export GRAPH_BACKEND_URL="ws://localhost:8182/gremlin"

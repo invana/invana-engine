@@ -39,7 +39,7 @@
             ],
             "env": {
                 "GRAPH_BACKEND": "JanusGraphConnector",
-                "GRAPH_BACKEND_URL": "ws://localhost:8182/gremlin"
+                "GRAPH_BACKEND_URL": "ws://localhost:28182/gremlin"
             },
             "justMyCode": true,
             "console": "integratedTerminal"

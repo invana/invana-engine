@@ -77,12 +77,11 @@ class ConnectorBase(abc.ABC):
 
     @abc.abstractmethod
     def _execute_query(self, query:str, timeout:int=None, serialize=True, raise_exception:bool= False, 
-                       query_language=None, finished_callback=None ):
+                       query_language=None, finished_callback=None, **kwargs ):
         pass
 
     def execute_query(self, query: str, timeout: int = None, raise_exception: bool = False,
-                      query_language: str = None, 
-                      finished_callback=None) -> any:
+                      query_language: str = None, finished_callback=None, **kwargs) -> any:
         """
 
         :param query:
@@ -94,5 +93,4 @@ class ConnectorBase(abc.ABC):
         query_language = query_language if query_language else self.default_query_language
         self.validate_query_language(self.default_query_language)
         return self._execute_query(query, timeout=timeout, raise_exception=raise_exception,
-                                   query_language=query_language,
-                                   finished_callback=finished_callback)
+                                   query_language=query_language, finished_callback=finished_callback, **kwargs)
