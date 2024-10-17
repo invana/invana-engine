@@ -1,4 +1,0 @@
-
-
-class CantImplementInGremlinError(Exception):
-    pass
