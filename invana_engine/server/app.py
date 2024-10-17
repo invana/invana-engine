@@ -20,12 +20,11 @@ from .views import HomePageView, GremlinQueryView
 from invana_engine.settings import GRAPH_BACKEND, DEBUG, GRAPH_BACKEND_URL,  \
      SERVER_PORT
 from invana_engine.graphql.graphiql.handler import make_graphiql_handler
-# from invana_engine.graphql.schema import get_schema
 from ..settings import __VERSION__, __AUTHOR_NAME__, __AUTHOR_EMAIL__
 from starlette.routing import Mount
 from starlette.staticfiles import StaticFiles
 from ariadne.asgi import GraphQL
-from ..graphql.generators import SchemaGenerator
+from ..graphql.schema import SchemaGenerator
 from invana_engine import InvanaGraph
 from ariadne.asgi.handlers import GraphQLTransportWSHandler
 from ariadne.explorer import ExplorerGraphiQL, ExplorerApollo
@@ -67,76 +66,6 @@ if GRAPH_BACKEND_URL is None:
 
 def create_app():
 
-
-    schema_def =  """
-    
-        # type ShortFilm {
-        #     title: String
-        #     published_date: Date
-        #     extended_to: [Movie!]! @relationship(label: "extended_to", direction: OUT, properties: "ExtendedAt")        
-        # }
-
-        # type Movie {
-        #     title: String
-        #     published_date: Date
-        #     actors: [Actor!]! @relationship(label: "ACTED_IN", direction: IN, properties: "ActedIn")
-        # }
-
-        
-        # type Actor {
-        #     first_name: String
-        #     last_name: String
-        #     screen_name: String
-        #     movies: [Movie!]! @relationship(label: "ACTED_IN", direction: OUT, properties: "ActedIn")
-        #     shortFilms: [ShortFilm!]! @relationship(label: "ACTED_IN", direction: OUT, properties: "ActedIn")
-        #     # likes: [ShortFilm!]! @relationship(label: "likes", direction: OUT, properties: "Liked")
-        #     # likes2: [Movie!]! @relationship(label: "likes", direction: OUT, properties: "Liked")
-        # }
-
-        # type ActedIn @relationshipProperties {
-        #     roles: [String]
-        # }
-
-        # type Liked @relationshipProperties {
-        #     date: [String]
-        # }
-
-        # type ExtendedAt @relationshipProperties {
-        #     date: [String]
-        # }
-
-
-        type Movie {
-            title: String
-            published_date: Date
-            # actors: [Actor!]! @relationship(label: "ACTED_IN", direction: IN, properties: "ActedIn")
-        }
-
-        type ShortMovie {
-            title: String
-            published_date: Date
-            # actors: [Actor!]! @relationship(label: "ACTED_IN", direction: IN, properties: "ActedIn")
-        }
-
-        type Actor {
-            first_name: String
-            last_name: String
-            screen_name: String
-            shortmovies: [ShortMovie!]! @relationship(label: "ACTED_IN", direction: OUT, properties: "ActedIn")
-            movies: [Movie!]! @relationship(label: "ACTED_IN", direction: OUT, properties: "ActedIn")
-            likess: [Movie!]! @relationship(label: "HAS_LIKED", direction: IN, properties: "Liked")
-        }
-
-        interface ActedIn @relationshipProperties {
-            roles: [String]
-        }
-
-        interface Liked @relationshipProperties {
-            date: Date
-        }
-
-"""
-
     routes = [
         Route('/', endpoint=HomePageView),
         WebSocketRoute('/gremlin', GremlinQueryView),
@@ -147,11 +76,7 @@ def create_app():
     ]
     app = Starlette(routes=routes, middleware=middleware, debug=DEBUG)
 
-    # schema = example_schema_with_subscription()
-    # schema = example_schema()
-    # schema = generate_schema_dynamically()
-
-    schema_generator =  SchemaGenerator(schema_def)
+    schema_generator =  SchemaGenerator("")
     graphql_schema: GraphQLSchema = schema_generator.get_schema().graphql_schema
 
     # app.mount("/graph", GraphQL(schema.graphql_schema, debug=True,
@@ -163,8 +88,8 @@ def create_app():
                                 websocket_handler=GraphQLTransportWSHandler(),
                             )) 
 
-    app.state.graph = InvanaGraph()
-    app.state.graph_schema = schema_generator.graph_schema
+    # app.state.graph = InvanaGraph()
+    # app.state.graph_schema = schema_generator.graph_schema
     return app
 
 

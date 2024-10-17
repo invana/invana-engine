@@ -2,9 +2,7 @@ from typing import (
     Any,
     Callable,
     Dict,
-
 )
-
 from starlette.requests import Request
 from starlette.responses import HTMLResponse, Response
 

@@ -1,4 +1,0 @@
-
-
-class InvalidDefaultQueryLanguageException(Exception):
-    pass
