@@ -132,9 +132,9 @@ class GremlinConnector(ConnectorBase):
         :param raise_exception: When set to False, no exception will be raised.
         :return:
         """
-
+        query_language = query_language if query_language else self.default_query_language
         query_string = self.add_strategies_to_query(query)
-        timeout = self.timeout if timeout is None else timeout
+        timeout = timeout if timeout else self.default_timeout
         request_options = {"evaluationTimeout": timeout}
         request = GremlinQueryRequest(query)
         try:

@@ -30,7 +30,7 @@ class GremlinQueryRequest(RequestBase):
         return f"<GremlinQueryRequest {self.request_id}>"
 
     def __init__(self, query: str, request_options: dict = None):
-        super(GremlinQueryRequest, self).__init__()
+        super(GremlinQueryRequest, self).__init__(query, request_options=request_options)
         self.query = query
         self.request_options = request_options or {}
         self.started()

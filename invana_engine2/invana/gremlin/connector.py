@@ -87,16 +87,20 @@ class GremlinConnector(GraphConnectorBase):
         if call_from_event_loop:
             transport_kwargs['call_from_event_loop'] = call_from_event_loop
         self.transport_kwargs = transport_kwargs
-        INVANA_DESERIALIZER_MAP.update(deserializer_map or {})
-        self.deserializer_map = INVANA_DESERIALIZER_MAP
-        self.connect()
+        # INVANA_DESERIALIZER_MAP.update(deserializer_map or {})
+        # self.deserializer_map = INVANA_DESERIALIZER_MAP
+        self.deserializer_map = {}
+
+        # print("====self.deserializer_map", self.deserializer_map)
+        # exit()
         self.vertex = self.vertex_cls(self)
         self.edge = self.edge_cls(self)
         self.management = self.management_cls(self)
+        self.connect()
 
  
     def _init_connection(self):
-        logger.debug(f"create driver connection  ")
+        logger.debug("create driver connection  ", self.deserializer_map)
         self.connection = DriverRemoteConnection(
             self.connection_uri,
             traversal_source=self.traversal_source,

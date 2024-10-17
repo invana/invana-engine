@@ -13,10 +13,10 @@
 #     limitations under the License.
 
 from concurrent.futures import Future
-from invana_engine2.invana.gremlin.transporter import GremlinQueryResponse
+from invana_engine2.invana.gremlin.transporter import GremlinQueryResponse, GremlinQueryRequest
 
 
-def read_from_result_set_with_callback(result_set, callback, request, finished_callback):
+def read_from_result_set_with_callback(result_set, callback, request: GremlinQueryRequest, finished_callback):
     def cb(f):
         try:
             f.result()

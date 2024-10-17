@@ -5,6 +5,7 @@
             "type": "python",
             "request": "launch",
             "program": "${file}",
+            "cwd": "${cwd}",
             "console": "integratedTerminal",
             "justMyCode": true
         },
@@ -51,7 +52,7 @@
             "module": "uvicorn",
             "args": [
                 "invana_engine.server.app:app",
-                "--port=8202",
+                "--port=8200",
                 "--host=0.0.0.0",
                 "--loop=asyncio",
                 "--reload"

@@ -25,7 +25,7 @@ class ConnectorBase(abc.ABC):
         self.password = password
         self.default_query_language = default_query_language
         self.validate_query_language(self.default_query_language)
-        self.default_timeout = default_timeout
+        self.default_timeout = default_timeout if default_timeout else DEFAULT_QUERY_TIMEOUT
 
     @abc.abstractmethod
     def supported_query_languages(self):

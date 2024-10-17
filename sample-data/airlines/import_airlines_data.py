@@ -6,11 +6,14 @@ cd sample-data/airlines
 python import_airlines_data.py
 """
 import sys
-sys.path.append("../../")
+import os
+sys.path.append(os.path.join(os.getcwd() ))
+print("sys.path", sys.path)
+print("os.", os.getcwd())
 from invana_engine2.invana import InvanaGraph
 import csv
 
-graph = InvanaGraph("ws://localhost:8182/gremlin")
+graph = InvanaGraph("ws://localhost:28182/gremlin")
 print("Initiating import: graph :", graph)
 
 
@@ -60,15 +63,24 @@ def clean_edges(edge_data):
 
 node_id_map = {}
 
-with open('./air-routes-latest-nodes.csv') as f:
+
+
+# result = graph.execute_query("g.V().limit(10)") 
+
+# print("===result", result)
+# exit()
+
+with open(os.path.join(os.getcwd() ,'./sample-data/airlines/air-routes-latest-nodes.csv')) as f:
     reader = csv.DictReader(f)
     for line in reader:
         cleaned_data = clean_nodes(line)
         created_data = graph.vertex.create(cleaned_data['label'], **cleaned_data['properties']).to_list()
-        print("created node", created_data[0].id)
-        node_id_map[cleaned_data['id']] = created_data[0].id
+        print("==============^^^^^^^^^^^^^^^^")
+        # print("created node", created_data[0])
+        # print("==============<<<<<<<<<<<<<<<")
+        # node_id_map[cleaned_data['id']] = created_data[0].id
 
-with open('./air-routes-latest-edges.csv') as f:
+with open(os.path.join(os.getcwd() ,'./sample-data/airlines/air-routes-latest-edges.csv')) as f:
     reader = csv.DictReader(f)
     for line in reader:
         cleaned_data = clean_edges(line)
