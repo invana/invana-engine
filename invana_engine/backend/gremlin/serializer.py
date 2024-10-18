@@ -62,10 +62,9 @@ class InvanaVertexDeserializer(graphsonV3d0.VertexDeserializer):
     @classmethod
     def objectify(cls, d, reader):
         return Node(
-            id=reader.toObject(
-                get_id(
-                    d["id"])), label=d.get(
-                "label", "vertex"))
+                id=reader.toObject(get_id(d["id"])), 
+                label=d.get("label", "vertex")
+            )
 
 
 class InvanaEdgeDeserializer(graphsonV3d0.EdgeDeserializer):
@@ -73,26 +72,22 @@ class InvanaEdgeDeserializer(graphsonV3d0.EdgeDeserializer):
     @classmethod
     def objectify(cls, d, reader):
         return RelationShip(
-            id=reader.toObject(
-                get_id(
-                    d["id"])), label=d.get(
-                "label", "edge"), inv=Node(
-                    id=reader.toObject(
-                        d["outV"]), label=d.get(
-                            "outVLabel", "vertex")), outv=Node(
-                                id=reader.toObject(
-                                    d["inV"]), label=d.get(
-                                        "inVLabel", "vertex")))
+                id=reader.toObject(get_id(d["id"])), 
+                label=d.get("label", "edge"), 
+                inv=Node(id=reader.toObject(d["outV"]), 
+                        label=d.get("outVLabel", "vertex")), 
+                outv=Node(id=reader.toObject(d["inV"]), 
+                        label=d.get("inVLabel", "vertex"))
+            )
 
 
 class InvanaPathDeserializer(graphsonV3d0.PathDeserializer):
 
     @classmethod
     def objectify(cls, d, reader):
-        return Path(
-            reader.toObject(
-                d["labels"]), reader.toObject(
-                d["objects"]))
+        return Path(reader.toObject(d["labels"]), 
+                    reader.toObject(d["objects"])
+                )
 
 
 # class PropertyDeserializer(graphsonV3d0.PropertyDeserializer):
