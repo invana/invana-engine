@@ -69,6 +69,8 @@ class QueryBase:
             started_event = self.get_event_by_state(QueryStateTypes.STARTED)
             self._runtime = get_elapsed_time(event.timestamp - started_event.timestamp)
 
+    def add_response(self, response: QueryResponse):
+        self.responses.append(response)
 
 class Query(QueryBase):
 
@@ -80,6 +82,8 @@ class Query(QueryBase):
 
     def query_successful(self, response: QueryResponse):
         self.add_event(QueryEvent(type=QueryStateTypes.SUCCESSFUL))
+        self.add_response(response)
 
-    def query_failed(self, e: Exception = None):
-        self.add_event(QueryEvent(type=QueryStateTypes.SUCCESSFUL, error=e))
+    def query_failed(self, response: QueryResponse, error: Exception = None):
+        self.add_event(QueryEvent(type=QueryStateTypes.SUCCESSFUL, error=error))
+        self.add_response(response)
