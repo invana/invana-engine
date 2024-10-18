@@ -54,8 +54,8 @@ class GremlinQueryView(WebSocketEndpoint):
             }
         }
         if GRAPH_BACKEND_AUTH_USERNAME or GRAPH_BACKEND_AUTH_PASSWORD:
-            auth = b"".join([b"\x00", GRAPH_BACKEND_AUTH_USERNAME.encode("utf-8"),
-                             b"\x00", GRAPH_BACKEND_AUTH_PASSWORD.encode("utf-8")])
+            auth = b"".join([b"\x00", GRAPH_BACKEND_AUTH_USERNAME.encode(
+                "utf-8"), b"\x00", GRAPH_BACKEND_AUTH_PASSWORD.encode("utf-8")])
             query_message['op'] = "authentication"
             query_message['processor'] = ""
             query_message['args']['sasl'] = base64.b64encode(auth).decode()
@@ -76,7 +76,8 @@ class GremlinQueryView(WebSocketEndpoint):
                 print(response_data)
                 await websocket.send_json(json.loads(response_data))
             except websockets.exceptions.ConnectionClosed:
-                logging.debug('Don\'t have any more messages. closed connection with gremlin server')
+                logging.debug(
+                    'Don\'t have any more messages. closed connection with gremlin server')
                 # await self.gremlin.close()
                 break
 

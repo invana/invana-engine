@@ -1,11 +1,11 @@
 #  Copyright 2021 Invana
-# 
+#
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
 #  You may obtain a copy of the License at
-# 
+#
 #  http:www.apache.org/licenses/LICENSE-2.0
-# 
+#
 #  Unless required by applicable law or agreed to in writing, software
 #  distributed under the License is distributed on an "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,7 +18,7 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.routing import Route, WebSocketRoute
 from .views import HomePageView, GremlinQueryView
 from invana_engine.settings import GRAPH_BACKEND, DEBUG, GRAPH_BACKEND_URL,  \
-     SERVER_PORT
+    SERVER_PORT
 from invana_engine.graphql.graphiql.handler import make_graphiql_handler
 from ..settings import __VERSION__, __AUTHOR_NAME__, __AUTHOR_EMAIL__
 from starlette.routing import Mount
@@ -41,10 +41,10 @@ logger = logging.getLogger(__name__)
 
 def welcome():
     logger.info(f"""
-██ ███    ██ ██    ██  █████  ███    ██  █████      ███████ ███    ██  ██████  ██ ███    ██ ███████ 
-██ ████   ██ ██    ██ ██   ██ ████   ██ ██   ██     ██      ████   ██ ██       ██ ████   ██ ██      
-██ ██ ██  ██ ██    ██ ███████ ██ ██  ██ ███████     █████   ██ ██  ██ ██   ███ ██ ██ ██  ██ █████   
-██ ██  ██ ██  ██  ██  ██   ██ ██  ██ ██ ██   ██     ██      ██  ██ ██ ██    ██ ██ ██  ██ ██ ██      
+██ ███    ██ ██    ██  █████  ███    ██  █████      ███████ ███    ██  ██████  ██ ███    ██ ███████
+██ ████   ██ ██    ██ ██   ██ ████   ██ ██   ██     ██      ████   ██ ██       ██ ████   ██ ██
+██ ██ ██  ██ ██    ██ ███████ ██ ██  ██ ███████     █████   ██ ██  ██ ██   ███ ██ ██ ██  ██ █████
+██ ██  ██ ██  ██  ██  ██   ██ ██  ██ ██ ██   ██     ██      ██  ██ ██ ██    ██ ██ ██  ██ ██ ██
 ██ ██   ████   ████   ██   ██ ██   ████ ██   ██     ███████ ██   ████  ██████  ██ ██   ████ ███████
 {__VERSION__} version ; {__AUTHOR_NAME__}({__AUTHOR_EMAIL__})""")
     logger.info(".................................................")
@@ -58,7 +58,8 @@ def welcome():
 welcome()
 
 if GRAPH_BACKEND_URL is None:
-    logger.error("ERROR: GRAPH_BACKEND_URL environment variable not set. Please fix it .")
+    logger.error(
+        "ERROR: GRAPH_BACKEND_URL environment variable not set. Please fix it .")
     logger.error(
         "Exiting the program now. Please refer the documentation at https://github.com/invana/invana-engine")
     exit()
@@ -67,26 +68,46 @@ if GRAPH_BACKEND_URL is None:
 def create_app():
 
     routes = [
-        Route('/', endpoint=HomePageView),
-        WebSocketRoute('/gremlin', GremlinQueryView),
-        Mount('/static', app=StaticFiles(packages=[('invana_engine.graphql.graphiql', 'static')]), name="static"),
+        Route(
+            '/',
+            endpoint=HomePageView),
+        WebSocketRoute(
+            '/gremlin',
+            GremlinQueryView),
+        Mount(
+            '/static',
+            app=StaticFiles(
+                packages=[
+                    ('invana_engine.graphql.graphiql',
+                     'static')]),
+            name="static"),
     ]
     middleware = [
-        Middleware(CORSMiddleware, allow_origins=['*'], allow_methods=["GET", "POST", "PUT", "DELETE"])
-    ]
+        Middleware(
+            CORSMiddleware,
+            allow_origins=['*'],
+            allow_methods=[
+                "GET",
+                "POST",
+                "PUT",
+                "DELETE"])]
     app = Starlette(routes=routes, middleware=middleware, debug=DEBUG)
 
-    schema_generator =  SchemaGenerator("")
+    schema_generator = SchemaGenerator("")
     graphql_schema: GraphQLSchema = schema_generator.get_schema().graphql_schema
 
     # app.mount("/graph", GraphQL(schema.graphql_schema, debug=True,
     #                              websocket_handler=GraphQLTransportWSHandler(),
-    #                              explorer=ExplorerGraphiQL(explorer_plugin=True ), 
+    #                              explorer=ExplorerGraphiQL(explorer_plugin=True ),
     #                              ))  # Graphiql IDE
-    app.mount("/graphql", GraphQL(graphql_schema, debug=True,
-                                explorer=ExplorerApollo( ), 
-                                websocket_handler=GraphQLTransportWSHandler(),
-                            )) 
+    app.mount(
+        "/graphql",
+        GraphQL(
+            graphql_schema,
+            debug=True,
+            explorer=ExplorerApollo(),
+            websocket_handler=GraphQLTransportWSHandler(),
+        ))
 
     # app.state.graph = InvanaGraph()
     # app.state.graph_schema = schema_generator.graph_schema

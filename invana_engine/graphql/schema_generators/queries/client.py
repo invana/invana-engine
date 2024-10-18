@@ -11,6 +11,7 @@ class BackendBasicInfoType(graphene.ObjectType):
     default_query_language = graphene.String()
     supported_query_languages = graphene.List(graphene.String)
 
+
 class ClientInfoType(graphene.ObjectType):
     host = graphene.String()
     host_ip_address = graphene.String()
@@ -18,7 +19,7 @@ class ClientInfoType(graphene.ObjectType):
 
 
 class BasicInfoType(graphene.ObjectType):
-    _hello = graphene.String( )
+    _hello = graphene.String()
     _version = graphene.String()
     _client = graphene.Field(ClientInfoType)
 
@@ -29,7 +30,7 @@ class BasicInfoType(graphene.ObjectType):
         request = info.context["request"]
         user_agent = request.headers.get("user-agent", "guest")
         return "Hello, %s!" % user_agent
-        
+
     def resolve__client(self, info):
         # return get_client_info()
         data = {
@@ -38,6 +39,6 @@ class BasicInfoType(graphene.ObjectType):
         }
         try:
             data['backend'] = info.context['request'].app.state.graph.backend.get_basic_info()
-        except:
+        except BaseException:
             data['backend'] = "NA"
         return data

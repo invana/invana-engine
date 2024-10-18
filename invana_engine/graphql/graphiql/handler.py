@@ -8,7 +8,7 @@ from starlette.responses import HTMLResponse, Response
 
 
 def generate_html(server_uri):
-   return f"""
+    return f"""
    <!doctype html>
    <html lang="en">
       <head>

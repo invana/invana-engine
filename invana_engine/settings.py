@@ -5,7 +5,9 @@ __AUTHOR_NAME__ = "Ravi Raja Merugu"
 __AUTHOR_EMAIL__ = "https://github.com/rrmerugu"
 
 
-GRAPH_BACKEND_URL = os.environ.get("GRAPH_BACKEND_URL", "ws://localhost:28182/gremlin")
+GRAPH_BACKEND_URL = os.environ.get(
+    "GRAPH_BACKEND_URL",
+    "ws://localhost:28182/gremlin")
 GRAPH_BACKEND = os.environ.get("GRAPH_BACKEND", "GremlinConnector")
 # GRAPH_BACKEND_CLASS = os.env.get("invana_engine.backends.")
 
@@ -15,7 +17,8 @@ GRAPH_BACKEND_AUTH_USERNAME = os.environ.get("GRAPH_BACKEND_AUTH_USERNAME")
 GRAPH_BACKEND_AUTH_PASSWORD = os.environ.get("GRAPH_BACKEND_AUTH_PASSWORD")
 
 # gremlin specific settings
-GRAPH_BACKEND_GREMLIN_TRAVERSAL_SOURCE = os.environ.get("GRAPH_BACKEND_GREMLIN_TRAVERSAL_SOURCE", "g")
+GRAPH_BACKEND_GREMLIN_TRAVERSAL_SOURCE = os.environ.get(
+    "GRAPH_BACKEND_GREMLIN_TRAVERSAL_SOURCE", "g")
 
 
 DEBUG = os.environ.get("DEBUG", False)

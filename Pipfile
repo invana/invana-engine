@@ -7,17 +7,17 @@ name = "pypi"
 starlette = "*"
 uvicorn = "*"
 graphene = "*"
-websockets = "*"
-graphql-core = "*"
 typing-extensions = "*"
-starlette-graphene3 = "*"
 neo4j = "*"
-ariadne = "*"
 gremlinpython = "*"
+ariadne = "*"
+websockets = "*"
 
 [dev-packages]
 pytest = "*"
 pandas = "*"
+pylint = "*"
+autopep8 = "*"
 
 [requires]
-python_version = "3.8"
+python_version = "3.11"

@@ -12,4 +12,3 @@ def get_elapsed_time(start_time, end_time):
 
 def get_datetime():
     return datetime.now()
-
