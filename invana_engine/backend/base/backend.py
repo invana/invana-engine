@@ -34,3 +34,7 @@ class BackendAbstract(ABC):
         """
         Abstract method to make raw query on the database driver
         """
+
+    @abstractmethod
+    def drop(self):
+        pass

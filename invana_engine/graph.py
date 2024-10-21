@@ -1,4 +1,4 @@
-
+import logging
 from .backend.base import BackendAbstract
 from .backend import GremlinBackend
 from .settings import GRAPH_BACKEND_URL
@@ -41,3 +41,7 @@ class InvanaGraph:
             timeout=timeout,
             raise_exception=raise_exception,
             finished_callback=finished_callback)
+
+    def drop(self):
+        logging.info("Dropping the data")
+        self.backend.drop()

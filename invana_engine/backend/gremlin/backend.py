@@ -69,3 +69,5 @@ class GremlinBackend(BackendAbstract):
             query_instance.add_response(response_instance)
             return response_instance
    
+    def drop(self):
+        self.g.V().drop().iterate()
