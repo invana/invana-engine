@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "7e334d4da6e35deed31ab33955d2768c52ff0bd31d068d2635ac85b13912fe4e"
+            "sha256": "a146eda750132ab61c6b3e3834b6c595e1ffe8cac24164a2270804a928143ac3"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -288,11 +288,11 @@
         },
         "gremlinpython": {
             "hashes": [
-                "sha256:58d12e4af81210d7770d54da8f1f586de816bc00858e095f76326d338ea34acd",
-                "sha256:ff925632f70fc5afff6864627fa69de8df577090a6eea63f10f0fed7194f98bf"
+                "sha256:73caeb2af98b94528726a7af9d687e9484b5fe9c9f5cab8870d69c15134a85b9",
+                "sha256:d62dcfd5ff7f504b46f9ad3e04dda87443c330644ec5645d0efba5e0e363cbfe"
             ],
             "index": "pypi",
-            "version": "==3.7.2"
+            "version": "==3.7.0"
         },
         "h11": {
             "hashes": [

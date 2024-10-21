@@ -4,13 +4,14 @@ from concurrent.futures import Future
 from gremlin_python.driver.remote_connection import (
      RemoteTraversal)
 from .utils import read_from_result_set_with_out_callback
+from .traversal_source import InvanaTraversalSource
 
 
 class DriverRemoteConnection(_DriverRemoteConnection):
     
-    @property
-    def client(self):
-        return self._client
+    # @property
+    # def client(self):
+    #     return self._client
     pass
     # def _submit_async(self, bytecode):
     #     # log.debug("submit_async with bytecode '%s'", str(bytecode))
@@ -43,22 +44,22 @@ class DriverRemoteConnection(_DriverRemoteConnection):
     #         query_instance.add_response(response_instance)
     #         return response_instance
     
-    def _submit_async(self, bytecode, query_instance):
-        result_set = self._client.submit_async(bytecode, request_options=self._extract_request_options(bytecode))
-        return  read_from_result_set_with_out_callback(result_set, query_instance)
+    # def _submit_async(self, bytecode, query_instance):
+    #     result_set = self._client.submit_async(bytecode, request_options=self._extract_request_options(bytecode))
+    #     return  read_from_result_set_with_out_callback(result_set, query_instance)
 
-    def submit_async(self, bytecode):
-        # if request_options is None:
-        #     request_options = {}
-        # request_options.update(self._extract_request_options(bytecode))
-        query_instance = Query(str(bytecode))
-        try:
-            response = self._submit_async(bytecode, query_instance)
-            response_instance = QueryResponse(data=response, status_code=200,)
-            query_instance.add_response(response_instance)
-            return response_instance
-        except Exception as e:
-            response_instance = QueryResponse(data=None, error=e, status_code=400,)
-            query_instance.add_response(response_instance)
-            return response_instance
+    # def submit_async(self, bytecode):
+    #     # if request_options is None:
+    #     #     request_options = {}
+    #     # request_options.update(self._extract_request_options(bytecode))
+    #     query_instance = Query(str(bytecode))
+    #     try:
+    #         response = self._submit_async(bytecode, query_instance)
+    #         response_instance = QueryResponse(data=response, status_code=200,)
+    #         query_instance.add_response(response_instance)
+    #         return response_instance
+    #     except Exception as e:
+    #         response_instance = QueryResponse(data=None, error=e, status_code=400,)
+    #         query_instance.add_response(response_instance)
+    #         return response_instance
         

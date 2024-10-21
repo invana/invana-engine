@@ -17,14 +17,13 @@ print("Initiating import: graph :", graph)
 
  
 for i in range(0, 10):
-    result = graph.run_query("g.addV('Hello').property('name','Test').next()") 
-# graph.execute_query("g.addV('Hello').property('name', 'Test').elementMap()")
-count = graph.run_query("g.V().limit(10).count()") 
-print("===count", count)
-result = graph.run_query("g.V().limit(10).elementMap().toList()") 
-print("===result", result)
+    # result = graph.run_query("g.addV('Hello').property('name','Test').next()") 
+    print("====", i)
+    a = graph.backend.g.addV('Hello').property('name',f'Test {i}').elementMap().next()
+    print(a)
 
-result2 = graph.backend.g.V().limit(10).elementMap().toList()
-print("===result2", result2)
 
+result2 = graph.backend.g.V().limit(1).elementMap().toList()
+for r in result2:
+    print("===r", r)
  

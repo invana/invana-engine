@@ -10,7 +10,7 @@ class BackendAbstract(ABC):
         self.connection_uri = connection_uri
         self.driver = None
         self.default_timeout = default_timeout if default_timeout else DEFAULT_QUERY_TIMEOUT
-        self.connect()
+        # self.connect() this should be called after init
 
     @abstractmethod
     def connect(self):
