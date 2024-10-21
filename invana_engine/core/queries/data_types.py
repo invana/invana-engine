@@ -9,10 +9,10 @@ from invana_engine.utils.utils import create_uuid, get_elapsed_time, get_datetim
 
 @dataclass
 class QueryRequest:
-    id: str = field(default_factory=lambda: str(uuid.uuid4()))
-    timestamp: datetime = field(default_factory=datetime.now)
     query_string: str
-    extra_options: T.Dict = None
+    id: str = field(default_factory=lambda: str(create_uuid()))
+    timestamp: datetime = field(default_factory=datetime.now)
+    extra_options: T.Optional[T.Dict] = field(default_factory=dict)
 
     def __repr__(self):
         return f"<Request:{self.id} query_string={self.query_string}>"
@@ -20,10 +20,10 @@ class QueryRequest:
 
 @dataclass
 class QueryResponse:
-    id: str = field(default_factory=lambda: str(uuid.uuid4()))
-    timestamp: datetime = field(default_factory=datetime.now)
     status_code: str = None
-    data: T.Any = None
+    id: str = field(default_factory=lambda: str(create_uuid()))
+    timestamp: datetime = field(default_factory=datetime.now)
+    data: T.Optional[T.Dict] = field(default_factory=dict)
     error: T.Optional[Exception] = None
 
     def is_success(self):
@@ -35,10 +35,10 @@ class QueryResponse:
 
 @dataclass
 class QueryEvent:
-    id: str = field(default_factory=lambda: str(uuid.uuid4()))
-    timestamp: datetime = field(default_factory=datetime.now)
-    type: QueryStateTypes = None
     error: T.Optional[Exception] = None
+    type: QueryStateTypes = QueryStateTypes
+    id: str = field(default_factory=lambda: str(create_uuid()))
+    timestamp: datetime = field(default_factory=datetime.now)
 
     def __repr__(self):
         return f"<QueryEvent:{self.id} status_code={self.type}>"

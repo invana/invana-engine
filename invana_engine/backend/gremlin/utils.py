@@ -13,62 +13,48 @@
 #     limitations under the License.
 
 from concurrent.futures import Future
-from invana_engine.core.queries import QueryResponse
-from functools import wraps
+from invana_engine.core.queries import QueryResponse, Query
 
 
-def read_from_result_set_decorator(func):
-    @wraps(func)
-    def wrapper(result_set, request, callback=None, finished_callback=None, *args, **kwargs):
-        def cb(f):
-            try:
-                f.result()
-            except Exception as e:
-                if request.has_callback:
-                    raise e
-                else:
-                    future.set_exception(e)
-            else:
-                if request.has_callback:
-                    # With callback
-                    while not result_set.stream.empty():
-                        single_result = result_set.stream.get_nowait()
-                        callback(
-                            QueryResponse(
-                                206,
-                                data=single_result))
-                        request.response_received_successfully(206)
-                    request.finished_with_success()
-                    if finished_callback:
-                        finished_callback()
-                else:
-                    # Without callback
-                    results = []
-                    while not result_set.stream.empty():
-                        results += result_set.stream.get_nowait()
+def read_from_result_set_with_callback(result_set, callback, query: Query, finished_callback):
+    def cb(f):
+        try:
+            f.result()
+        except Exception as e:
+            raise e
+        else:
+            while not result_set.stream.empty():
+                single_result = result_set.stream.get_nowait()
+                response_instance = QueryResponse(data=single_result, status_code=206)
+                callback(response_instance)
+                query.add_response(response_instance)
+                query.response_received_successfully(206)
+            query.query_successful()
 
-                    future.set_result(
-                        QueryResponse(
-                            status_code=200,
-                            data=results
-                        )
-                    )
-                    request.response_received_successfully(200)
-                    request.finished_with_success()
+    result_set.done.add_done_callback(cb)
 
-        if not request.has_callback:
-            future = Future()
+    if finished_callback:
+        finished_callback()
 
-        result_set.done.add_done_callback(cb)
 
-        if not request.has_callback:
-            return future.result()
+def read_from_result_set_with_out_callback(result_set, query_instance: Query):
+    future = Future()
 
-        # Invoke the original function
-        return func(result_set, request, callback, finished_callback, *args, **kwargs)
+    def cb(f):
+        try:
+            f.result()
+        except Exception as e:
+            future.set_exception(e)
+        else:
+            results = []
+            while not result_set.stream.empty():
+                results += result_set.stream.get_nowait()
+            response_instance = QueryResponse(data=results, status_code= 200)
+            future.set_result(response_instance)
+            query_instance.query_successful()
 
-    return wrapper
-
+    result_set.done.add_done_callback(cb)
+    return future.result()
 
 def get_id(_id):
     if isinstance(_id, dict):

@@ -9,9 +9,11 @@ uvicorn = "*"
 graphene = "*"
 typing-extensions = "*"
 neo4j = "*"
-gremlinpython = "*"
 ariadne = "*"
 websockets = "*"
+aiohttp = "*"
+async-timeout = "*"
+gremlinpython = "*"
 
 [dev-packages]
 pytest = "*"

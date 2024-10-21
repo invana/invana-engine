@@ -11,25 +11,25 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-from starlette.applications import Starlette
 import logging
+from graphql import GraphQLSchema
+from starlette.applications import Starlette
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.routing import Route, WebSocketRoute
-from .views import HomePageView, GremlinQueryView
-from invana_engine.settings import GRAPH_BACKEND, DEBUG, GRAPH_BACKEND_URL,  \
-    SERVER_PORT
-from invana_engine.graphql.graphiql.handler import make_graphiql_handler
-from ..settings import __VERSION__, __AUTHOR_NAME__, __AUTHOR_EMAIL__
 from starlette.routing import Mount
 from starlette.staticfiles import StaticFiles
 from ariadne.asgi import GraphQL
-from ..graphql.schema import SchemaGenerator
-from invana_engine import InvanaGraph
 from ariadne.asgi.handlers import GraphQLTransportWSHandler
 from ariadne.explorer import ExplorerGraphiQL, ExplorerApollo
-from graphql import GraphQLSchema
-import logging
+from .views import HomePageView, GremlinQueryView
+from ..settings import __VERSION__, __AUTHOR_NAME__, __AUTHOR_EMAIL__
+from ..graphql.schema import SchemaGenerator
+from ..graph import InvanaGraph
+from ..graphql.graphiql.handler import make_graphiql_handler
+from ..settings import GRAPH_BACKEND, DEBUG, GRAPH_BACKEND_URL,  \
+    SERVER_PORT
+from .starlette import InvanaApp
 
 
 logger = logging.getLogger(__name__)
@@ -57,7 +57,7 @@ def welcome():
 
 welcome()
 
-if GRAPH_BACKEND_URL is None:
+if not GRAPH_BACKEND_URL:
     logger.error(
         "ERROR: GRAPH_BACKEND_URL environment variable not set. Please fix it .")
     logger.error(
@@ -68,14 +68,9 @@ if GRAPH_BACKEND_URL is None:
 def create_app():
 
     routes = [
-        Route(
-            '/',
-            endpoint=HomePageView),
-        WebSocketRoute(
-            '/gremlin',
-            GremlinQueryView),
-        Mount(
-            '/static',
+        Route('/', endpoint=HomePageView),
+        WebSocketRoute( '/gremlin', GremlinQueryView),
+        Mount( '/static',
             app=StaticFiles(
                 packages=[
                     ('invana_engine.graphql.graphiql',
@@ -91,7 +86,7 @@ def create_app():
                 "POST",
                 "PUT",
                 "DELETE"])]
-    app = Starlette(routes=routes, middleware=middleware, debug=DEBUG)
+    app = InvanaApp(routes=routes, middleware=middleware, debug=DEBUG)
 
     schema_generator = SchemaGenerator("")
     graphql_schema: GraphQLSchema = schema_generator.get_schema().graphql_schema
@@ -101,15 +96,14 @@ def create_app():
     #                              explorer=ExplorerGraphiQL(explorer_plugin=True ),
     #                              ))  # Graphiql IDE
     app.mount(
-        "/graphql",
-        GraphQL(
-            graphql_schema,
-            debug=True,
-            explorer=ExplorerApollo(),
-            websocket_handler=GraphQLTransportWSHandler(),
-        ))
+            "/graphql",
+            GraphQL( graphql_schema,
+                debug=True, explorer=ExplorerGraphiQL(),
+                websocket_handler=GraphQLTransportWSHandler(),
+            )
+        )
 
-    # app.state.graph = InvanaGraph()
+    app.state.graph = InvanaGraph()
     # app.state.graph_schema = schema_generator.graph_schema
     return app
 

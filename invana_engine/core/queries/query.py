@@ -15,7 +15,7 @@ class QueryBase:
     _updated_at = None
 
     request = QueryRequest
-    responses: T.List[QueryResponse]
+    _responses: T.List[QueryResponse]
     _state = None
     _events : T.List[QueryEvent] = []
     _runtime = None
@@ -28,6 +28,7 @@ class QueryBase:
         self.query_id = create_uuid()
         self.parent_query_id = parent_query_id
         self._created_at = self.request.timestamp
+        self._responses = []
 
     @abstractmethod
     def query_created(self):
@@ -48,6 +49,10 @@ class QueryBase:
     @property
     def runtime(self):
         return self._runtime
+
+    @property
+    def responses(self):
+        return self._responses
 
     def get_event_by_state(self, state) -> QueryEvent:
         return next(filter(lambda item: item.type == state, self.events), None)
@@ -70,7 +75,7 @@ class QueryBase:
             self._runtime = get_elapsed_time(event.timestamp - started_event.timestamp)
 
     def add_response(self, response: QueryResponse):
-        self.responses.append(response)
+        self._responses.append(response)
 
 class Query(QueryBase):
 
