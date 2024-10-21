@@ -6,21 +6,14 @@ from .exception import PathNotFound
 from .base import ImporterBase
 
 
-
 class JSONImporter(ImporterBase):
     """
     This importer expects files to be in the structure:
-
-    <path>/nodes.json
-    <path>/links.json
+ 
     
     """
-
-    base_path: str = None
-
-    nodes_file_pattern = ["nodes.json"]
-    links_file_pattern = ["links.json"]
-    nodes_map : T.Dict[T.Union[int, str], T.Union[int, str]] = {}
+    nodes_file_pattern = ["*nodes.json"]
+    links_file_pattern = ["*links.json"]
 
     def read_file(self, file_path):
         with open(file_path, 'r') as file:

@@ -1,15 +1,22 @@
-from pathlib import Path
-from collections import defaultdict
-import json
 import abc
 import os
+import typing as T
+from pathlib import Path
+from collections import defaultdict
 from .exception import PathNotFound, DuplicateFileError
 
 
 class ImporterBase(abc.ABC):
 
+    """
+    
+    nodes_file_pattern = ["nodes.json"] or ["nodes.csv"] or ...
+    links_file_pattern = ["links.json"] or ["links.csv"] or ...
+    
+    """
     nodes_file_pattern = None
     links_file_pattern = None
+    nodes_map : T.Dict[T.Union[int, str], T.Union[int, str]] = {}
 
     def __init__(self, base_path: str, invana) -> None:
         self.base_path = base_path
@@ -54,11 +61,12 @@ class ImporterBase(abc.ABC):
 
         return nodes_files, links_files
 
-    def group_by_labels(self, data):
+    def group_by_labels(self, data, clean_item_fn=None):
         data_groups = defaultdict(list)
         # Group data
-        for node in data:
-            data_groups[node['label']].append(node)
+        for item in data:
+            item_cleaned = clean_item_fn(item) if clean_item_fn else item
+            data_groups[item_cleaned['label']].append(item_cleaned)
         return data_groups
 
 
@@ -75,16 +83,16 @@ class ImporterBase(abc.ABC):
 
         return all_nodes, all_links
     
-    def start(self):
+    def start(self, clean_nodes_fn=None , clean_links_fn=None ):
         all_nodes, all_links = self.read_files()
-        node_groups = self.group_by_labels(all_nodes)
-        link_groups = self.group_by_labels(all_links)
+        node_groups = self.group_by_labels(all_nodes, clean_item_fn=clean_nodes_fn)
+        link_groups = self.group_by_labels(all_links, clean_item_fn=clean_links_fn)
         for label, nodes in node_groups.items():
-            print(f"Found {label}: {nodes.__len__()}")
+            print(f"Found {label} \t\tnodes: {nodes.__len__()}")
             self.create_nodes(nodes)
 
         for label, links in link_groups.items():
-            print(f"Found {label}: {links.__len__()}")
+            print(f"Found {label}\t\tlinks: {links.__len__()}")
             self.create_nodes(links)
 
         # print(f"Created {nodes_map.__len__()} nodes, and {links_instances.__len__()} links")
