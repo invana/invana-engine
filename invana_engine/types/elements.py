@@ -17,16 +17,20 @@ class GenericData:
 
 @dataclass
 class Property:
-    id: T.Optional[ElementIdType]
     key: str
     value: any
+    id: T.Optional[ElementIdType] = None
 
     def __repr__(self) -> str:
-        return f"vp[{self.key}={self.value}]"
+        return f"P[{self.key}={self.value}]"
+
 
 @dataclass
 class VertexProperty(Property):
-    pass
+
+
+    def __repr__(self) -> str:
+        return f"VP[{self.key}={self.value}]"
 
 
 @dataclass
@@ -74,7 +78,7 @@ class RelationShip(ElementBase):
     type: str = "edge"
 
     def __repr__(self):
-        return f'<RelationShip:{self.label}::{self.id} ' \
+        return f'<Link:{self.label}::{self.id} ' \
             f'({self.outv.__short_repr__()}) -> {self.label} -> ({self.inv.__short_repr__()})' \
             f' {self.properties}>'
 

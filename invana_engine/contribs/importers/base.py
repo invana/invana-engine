@@ -4,6 +4,7 @@ import typing as T
 from pathlib import Path
 from collections import defaultdict
 from .exception import PathNotFound, DuplicateFileError
+from invana_engine.backend.gremlin.backend import InvanaTraversalSource
 
 
 class ImporterBase(abc.ABC):
@@ -29,13 +30,23 @@ class ImporterBase(abc.ABC):
     def read_file(self, file_path):
         pass
 
-    @abc.abstractmethod
     def create_nodes(self, nodes):
-        pass
+        g: InvanaTraversalSource = self.invana.backend.g
+        for node in nodes:
+            node_instance = g.create_vertex(node['label'], **node['properties']).next()
+            print("node_instance", node_instance)
+            self.nodes_map[node['id']] = node_instance.id
+                        
 
-    @abc.abstractmethod
     def create_links(self, links):
-        pass
+        g: InvanaTraversalSource = self.invana.backend.g
+        for link in links:
+            links_instance = g.create_edge(link['label'],
+                                self.nodes_map[link['from']],
+                                self.nodes_map[link['to']],
+                                **link['properties']
+                            ).next()
+            print("link_instance", links_instance)
 
     def scan_folder(self, folder_path):
         folder = Path(folder_path)
@@ -93,7 +104,7 @@ class ImporterBase(abc.ABC):
 
         for label, links in link_groups.items():
             print(f"Found {label}\t\tlinks: {links.__len__()}")
-            self.create_nodes(links)
+            self.create_links(links)
 
         # print(f"Created {nodes_map.__len__()} nodes, and {links_instances.__len__()} links")
 

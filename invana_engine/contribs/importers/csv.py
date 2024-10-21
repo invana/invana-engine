@@ -18,20 +18,4 @@ class CSVImporter(ImporterBase):
         with open(file_path, mode='r', encoding='utf-8') as csv_file:
             csv_reader = csv.DictReader(csv_file)
             return [row for row in csv_reader]
-        
-    def create_nodes(self, nodes):
-        g: InvanaTraversalSource = self.invana.backend.g
-        for node in nodes:
-            node_instance = g.create_vertex(node['label'], **node['properties']).next()
-            self.nodes_map[node['id']] = node_instance.id
-                        
 
-    def create_links(self, links):
-        g: InvanaTraversalSource = self.invana.backend.g
-        for link in links:
-            links_instance = g.create_edge(link['label'],
-                                self.nodes_map[link['from']],
-                                self.nodes_map[link['to']],
-                                **link['properties']
-                            )
-    
