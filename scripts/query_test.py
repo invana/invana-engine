@@ -19,7 +19,7 @@ print("Initiating import: graph :", graph)
 graph.backend.g.V().drop().iterate()
 for i in range(0, 1):
     a = graph.backend.g.addV('Hello').property('name',f'Test {i}').elementMap().next()
-    print(a)
+
 
 result = graph.backend.run_query('g.V().limit(1).toList()')
 print("====result", result.data)

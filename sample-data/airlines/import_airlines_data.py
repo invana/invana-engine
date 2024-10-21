@@ -11,7 +11,7 @@ sys.path.append(os.path.join(os.getcwd() ))
 print("sys.path", sys.path)
 print("os.", os.getcwd())
 from invana_engine import InvanaGraph
-from invana_engine.backend import GremlinBackend
+from invana_engine.backend import InvanaTraversalSource, GremlinBackend
 import csv
 
 invana = InvanaGraph()
@@ -61,7 +61,7 @@ def clean_edges(edge_data):
     }
 
 node_id_map = {}
-backend: GremlinBackend  = invana.backend
+backend: GremlinBackend = invana.backend
 backend.g.V().drop().iterate()
 
 
@@ -75,12 +75,11 @@ with open(os.path.join(os.getcwd() ,'./sample-data/airlines/air-routes-latest-no
 
 with open(os.path.join(os.getcwd() ,'./sample-data/airlines/air-routes-latest-edges.csv')) as f:
     reader = csv.DictReader(f)
+    g: InvanaTraversalSource = backend.g
     for line in reader:
         cleaned_data = clean_edges(line)
-        created_data = backend.g.create_edge(cleaned_data['label'],
+        created_data = g.create_edge(cleaned_data['label'],
                                          node_id_map[cleaned_data['from']],
                                          node_id_map[cleaned_data['to']],
-                                         **cleaned_data['properties']).next()
+                                         **cleaned_data['properties']).elementMap().next()
         print(f"**created edge {created_data.id}")
-
-

@@ -1,1 +1,1 @@
-from .gremlin.backend import GremlinBackend
+from .gremlin.backend import GremlinBackend, InvanaTraversalSource

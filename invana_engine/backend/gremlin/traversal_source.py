@@ -11,12 +11,11 @@
 #     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
-
+import copy
 from gremlin_python.process.graph_traversal import GraphTraversal, GraphTraversalSource
 from gremlin_python.process.traversal import P, TextP, Bytecode, Cardinality
 from gremlin_python.process.graph_traversal import __ as AnonymousTraversal
 from .search import GraphSearch
-import copy
 
 
 class InvanaTraversal(GraphTraversal):
@@ -111,6 +110,9 @@ class __(AnonymousTraversal):
 class InvanaTraversalSource(GraphTraversalSource):
 
     graph_traversal: InvanaTraversal
+
+    def get_graph_traversal(self) -> InvanaTraversal:
+        return self.graph_traversal(self.graph, self.traversal_strategies, Bytecode(self.bytecode))
 
     def __init__(self, *args, **kwargs):
         super(InvanaTraversalSource, self).__init__(*args, **kwargs)

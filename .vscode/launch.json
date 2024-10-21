@@ -7,24 +7,10 @@
             "program": "${file}",
             "cwd": "${cwd}",
             "console": "integratedTerminal",
-            "justMyCode": true
-        },
-        {
-            "name": "Old GraphQL App",
-            "type": "python",
-            "request": "launch",
-            "module": "uvicorn",
-            "args": [
-                "invana_engine2.server.app:app",
-                "--port=8201",
-                "--host=0.0.0.0",
-                "--loop=asyncio",
-                "--reload"
-            ],
+            "justMyCode": true,
             "env": {
-                "GREMLIN_SERVER_URL": "ws://localhost:8182/gremlin"
+                "PYTHONPATH": "${workspaceFolder}"
             },
-            "justMyCode": true
         },
         {
             "name": "GraphQL App: Janusgraph",

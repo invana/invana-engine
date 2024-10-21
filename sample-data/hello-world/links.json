@@ -1,0 +1,12 @@
+[
+    {
+        "id" : "1-2",
+        "label": "authored",
+        "properties": {
+            "first_commit": "somewhere in 2019"
+        },
+        "from": 1,
+        "to": 2
+    }
+   
+]

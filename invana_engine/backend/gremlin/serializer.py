@@ -15,10 +15,11 @@
 from gremlin_python.structure.io import graphsonV3d0
 from gremlin_python.process.traversal import T, Direction
 from .utils import get_id
-from invana_engine.types import RelationShip, Node
+from invana_engine.types import RelationShip, Node, \
+    Property, VertexProperty
 
 
-class InvanaMapType(graphsonV3d0.MapType):
+class MapType(graphsonV3d0.MapType):
 
     @staticmethod
     def create_node_object(dict_data):
@@ -31,25 +32,25 @@ class InvanaMapType(graphsonV3d0.MapType):
 
     @staticmethod
     def create_relationship_object(dict_data):
-        _ = dict_data.copy()
-        id = get_id(_[T.id])
-        label = _[T.label]
-        inv = _[Direction.IN]
-        outv = _[Direction.OUT]
-        del _[T.id]
-        del _[T.label]
-        del _[Direction.IN]
-        del _[Direction.OUT]
+        properties = dict_data.copy()
+        id = get_id(properties[T.id])
+        label = properties[T.label]
+        inv = properties[Direction.IN]
+        outv = properties[Direction.OUT]
+        del properties[T.id]
+        del properties[T.label]
+        del properties[Direction.IN]
+        del properties[Direction.OUT]
         return RelationShip(
             id=id,
             label=label,
             outv=outv,
             inv=inv,
-            properties=_)
+            properties=properties)
 
     @classmethod
     def objectify(cls, l, reader):
-        new_dict = super(InvanaMapType, cls).objectify(l, reader)
+        new_dict = super(MapType, cls).objectify(l, reader)
         if T.id in new_dict and Direction.IN not in new_dict:
             return cls.create_node_object(new_dict)
         if T.id in new_dict and Direction.IN in new_dict:
@@ -57,29 +58,50 @@ class InvanaMapType(graphsonV3d0.MapType):
         return new_dict
 
 
-class InvanaVertexDeserializer(graphsonV3d0.VertexDeserializer):
+class VertexPropertyDeserializer(graphsonV3d0.VertexPropertyDeserializer):
 
     @classmethod
     def objectify(cls, d, reader):
-        return Node(
-                id=reader.to_object(get_id(d["id"])), 
-                label=d.get("label", "vertex"),
-                properties=d.get("label", "vertex")
+        # element = reader.to_object(d["element"]) if "element" in d else None
+        return VertexProperty(id=get_id(reader.to_object(d["id"])), key=d["label"],
+                               value=reader.to_object(d["value"]))
 
+
+class PropertyDeserializer(graphsonV3d0.PropertyDeserializer):
+
+    @classmethod
+    def objectify(cls, d, reader):
+        element = reader.to_object(d["element"]) if "element" in d else None
+        return Property(id=get_id(reader.to_object(d["id"])), key=d["label"],
+                         value=reader.to_object(d["value"]))
+
+
+class VertexDeserializer(graphsonV3d0.VertexDeserializer):
+
+    @classmethod
+    def objectify(cls, d, reader):
+        node = super(VertexDeserializer, cls).objectify(d, reader)
+        return Node(
+                id=node.id, 
+                label=node.label,
+                properties=node.properties
             )
 
 
-class InvanaEdgeDeserializer(graphsonV3d0.EdgeDeserializer):
+class EdgeDeserializer(graphsonV3d0.EdgeDeserializer):
 
     @classmethod
     def objectify(cls, d, reader):
+        edge = super(EdgeDeserializer, cls).objectify(d, reader)
         return RelationShip(
                 id=reader.to_object(get_id(d["id"])), 
                 label=d.get("label", "edge"), 
                 inv=Node(id=reader.to_object(d["outV"]), 
                         label=d.get("outVLabel", "vertex")), 
                 outv=Node(id=reader.to_object(d["inV"]), 
-                        label=d.get("inVLabel", "vertex"))
+                        label=d.get("inVLabel", "vertex")),
+                properties=edge.properties
+
             )
 
 
@@ -92,19 +114,12 @@ class InvanaEdgeDeserializer(graphsonV3d0.EdgeDeserializer):
 #                 )
 
 
-# class PropertyDeserializer(graphsonV3d0.PropertyDeserializer):
-#
-#     @classmethod
-#     def objectify(cls, d, reader):
-#         element = reader.to_object(d["element"]) if "element" in d else None
-#         return Property(d["key"], reader.to_object(d["value"]), element)
-
 
 INVANA_DESERIALIZER_MAP = {
-    "g:Map": InvanaMapType,
-    "g:Vertex": InvanaVertexDeserializer,
-    "g:Edge": InvanaEdgeDeserializer,
-    # "g:Path": InvanaPathDeserializer,
-
-    # "g:Property": InvanaEdgeDeserializer,
+    "g:Map": MapType,
+    "g:Vertex": VertexDeserializer,
+    "g:Edge": EdgeDeserializer,
+    "g:VertexProperty": VertexPropertyDeserializer,
+    "g:Property": PropertyDeserializer
+    # "g:Path": InvanaPathDeserializer
 }

@@ -17,7 +17,7 @@ class GremlinBackend(BackendAbstract):
     traversal_source: T.AnyStr = "g"
     traversal_source_class: GraphTraversalSource = InvanaTraversalSource
     deserializer_map: T.Dict[str, T.Any] = None
-    g: GraphTraversalSource = None
+    g: GraphTraversalSource = InvanaTraversalSource
     call_from_event_loop: bool = False
     transport_kwargs: T.Dict = {} 
 

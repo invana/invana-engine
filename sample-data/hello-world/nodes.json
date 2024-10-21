@@ -1,0 +1,16 @@
+[
+    {
+        "id" : 1,
+        "label": "Person",
+        "properties": {
+            "name": "Ravi"
+        } 
+    },
+    {
+        "id": 2,
+        "label": "Project",
+        "properties": {
+            "name": "invana-engine"
+        }
+    }
+]

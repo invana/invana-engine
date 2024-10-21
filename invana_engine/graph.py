@@ -1,8 +1,8 @@
 
-from invana_engine import settings
 from .backend.base import BackendAbstract
 from .backend import GremlinBackend
 from .settings import GRAPH_BACKEND_URL
+
 
 class InvanaGraph:
 

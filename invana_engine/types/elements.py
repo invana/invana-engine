@@ -16,15 +16,36 @@ class GenericData:
 
 
 @dataclass
+class Property:
+    id: T.Optional[ElementIdType]
+    key: str
+    value: any
+
+    def __repr__(self) -> str:
+        return f"vp[{self.key}={self.value}]"
+
+@dataclass
+class VertexProperty(Property):
+    pass
+
+
+@dataclass
 class ElementBase:
     id: ElementIdType
     label: str
     properties: T.Optional[PropertiesType]
 
+    def properties_to_json(self):
+        properties = {}
+        for property in self.properties:
+            properties[property.key] = property.value
+        return properties
+
 
 @dataclass
 class Node(ElementBase):
     type: str = "vertex"
+    properties: T.List[VertexProperty]
 
     def __repr__(self):
         return f'<Node:{self.label} id="{self.id}" {self.properties}>'
@@ -37,7 +58,7 @@ class Node(ElementBase):
             "id": self.id,
             "type": self.type,
             "label": self.label,
-            "properties": self.properties}
+            "properties": self.properties_to_json()}
 
 
 @dataclass
@@ -49,6 +70,7 @@ class UnLabelledNode(Node):
 class RelationShip(ElementBase):
     inv: T.Union[ElementIdType, Node, UnLabelledNode]  # to
     outv: T.Union[ElementIdType, Node, UnLabelledNode]  # from
+    properties: T.Optional[T.List[Property]]
     type: str = "edge"
 
     def __repr__(self):
@@ -61,7 +83,8 @@ class RelationShip(ElementBase):
             "id": self.id,
             "type": self.type,
             "label": self.label,
-            "properties": self.properties}
+            "properties": self.properties_to_json()
+        }
         base_data['inv'] = self.inv.to_json()
         base_data['outv'] = self.outv.to_json()
         return base_data
