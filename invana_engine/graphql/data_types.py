@@ -65,8 +65,8 @@ class GetOrCreateNodeType(graphene.Scalar):
 
 
 class EdgeType(NodeType):
-    inv = graphene.Field(NodeType)
-    outv = graphene.Field(NodeType)
+    inV = graphene.Field(NodeType)
+    outV = graphene.Field(NodeType)
 
 
 class NodeOrEdgeType(EdgeType):

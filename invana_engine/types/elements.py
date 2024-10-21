@@ -41,8 +41,9 @@ class ElementBase:
 
     def properties_to_json(self):
         properties = {}
-        for property in self.properties:
-            properties[property.key] = property.value
+        if self.properties:
+            for property in self.properties:
+                properties[property.key] = property.value
         return properties
 
 
@@ -72,14 +73,14 @@ class UnLabelledNode(Node):
 
 @dataclass
 class RelationShip(ElementBase):
-    inv: T.Union[ElementIdType, Node, UnLabelledNode]  # to
-    outv: T.Union[ElementIdType, Node, UnLabelledNode]  # from
+    inV: T.Union[ElementIdType, Node, UnLabelledNode]  # to
+    outV: T.Union[ElementIdType, Node, UnLabelledNode]  # from
     properties: T.Optional[T.List[Property]]
     type: str = "edge"
 
     def __repr__(self):
         return f'<Link:{self.label}::{self.id} ' \
-            f'({self.outv.__short_repr__()}) -> {self.label} -> ({self.inv.__short_repr__()})' \
+            f'({self.outV.__short_repr__()}) -> {self.label} -> ({self.inV.__short_repr__()})' \
             f' {self.properties}>'
 
     def to_json(self):
@@ -89,13 +90,13 @@ class RelationShip(ElementBase):
             "label": self.label,
             "properties": self.properties_to_json()
         }
-        base_data['inv'] = self.inv.to_json()
-        base_data['outv'] = self.outv.to_json()
+        base_data['inV'] = self.inV.to_json()
+        base_data['outV'] = self.outV.to_json()
         return base_data
 
 
 @dataclass
 class UnLabelledRelationShip(RelationShip):
     label: T.Optional[str]
-    inv: T.Optional[T.Union[ElementIdType, Node, UnLabelledNode]]  # to
-    outv: T.Optional[T.Union[ElementIdType, Node, UnLabelledNode]]  # from
+    inV: T.Optional[T.Union[ElementIdType, Node, UnLabelledNode]]  # to
+    outV: T.Optional[T.Union[ElementIdType, Node, UnLabelledNode]]  # from

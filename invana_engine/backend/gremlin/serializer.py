@@ -23,29 +23,36 @@ class MapType(graphsonV3d0.MapType):
 
     @staticmethod
     def create_node_object(dict_data):
-        properties = dict_data.copy()
-        id = get_id(properties[T.id])
-        label = properties[T.label]
-        del properties[T.id]
-        del properties[T.label]
+        data = dict_data.copy()
+        id = get_id(data[T.id])
+        label = data[T.label]
+        del data[T.id]
+        del data[T.label]
+        properties = []
+        for key, value, in data.items():
+            properties.append(VertexProperty(key=key, value=value))
         return Node(id=id, label=label, properties=properties)
 
     @staticmethod
     def create_relationship_object(dict_data):
-        properties = dict_data.copy()
-        id = get_id(properties[T.id])
-        label = properties[T.label]
-        inv = properties[Direction.IN]
-        outv = properties[Direction.OUT]
-        del properties[T.id]
-        del properties[T.label]
-        del properties[Direction.IN]
-        del properties[Direction.OUT]
+        data = dict_data.copy()
+        id = get_id(data[T.id])
+        label = data[T.label]
+        inV = data[Direction.IN]
+        outV = data[Direction.OUT]
+        del data[T.id]
+        del data[T.label]
+        del data[Direction.IN]
+        del data[Direction.OUT]
+
+        properties = []
+        for key, value, in data.items():
+            properties.append(Property(key=key, value=value))
         return RelationShip(
             id=id,
             label=label,
-            outv=outv,
-            inv=inv,
+            outV=outV,
+            inV=inV,
             properties=properties)
 
     @classmethod
@@ -98,8 +105,8 @@ class EdgeDeserializer(graphsonV3d0.EdgeDeserializer):
         _ = RelationShip(
                 id=get_id(reader.to_object(d["id"])), 
                 label=edge.label, 
-                inv=Node(id=edge.inV.id, label=edge.inV.label, properties=edge.properties), 
-                outv=Node(id=edge.outV.id, label=edge.outV.label, properties=edge.properties), 
+                inV=Node(id=edge.inV.id, label=edge.inV.label, properties=edge.inV.properties), 
+                outV=Node(id=edge.outV.id, label=edge.outV.label, properties=edge.outV.properties), 
                 properties=edge.properties
 
             )
