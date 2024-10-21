@@ -10,7 +10,7 @@ import os
 sys.path.append(os.path.join(os.getcwd() ))
 print("sys.path", sys.path)
 print("os.", os.getcwd())
-from invana_engine2.invana import InvanaGraph
+from invana_engine import InvanaGraph
 import csv
 
 graph = InvanaGraph("ws://localhost:28182/gremlin")

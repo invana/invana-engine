@@ -22,4 +22,4 @@ for i in range(0, 1):
     print(a)
 
 result = graph.backend.run_query('g.V().limit(1).toList()')
-print("====result", result)
+print("====result", result.data)

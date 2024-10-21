@@ -43,6 +43,11 @@ class GremlinBackend(BackendAbstract):
             )
         self.g = traversal().withRemote(self.driver)
         
+    def close(self):
+        pass
+
+    def reconnect(self):
+        pass
 
     def run_query(self, query_string: str, extra_options=None, timeout=None,
                   callback=None, finished_callback=None, **kwargs):

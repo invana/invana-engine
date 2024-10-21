@@ -1,6 +1,7 @@
 
 from abc import ABC, abstractmethod
 from invana_engine.settings import DEFAULT_QUERY_TIMEOUT
+from ...core.queries import QueryResponse, QueryEvent, QueryRequest
 
 class BackendAbstract(ABC):
 
@@ -18,10 +19,18 @@ class BackendAbstract(ABC):
         Abstract method to initiate the driver.
         This method must be implemented by any subclass.
         """
+    
+    @abstractmethod
+    def close(self):
+        pass
 
     @abstractmethod
+    def reconnect(self):
+        pass
+    
+    @abstractmethod
     def run_query(self, query_string: str, extra_options=None, timeout=None,
-                  callback=None, finished_callback=None, **kwargs):
+                  callback=None, finished_callback=None, **kwargs) -> QueryResponse:
         """
         Abstract method to make raw query on the database driver
         """
