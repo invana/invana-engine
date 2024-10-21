@@ -16,14 +16,10 @@ graph = InvanaGraph()
 print("Initiating import: graph :", graph)
 
  
-for i in range(0, 10):
-    # result = graph.run_query("g.addV('Hello').property('name','Test').next()") 
-    print("====", i)
+graph.backend.g.V().drop().iterate()
+for i in range(0, 1):
     a = graph.backend.g.addV('Hello').property('name',f'Test {i}').elementMap().next()
     print(a)
 
-
-result2 = graph.backend.g.V().limit(1).elementMap().toList()
-for r in result2:
-    print("===r", r)
- 
+result = graph.backend.run_query('g.V().limit(1).toList()')
+print("====result", result)

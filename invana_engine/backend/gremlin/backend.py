@@ -1,13 +1,14 @@
 from gremlin_python.process.anonymous_traversal import traversal
-# from .driver import DriverRemoteConnection
 from gremlin_python.structure.io.graphsonV3d0 import GraphSONReader, GraphSONWriter
 from gremlin_python.process.graph_traversal import GraphTraversalSource
 import typing as T
 from ..base import BackendAbstract
 from .serializer import INVANA_DESERIALIZER_MAP
-from invana_engine.core.queries import Query
+from invana_engine.core.queries import Query, QueryResponse, QueryRequest
 from .traversal_source import InvanaTraversalSource
-from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection
+# from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection
+from .driver import DriverRemoteConnection
+from .utils import read_from_result_set_with_out_callback
 
 
 class GremlinBackend(BackendAbstract):
@@ -48,7 +49,15 @@ class GremlinBackend(BackendAbstract):
         if extra_options is None:
             extra_options = {} 
         extra_options["evaluationTimeout"] = timeout if timeout else self.default_timeout
-        # query_instance = Query(query_string, extra_options=extra_options )
-        _ = self.driver.submit_async(query_string).result()
-        return _
-     
+        query_instance = Query(str(query_string), extra_options=extra_options)
+        query_instance.query_started()
+        try:
+            result_set = self.driver._client.submit_async(query_string, request_options=extra_options).result()
+            response_instance = read_from_result_set_with_out_callback(result_set, query_instance)
+            query_instance.add_response(response_instance)
+            return response_instance
+        except Exception as e:
+            response_instance = QueryResponse(data=None, error=e, status_code=400,)
+            query_instance.add_response(response_instance)
+            return response_instance
+   

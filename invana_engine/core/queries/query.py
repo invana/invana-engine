@@ -69,10 +69,10 @@ class QueryBase:
         self.updated_state(event.type, event.timestamp)
         if event.type == QueryStateTypes.FAILED:
             started_event = self.get_event_by_state(QueryStateTypes.STARTED)
-            self._runtime = get_elapsed_time(event.timestamp - started_event.timestamp)
+            self._runtime = get_elapsed_time(event.timestamp , started_event.timestamp)
         elif event.type == QueryStateTypes.SUCCESSFUL:
             started_event = self.get_event_by_state(QueryStateTypes.STARTED)
-            self._runtime = get_elapsed_time(event.timestamp - started_event.timestamp)
+            self._runtime = get_elapsed_time(event.timestamp , started_event.timestamp)
 
     def add_response(self, response: QueryResponse):
         self._responses.append(response)

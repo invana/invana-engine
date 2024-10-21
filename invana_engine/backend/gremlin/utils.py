@@ -16,28 +16,28 @@ from concurrent.futures import Future
 from invana_engine.core.queries import QueryResponse, Query
 
 
-def read_from_result_set_with_callback(result_set, callback, query: Query, finished_callback):
-    def cb(f):
-        try:
-            f.result()
-        except Exception as e:
-            raise e
-        else:
-            while not result_set.stream.empty():
-                single_result = result_set.stream.get_nowait()
-                response_instance = QueryResponse(data=single_result, status_code=206)
-                callback(response_instance)
-                query.add_response(response_instance)
-                query.response_received_successfully(206)
-            query.query_successful()
+# def read_from_result_set_with_callback(result_set, callback, query: Query, finished_callback):
+#     def cb(f):
+#         try:
+#             f.result()
+#         except Exception as e:
+#             raise e
+#         else:
+#             while not result_set.stream.empty():
+#                 single_result = result_set.stream.get_nowait()
+#                 response_instance = QueryResponse(data=single_result, status_code=206)
+#                 callback(response_instance)
+#                 query.add_response(response_instance)
+#                 query.response_received_successfully(206)
+#             query.query_successful()
 
-    result_set.done.add_done_callback(cb)
+#     result_set.done.add_done_callback(cb)
 
-    if finished_callback:
-        finished_callback()
+#     if finished_callback:
+#         finished_callback()
 
 
-def read_from_result_set_with_out_callback(result_set, query_instance: Query):
+def read_from_result_set_with_out_callback(result_set, query_instance: Query=None):
     future = Future()
 
     def cb(f):
@@ -50,8 +50,8 @@ def read_from_result_set_with_out_callback(result_set, query_instance: Query):
             while not result_set.stream.empty():
                 results += result_set.stream.get_nowait()
             response_instance = QueryResponse(data=results, status_code= 200)
+            query_instance.query_successful(response_instance)
             future.set_result(response_instance)
-            query_instance.query_successful()
 
     result_set.done.add_done_callback(cb)
     return future.result()
