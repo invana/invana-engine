@@ -13,7 +13,7 @@
             },
         },
         {
-            "name": "GraphQL App: Janusgraph",
+            "name": "GraphQL: Janusgraph",
             "type": "python",
             "request": "launch",
             "module": "uvicorn",
@@ -25,14 +25,15 @@
                 "--reload"
             ],
             "env": {
-                "GRAPH_BACKEND": "JanusGraphConnector",
+                "PYTHONPATH": "${workspaceFolder}",
+                "GRAPH_BACKEND_CLASS": "GremlinBackend",
                 "GRAPH_BACKEND_URL": "ws://localhost:28182/gremlin"
             },
             "justMyCode": true,
             "console": "integratedTerminal"
         },
         {
-            "name": "GraphQL App: Neo4j",
+            "name": "GraphQL: Neo4j",
             "type": "python",
             "request": "launch",
             "module": "uvicorn",
@@ -44,7 +45,8 @@
                 "--reload"
             ],
             "env": {
-                "GRAPH_BACKEND": "CypherConnector",
+                "PYTHONPATH": "${workspaceFolder}",
+                "GRAPH_BACKEND_CLASS": "CypherBackend",
                 "GRAPH_BACKEND_URL": "neo4j://localhost:17687",
                 "GRAPH_BACKEND_DATABASE_NAME": "neo4j",
                 "GRAPH_BACKEND_AUTH_USERNAME": "neo4j",

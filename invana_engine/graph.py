@@ -1,17 +1,35 @@
 import logging
+import importlib
 from .backend.base import BackendAbstract
 from .backend import GremlinBackend, CypherBackend
-from .settings import GRAPH_BACKEND_URL
+from .backend.exceptions import BackendNotFound
+from invana_engine import settings
 
 
 class InvanaGraph:
 
     backend : BackendAbstract
+    backend_class_name: str = None
     
     def __init__(self):
-        # self.settings = settings
-        self.backend = CypherBackend(GRAPH_BACKEND_URL)
-  
+
+        self.backend_class_name = settings.GRAPH_BACKEND_CLASS
+        if self.backend_class_name == "CypherBackend":
+            self.backend = CypherBackend(settings.GRAPH_BACKEND_URL, 
+                                database_name=settings.GRAPH_BACKEND_DATABASE_NAME,
+                                username=settings.GRAPH_BACKEND_AUTH_USERNAME,
+                                password=settings.GRAPH_BACKEND_AUTH_PASSWORD,
+                            )
+        elif self.backend_class_name == "GremlinBackend":
+              self.backend = GremlinBackend(settings.GRAPH_BACKEND_URL, 
+                                    database_name=settings.GRAPH_BACKEND_DATABASE_NAME,
+                                    username=settings.GRAPH_BACKEND_AUTH_USERNAME,
+                                    password=settings.GRAPH_BACKEND_AUTH_PASSWORD,
+                                    traversal_source=settings.GRAPH_BACKEND_GREMLIN_TRAVERSAL_SOURCE
+                                )
+        else:
+            raise BackendNotFound(f"{self.backend_class_name} backend not found.")
+        
     def connect(self):
         return self.backend.connect()
 
@@ -21,6 +39,15 @@ class InvanaGraph:
     def reconnect(self):
         return self.backend.reconnect()
 
+    # def get_backend_class(self, backend_class_name):
+    #     # backend_module_str = ".".join(backend_cls_str.split(".")[:-1])
+    #     # backend_class_name = backend_cls_str.split(".")[-1]
+    #     # backend_module = importlib.import_module(backend_module_str)
+    #     backend_module = importlib.import_module('invana_engine.backends')
+
+    #     return getattr(backend_module, backend_class_name)
+  
+  
     def run_query(
             self,
             query_string: str,

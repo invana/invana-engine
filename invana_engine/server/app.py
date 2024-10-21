@@ -27,7 +27,7 @@ from ..settings import __VERSION__, __AUTHOR_NAME__, __AUTHOR_EMAIL__
 from ..graphql.schema import SchemaGenerator
 from ..graph import InvanaGraph
 from ..graphql.graphiql.handler import make_graphiql_handler
-from ..settings import GRAPH_BACKEND, DEBUG, GRAPH_BACKEND_URL,  \
+from ..settings import GRAPH_BACKEND_CLASS, DEBUG, GRAPH_BACKEND_URL,  \
     SERVER_PORT
 from .starlette import InvanaApp
 
@@ -50,7 +50,7 @@ def welcome():
     logger.info(".................................................")
     logger.info(f"Starting Invana Engine server at 0.0.0.0:{SERVER_PORT}")
     logger.info(f"Using GRAPH_BACKEND_URL: {GRAPH_BACKEND_URL}")
-    logger.info(f"Using GRAPH_BACKEND: {GRAPH_BACKEND}")
+    logger.info(f"Using GRAPH_BACKEND_CLASS: {GRAPH_BACKEND_CLASS}")
     logger.info(f"Using DEBUG: {DEBUG}")
     logger.info(".................................................")
 
