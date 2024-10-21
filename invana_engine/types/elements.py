@@ -28,7 +28,6 @@ class Property:
 @dataclass
 class VertexProperty(Property):
 
-
     def __repr__(self) -> str:
         return f"VP[{self.key}={self.value}]"
 

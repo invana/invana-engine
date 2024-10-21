@@ -8,7 +8,6 @@ __AUTHOR_EMAIL__ = "https://github.com/rrmerugu"
 GRAPH_BACKEND_URL = os.environ.get("GRAPH_BACKEND_URL", "ws://localhost:28182/gremlin")
 GRAPH_BACKEND = os.environ.get("GRAPH_BACKEND", "GremlinConnector")
 # GRAPH_BACKEND_CLASS = os.env.get("invana_engine.backends.")
-
 GRAPH_BACKEND_DATABASE_NAME = os.environ.get("GRAPH_BACKEND_DATABASE_NAME")
 
 GRAPH_BACKEND_AUTH_USERNAME = os.environ.get("GRAPH_BACKEND_AUTH_USERNAME")

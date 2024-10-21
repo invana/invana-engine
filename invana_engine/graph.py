@@ -1,6 +1,6 @@
 import logging
 from .backend.base import BackendAbstract
-from .backend import GremlinBackend
+from .backend import GremlinBackend, CypherBackend
 from .settings import GRAPH_BACKEND_URL
 
 
@@ -10,7 +10,7 @@ class InvanaGraph:
     
     def __init__(self):
         # self.settings = settings
-        self.backend = GremlinBackend(GRAPH_BACKEND_URL)
+        self.backend = CypherBackend(GRAPH_BACKEND_URL)
   
     def connect(self):
         return self.backend.connect()
