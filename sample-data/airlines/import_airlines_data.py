@@ -11,10 +11,11 @@ sys.path.append(os.path.join(os.getcwd() ))
 print("sys.path", sys.path)
 print("os.", os.getcwd())
 from invana_engine import InvanaGraph
+from invana_engine.backend import GremlinBackend
 import csv
 
-graph = InvanaGraph("ws://localhost:28182/gremlin")
-print("Initiating import: graph :", graph)
+invana = InvanaGraph()
+print("Initiating import: invana :", invana)
 
 
 def clean_nodes(node_data):
@@ -34,7 +35,6 @@ def clean_nodes(node_data):
         "label": _label,
         "properties": cleaned_data
     }
-
 
 def clean_edges(edge_data):
     cleaned_data = {}
@@ -60,35 +60,27 @@ def clean_edges(edge_data):
         "properties": cleaned_data
     }
 
-
 node_id_map = {}
+backend: GremlinBackend  = invana.backend
+backend.g.V().drop().iterate()
 
-
-
-# result = graph.execute_query("g.V().limit(10)") 
-
-# print("===result", result)
-# exit()
 
 with open(os.path.join(os.getcwd() ,'./sample-data/airlines/air-routes-latest-nodes.csv')) as f:
     reader = csv.DictReader(f)
     for line in reader:
         cleaned_data = clean_nodes(line)
-        created_data = graph.vertex.create(cleaned_data['label'], **cleaned_data['properties']).to_list()
-        print("==============^^^^^^^^^^^^^^^^")
-        # print("created node", created_data[0])
-        # print("==============<<<<<<<<<<<<<<<")
-        # node_id_map[cleaned_data['id']] = created_data[0].id
+        created_data = backend.g.create_vertex(cleaned_data['label'], **cleaned_data['properties']).next()
+        print(f"**created node {created_data}")
+        node_id_map[cleaned_data['id']] = created_data.id
 
 with open(os.path.join(os.getcwd() ,'./sample-data/airlines/air-routes-latest-edges.csv')) as f:
     reader = csv.DictReader(f)
     for line in reader:
         cleaned_data = clean_edges(line)
-        created_data = graph.edge.create(cleaned_data['label'],
+        created_data = backend.g.create_edge(cleaned_data['label'],
                                          node_id_map[cleaned_data['from']],
                                          node_id_map[cleaned_data['to']],
-                                         **cleaned_data['properties']).to_list()
-        print("created edge", created_data[0].id)
+                                         **cleaned_data['properties']).next()
+        print(f"**created edge {created_data.id}")
 
 
-graph.close()

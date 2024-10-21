@@ -18,8 +18,8 @@ from gremlin_python.process.graph_traversal import __ as AnonymousTraversal
 from .search import GraphSearch
 import copy
 
-class InvanaTraversal(GraphTraversal):
 
+class InvanaTraversal(GraphTraversal):
 
     def clone(self):
         return InvanaTraversal(self.graph, self.traversal_strategies, copy.deepcopy(self.bytecode))
@@ -109,6 +109,9 @@ class __(AnonymousTraversal):
 
 
 class InvanaTraversalSource(GraphTraversalSource):
+
+    graph_traversal: InvanaTraversal
+
     def __init__(self, *args, **kwargs):
         super(InvanaTraversalSource, self).__init__(*args, **kwargs)
         self.graph_traversal = InvanaTraversal

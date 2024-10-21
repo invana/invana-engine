@@ -14,7 +14,8 @@ from .utils import read_from_result_set_with_out_callback
 class GremlinBackend(BackendAbstract):
 
     connection_uri: T.AnyStr = None
-    traversal_source: T.AnyStr = InvanaTraversalSource
+    traversal_source: T.AnyStr = "g"
+    traversal_source_class: GraphTraversalSource = InvanaTraversalSource
     deserializer_map: T.Dict[str, T.Any] = None
     g: GraphTraversalSource = None
     call_from_event_loop: bool = False
@@ -22,10 +23,12 @@ class GremlinBackend(BackendAbstract):
 
     def __init__(self, connection_uri, traversal_source="g",
                 deserializer_map=None, default_timeout=None,
+                traversal_source_class=InvanaTraversalSource,
                 call_from_event_loop=True,
                 *args, **kwargs):
         super().__init__(connection_uri, default_timeout=default_timeout, *args, **kwargs)
         self.traversal_source = traversal_source if traversal_source else "g"
+        self.traversal_source_class = traversal_source_class
         INVANA_DESERIALIZER_MAP.update(deserializer_map or {})
         self.call_from_event_loop = call_from_event_loop
         self.deserializer_map = INVANA_DESERIALIZER_MAP
@@ -41,7 +44,7 @@ class GremlinBackend(BackendAbstract):
                 graphson_writer=GraphSONWriter(serializer_map={}),
                 **self.transport_kwargs
             )
-        self.g = traversal().withRemote(self.driver)
+        self.g = traversal(traversal_source_class=self.traversal_source_class).withRemote(self.driver)
         
     def close(self):
         pass
