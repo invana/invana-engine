@@ -13,7 +13,7 @@ ariadne = "*"
 websockets = "*"
 aiohttp = "*"
 async-timeout = "*"
-gremlinpython = "==3.7"
+gremlinpython = "==3.7.3"
 
 [dev-packages]
 pytest = "*"

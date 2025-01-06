@@ -62,7 +62,7 @@ class GremlinBackend(BackendAbstract):
                   callback=None, finished_callback=None, **kwargs):
         if extra_options is None:
             extra_options = {} 
-        extra_options["evaluationTimeout"] = timeout if timeout else self.default_timeout
+        extra_options["evaluation_timeout"] = timeout if timeout else self.default_timeout
         query_instance = Query(str(query_string), extra_options=extra_options)
         query_instance.query_started()
         try:

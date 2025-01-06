@@ -27,7 +27,7 @@
             "env": {
                 "PYTHONPATH": "${workspaceFolder}",
                 "GRAPH_BACKEND_CLASS": "GremlinBackend",
-                "GRAPH_BACKEND_URL": "ws://localhost:28182/gremlin"
+                "GRAPH_BACKEND_URL": "ws://localhost:8182/gremlin"
             },
             "justMyCode": true,
             "console": "integratedTerminal"
