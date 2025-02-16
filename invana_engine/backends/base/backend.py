@@ -11,6 +11,7 @@ class BackendAbstract(ABC):
     connection_uri: T.AnyStr = None
     driver = None
     is_readonly : bool = False
+    default_query_language: T.AnyStr = None
 
     # objects_cls : "GenericQuerySetAbstract"
     # schema_cls : "SchemaQuerySetAbstract"
@@ -54,6 +55,15 @@ class BackendAbstract(ABC):
         """
         Abstract method to make raw query on the database driver
         """
+
+    def get_backend_info(self):
+        return {
+            "connection_uri" : self.connection_uri,
+            "backend_class": self.__class__.__name__, # type(self).__name__,
+            "is_readonly": self.is_readonly,
+            "default_query_language": self.default_query_language,
+            # "supported_query_languages": self.supported_query_languages()
+        }
 
     @abstractmethod
     def drop(self):

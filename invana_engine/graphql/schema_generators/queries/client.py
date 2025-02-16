@@ -38,7 +38,7 @@ class BasicInfoType(graphene.ObjectType):
             "host_ip_address": info.context['request'].base_url.netloc,
         }
         try:
-            data['backend'] = info.context['request'].app.state.graph.backend.get_basic_info()
+            data['backend'] = info.context['request'].app.state.graph.backend.get_backend_info()
         except BaseException:
             data['backend'] = "NA"
         return data

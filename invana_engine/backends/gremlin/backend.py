@@ -22,6 +22,8 @@ class GremlinBackend(BackendAbstract):
     call_from_event_loop: bool = False
     transport_kwargs: T.Dict = {} 
 
+    default_query_language: T.AnyStr = "gremlin"
+
 
     def __init__(self, 
                 connection_uri, 

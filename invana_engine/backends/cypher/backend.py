@@ -4,6 +4,7 @@ from ..base import BackendAbstract
 from invana_engine.core.queries import Query, QueryResponse, QueryRequest
 from neo4j import GraphDatabase, RoutingControl
 import logging
+import typing as T
 from .serializer import CypherSerializer
 from invana_engine.settings import DEFAULT_QUERY_TIMEOUT, GRAPH_BACKEND_URL, \
     GRAPH_BACKEND_AUTH_USERNAME, GRAPH_BACKEND_AUTH_PASSWORD, GRAPH_BACKEND_DATABASE_NAME
@@ -12,6 +13,9 @@ logger = logging.getLogger(__name__)
 
 class CypherBackend(BackendAbstract):
     
+    default_query_language: T.AnyStr = "cypher"
+
+
     def __init__(self, 
                 connection_uri: str,
                 is_readonly=False, 
