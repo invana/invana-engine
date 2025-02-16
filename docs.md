@@ -8,3 +8,18 @@ docker run -d -it -p 8182:8182 --name janusgraph janusgraph/janusgraph
 export GREMLIN_SERVER_URL=ws://megamind-ws:8182/gremlin
 uvicorn invana_engine.server.app:app  --loop=asyncio --reload --port 8200
 ```
+
+
+## Architecture 
+
+
+- Connector ( tinkerpop, neo4j ) - runs raw queries
+- Query (queries connectors - request, response)
+
+
+- Backend 
+    - execute_query
+    - SchemaManager
+        - SchemaReader
+        - SchemaWriter
+    - ogm

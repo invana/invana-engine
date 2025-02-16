@@ -21,8 +21,9 @@ class GremlinBackend(BackendAbstract):
     call_from_event_loop: bool = False
     transport_kwargs: T.Dict = {} 
 
-    def __init__(self, connection_uri, 
-                 traversal_source="g",
+    def __init__(self, 
+                connection_uri, 
+                traversal_source="g",
                 deserializer_map=None, 
                 is_readonly=False,
                 default_timeout=DEFAULT_QUERY_TIMEOUT,
