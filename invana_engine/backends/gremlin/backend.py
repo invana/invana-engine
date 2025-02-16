@@ -10,6 +10,7 @@ from .traversal_source import InvanaTraversalSource
 # from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection
 from .driver import DriverRemoteConnection
 from .utils import read_from_result_set_with_out_callback
+from .querysets import GremlinQuerySet, GremlinSchemaQuerySet
 
 
 class GremlinBackend(BackendAbstract):
@@ -20,6 +21,7 @@ class GremlinBackend(BackendAbstract):
     g: GraphTraversalSource = InvanaTraversalSource
     call_from_event_loop: bool = False
     transport_kwargs: T.Dict = {} 
+
 
     def __init__(self, 
                 connection_uri, 
@@ -42,6 +44,9 @@ class GremlinBackend(BackendAbstract):
         if call_from_event_loop:
             self.transport_kwargs['call_from_event_loop'] = call_from_event_loop
         self.connect()
+
+        self.objects = GremlinQuerySet(self)
+        self.schema = GremlinSchemaQuerySet(self)
 
     def connect(self):
         self.driver = DriverRemoteConnection(

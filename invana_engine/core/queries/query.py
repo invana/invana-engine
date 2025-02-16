@@ -29,6 +29,7 @@ class QueryBase:
         self.parent_query_id = parent_query_id
         self._created_at = self.request.timestamp
         self._responses = []
+        self.query_created()
 
     @abstractmethod
     def query_created(self):

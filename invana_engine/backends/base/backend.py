@@ -2,12 +2,21 @@ import typing as T
 from abc import ABC, abstractmethod
 from invana_engine.settings import DEFAULT_QUERY_TIMEOUT
 from ...core.queries import QueryResponse, QueryEvent, QueryRequest
+if T.TYPE_CHECKING:
+    from .queryset import GenericQuerySetAbstract, SchemaQuerySetAbstract
+
 
 class BackendAbstract(ABC):
 
     connection_uri: T.AnyStr = None
     driver = None
     is_readonly : bool = False
+
+    # objects_cls : "GenericQuerySetAbstract"
+    # schema_cls : "SchemaQuerySetAbstract"
+
+    objects: "GenericQuerySetAbstract"  = None
+    schema: "SchemaQuerySetAbstract"  = None
 
     def __init__(self, connection_uri, auth=None, 
                  is_readonly=None,
@@ -17,6 +26,12 @@ class BackendAbstract(ABC):
         self.is_readonly = is_readonly
         self.default_timeout = default_timeout if default_timeout else DEFAULT_QUERY_TIMEOUT
         # self.connect() this should be called after init
+        # if self.objects_cls is None:
+        #     raise NotImplementedError("objects_cls must be set in the Backend class") 
+        # if self.schema_cls is None:
+        #     raise NotImplementedError("schema_cls must be set in the Backend class")   
+        # self.objects = self.objects_cls(self)
+        # self.schema = self.schema_cls(self)
 
     @abstractmethod
     def connect(self):
