@@ -1,7 +1,7 @@
 import os 
 import csv
 import typing as T
-from invana_engine.backends.gremlin.backend import InvanaTraversalSource
+from invana_engine.backends.gremlin.connector import InvanaTraversalSource
 from .base import ImporterBase
 
 

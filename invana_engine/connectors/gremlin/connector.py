@@ -2,7 +2,7 @@ from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.structure.io.graphsonV3d0 import GraphSONReader, GraphSONWriter
 from gremlin_python.process.graph_traversal import GraphTraversalSource
 import typing as T
-from ..base import BackendAbstract
+from ..base import ConnectorAbstract
 from .serializer import INVANA_DESERIALIZER_MAP
 from invana_engine.settings import DEFAULT_QUERY_TIMEOUT
 from invana_engine.core.queries import Query, QueryResponse, QueryRequest
@@ -12,7 +12,7 @@ from .driver import DriverRemoteConnection
 from .utils import read_from_result_set_with_out_callback
 
 
-class GremlinBackend(BackendAbstract):
+class GremlinConnector(ConnectorAbstract):
 
     traversal_source: T.AnyStr = "g"
     traversal_source_class: GraphTraversalSource = InvanaTraversalSource

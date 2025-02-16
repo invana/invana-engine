@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from invana_engine.settings import DEFAULT_QUERY_TIMEOUT
 from ...core.queries import QueryResponse, QueryEvent, QueryRequest
 
-class BackendAbstract(ABC):
+class ConnectorAbstract(ABC):
 
     connection_uri: T.AnyStr = None
     driver = None

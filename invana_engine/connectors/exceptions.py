@@ -1,0 +1,4 @@
+
+
+class ConnectorNotFound(Exception):
+    pass

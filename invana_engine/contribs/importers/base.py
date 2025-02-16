@@ -4,7 +4,7 @@ import typing as T
 from pathlib import Path
 from collections import defaultdict
 from .exception import PathNotFound, DuplicateFileError
-from invana_engine.backends.gremlin.backend import InvanaTraversalSource
+from invana_engine.backends.gremlin.connector import InvanaTraversalSource
 
 
 class ImporterBase(abc.ABC):

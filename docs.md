@@ -17,7 +17,7 @@ uvicorn invana_engine.server.app:app  --loop=asyncio --reload --port 8200
 - Query (queries connectors - request, response)
 
 
-- Backend 
+- Connector 
     - execute_query
     - SchemaManager
         - SchemaReader

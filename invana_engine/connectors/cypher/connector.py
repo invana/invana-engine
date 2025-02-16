@@ -1,6 +1,6 @@
 from invana_engine.settings import DEFAULT_QUERY_TIMEOUT, GRAPH_BACKEND_AUTH_USERNAME,  \
     GRAPH_BACKEND_AUTH_PASSWORD, GRAPH_BACKEND_DATABASE_NAME
-from ..base import BackendAbstract
+from ..base import ConnectorAbstract
 from invana_engine.core.queries import Query, QueryResponse, QueryRequest
 from neo4j import GraphDatabase, RoutingControl
 import logging
@@ -10,7 +10,7 @@ from invana_engine.settings import DEFAULT_QUERY_TIMEOUT, GRAPH_BACKEND_URL, \
 logger = logging.getLogger(__name__)
 
 
-class CypherBackend(BackendAbstract):
+class CypherConnector(ConnectorAbstract):
     
     def __init__(self, 
                 connection_uri: str,
