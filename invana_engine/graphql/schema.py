@@ -1,6 +1,6 @@
 import graphene
 from .schema_generators.queries.client import BasicInfoType
-from .schema_generators.queries.run_query import RunQueryObjectType
+from .schema_generators.queries import RunQueryObjectType, GenericQueriesObjectType
 
 
 class GraphQLSchemaGenerator:
@@ -12,6 +12,7 @@ class GraphQLSchemaGenerator:
         return type("Query", (
             BasicInfoType,
             RunQueryObjectType,
+            GenericQueriesObjectType,
             *type_def_classes
         ), {})
 

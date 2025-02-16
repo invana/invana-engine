@@ -65,3 +65,8 @@ def get_id(_id):
         else:
             return _id.get('@value')
     return _id
+
+
+
+def divide_chunks(l, n):
+    return [l[i * n:(i + 1) * n] for i in range((len(l) + n - 1) // n)]
