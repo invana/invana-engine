@@ -24,7 +24,7 @@ from ariadne.asgi.handlers import GraphQLTransportWSHandler
 from ariadne.explorer import ExplorerGraphiQL, ExplorerApollo
 from .views import HomePageView, GremlinQueryView
 from ..settings import __VERSION__, __AUTHOR_NAME__, __AUTHOR_EMAIL__
-from ..graphql.schema import SchemaGenerator
+from ..graphql.schema import GraphQLSchemaGenerator
 from ..graph import InvanaGraph
 from ..graphql.graphiql.handler import make_graphiql_handler
 from ..settings import GRAPH_BACKEND_CLASS, DEBUG, GRAPH_BACKEND_URL,  \
@@ -88,7 +88,7 @@ def create_app():
                 "DELETE"])]
     app = InvanaApp(routes=routes, middleware=middleware, debug=DEBUG)
 
-    schema_generator = SchemaGenerator("")
+    schema_generator = GraphQLSchemaGenerator("")
     graphql_schema: GraphQLSchema = schema_generator.get_schema().graphql_schema
 
     # app.mount("/graph", GraphQL(schema.graphql_schema, debug=True,

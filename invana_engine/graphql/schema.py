@@ -3,7 +3,7 @@ from .schema_generators.queries.client import BasicInfoType
 from .schema_generators.queries.run_query import RunQueryObjectType
 
 
-class SchemaGenerator:
+class GraphQLSchemaGenerator:
 
     def __init__(self, schema_str: str) -> None:
         self.schema_str = schema_str
