@@ -1,2 +1,2 @@
-from .gremlin.connector import GremlinBackend, InvanaTraversalSource
-from .cypher.connector import CypherBackend
+from .gremlin.backend import GremlinBackend, InvanaTraversalSource
+from .cypher.backend import CypherBackend

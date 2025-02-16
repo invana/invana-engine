@@ -1,1 +1,1 @@
-from .connector import GremlinBackend
+from .backend import GremlinBackend
