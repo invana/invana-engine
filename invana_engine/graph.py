@@ -1,8 +1,8 @@
 import logging
 import importlib
-from .backends.base import ConnectorAbstract
-from .backends import GremlinConnector, CypherConnector
-from .backends.exceptions import ConnectorNotFound
+from .connectors.base import ConnectorAbstract
+from .connectors import GremlinConnector, CypherConnector
+from .connectors.exceptions import ConnectorNotFound
 from invana_engine import settings
 
 

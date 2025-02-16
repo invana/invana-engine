@@ -11,7 +11,7 @@ sys.path.append(os.path.join(os.getcwd() ))
 print("sys.path", sys.path)
 print("os.", os.getcwd())
 from invana_engine import InvanaGraph
-from invana_engine.backends import InvanaTraversalSource, GremlinConnector
+from invana_engine.connectors import InvanaTraversalSource, GremlinConnector
 import csv
 
 invana = InvanaGraph()
