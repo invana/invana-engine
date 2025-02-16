@@ -46,7 +46,7 @@ docker logs janusgraph -f
 
 # start invana engine
 export GRAPH_BACKEND_URL="ws://localhost:8182/gremlin"
-export GRAPH_BACKEND="JanusGraphConnector"  # or GremlinConnector for other gremlin based dbs
+export GRAPH_BACKEND="JanusGraphBackend"  # or GremlinBackend for other gremlin based dbs
 
 uvicorn invana_engine.server.app:app --port=8200 --host=0.0.0.0 --loop=asyncio
 ```
@@ -57,7 +57,7 @@ uvicorn invana_engine.server.app:app --port=8200 --host=0.0.0.0 --loop=asyncio
 docker run -d -p 27474:7474 -p 27687:7687 -e NEO4J_AUTH=neo4j/supersecret neo4j 
 
 
-export GRAPH_BACKEND=CypherConnector
+export GRAPH_BACKEND=CypherBackend
 export GRAPH_BACKEND_URL="neo4j://localhost:17687"
 export GRAPH_BACKEND_DATABASE_NAME=neo4j
 export GRAPH_BACKEND_AUTH_USERNAME=neo4j

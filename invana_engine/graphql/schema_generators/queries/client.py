@@ -4,7 +4,7 @@ import socket
 from invana_engine.settings import __VERSION__
 
 
-class ConnectorBasicInfoType(graphene.ObjectType):
+class BackendBasicInfoType(graphene.ObjectType):
     connection_uri = graphene.String()
     backend_class = graphene.String()
     is_readonly = graphene.Boolean()
@@ -15,7 +15,7 @@ class ConnectorBasicInfoType(graphene.ObjectType):
 class ClientInfoType(graphene.ObjectType):
     host = graphene.String()
     host_ip_address = graphene.String()
-    backend = graphene.Field(ConnectorBasicInfoType)
+    backend = graphene.Field(BackendBasicInfoType)
 
 
 class BasicInfoType(graphene.ObjectType):

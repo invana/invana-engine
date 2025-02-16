@@ -11,7 +11,7 @@ sys.path.append(os.path.join(os.getcwd() ))
 print("sys.path", sys.path)
 print("os.", os.getcwd())
 from invana_engine import InvanaGraph
-from invana_engine.connectors import InvanaTraversalSource, GremlinConnector
+from invana_engine.backends import InvanaTraversalSource, GremlinBackend
 import csv
 
 invana = InvanaGraph()
@@ -61,7 +61,7 @@ def clean_edges(edge_data):
     }
 
 node_id_map = {}
-backend: GremlinConnector = invana.backend
+backend: GremlinBackend = invana.backend
 backend.g.V().drop().iterate()
 
 

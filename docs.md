@@ -13,11 +13,11 @@ uvicorn invana_engine.server.app:app  --loop=asyncio --reload --port 8200
 ## Architecture 
 
 
-- Connector ( tinkerpop, neo4j ) - runs raw queries
+- Backend ( tinkerpop, neo4j ) - runs raw queries
 - Query (queries connectors - request, response)
 
 
-- Connector 
+- Backend 
     - execute_query
     - SchemaManager
         - SchemaReader

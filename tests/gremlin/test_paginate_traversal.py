@@ -1,4 +1,4 @@
-from invana.gremlin.connector import GremlinConnector
+from invana.gremlin.connector import GremlinBackend
 import pytest
 
 

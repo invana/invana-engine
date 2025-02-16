@@ -1,7 +1,7 @@
 import pytest
-from aiohttp import ClientConnectorError
+from aiohttp import ClientBackendError
 from gremlin_python.driver.protocol import GremlinServerError
-from invana.gremlin.connector import GremlinConnector
+from invana.gremlin.connector import GremlinBackend
 from invana.gremlin.transporter.response import GremlinQueryResponse
 from conftest import gremlin_connector, janusgraph_connector
 
@@ -36,13 +36,13 @@ class TestGremlinConnection:
             connector.execute_query("g.V().limit(1).toist()", raise_exception=True)
         assert isinstance(exec_info.value, GremlinServerError)
 
-    # def test_query_failed_with_runtime_error_exception_with_raise_exception(self, connector: GremlinConnector):
+    # def test_query_failed_with_runtime_error_exception_with_raise_exception(self, connector: GremlinBackend):
     #     connector.close()
     #     with pytest.raises(RuntimeError) as exec_info:
     #         connector.execute_query("g.V().limit(1).toList()", raise_exception=True)
     #     assert isinstance(exec_info.value, RuntimeError)
 
-    # def test_query_failed_with_timeout_exception_with_raise_exception(self, connector: GremlinConnector):
+    # def test_query_failed_with_timeout_exception_with_raise_exception(self, connector: GremlinBackend):
     #     connector.close()
     #     ERROR_598 = "SERVER ERROR TIMEOUT"
     #     with pytest.raises(GremlinServerError) as exec_info:
@@ -50,8 +50,8 @@ class TestGremlinConnection:
     #     assert isinstance(exec_info.value, GremlinServerError)
 
     def test_query_failed_with_client_connection_error_exception_with_raise_exception(self):
-        connector = GremlinConnector("ws://invalid-host:8182/gremlin")
-        with pytest.raises(ClientConnectorError) as exec_info:
+        connector = GremlinBackend("ws://invalid-host:8182/gremlin")
+        with pytest.raises(ClientBackendError) as exec_info:
             connector.execute_query("g.V().limit(1).toList()", raise_exception=True)
-        assert isinstance(exec_info.value, ClientConnectorError)
+        assert isinstance(exec_info.value, ClientBackendError)
         connector.close()

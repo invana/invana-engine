@@ -1,0 +1,4 @@
+
+
+class BackendNotFound(Exception):
+    pass

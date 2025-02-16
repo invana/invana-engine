@@ -26,7 +26,7 @@
             ],
             "env": {
                 "PYTHONPATH": "${workspaceFolder}",
-                "GRAPH_BACKEND_CLASS": "GremlinConnector",
+                "GRAPH_BACKEND_CLASS": "GremlinBackend",
                 "GRAPH_BACKEND_URL": "ws://localhost:8182/gremlin"
             },
             "justMyCode": true,
@@ -46,7 +46,7 @@
             ],
             "env": {
                 "PYTHONPATH": "${workspaceFolder}",
-                "GRAPH_BACKEND_CLASS": "CypherConnector",
+                "GRAPH_BACKEND_CLASS": "CypherBackend",
                 "GRAPH_BACKEND_URL": "neo4j://localhost:17687",
                 "GRAPH_BACKEND_DATABASE_NAME": "neo4j",
                 "GRAPH_BACKEND_AUTH_USERNAME": "neo4j",

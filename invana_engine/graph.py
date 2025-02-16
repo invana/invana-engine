@@ -1,34 +1,34 @@
 import logging
 import importlib
-from .connectors.base import ConnectorAbstract
-from .connectors import GremlinConnector, CypherConnector
-from .connectors.exceptions import ConnectorNotFound
+from .backends.base import BackendAbstract
+from .backends import GremlinBackend, CypherBackend
+from .backends.exceptions import BackendNotFound
 from invana_engine import settings
 
 
 class InvanaGraph:
 
-    backend : ConnectorAbstract
+    backend : BackendAbstract
     backend_class_name: str = None
     
     def __init__(self):
 
         self.backend_class_name = settings.GRAPH_BACKEND_CLASS
-        if self.backend_class_name == "CypherConnector":
-            self.backend = CypherConnector(settings.GRAPH_BACKEND_URL, 
+        if self.backend_class_name == "CypherBackend":
+            self.backend = CypherBackend(settings.GRAPH_BACKEND_URL, 
                                 database_name=settings.GRAPH_BACKEND_DATABASE_NAME,
                                 username=settings.GRAPH_BACKEND_AUTH_USERNAME,
                                 password=settings.GRAPH_BACKEND_AUTH_PASSWORD,
                             )
-        elif self.backend_class_name == "GremlinConnector":
-              self.backend = GremlinConnector(settings.GRAPH_BACKEND_URL, 
+        elif self.backend_class_name == "GremlinBackend":
+              self.backend = GremlinBackend(settings.GRAPH_BACKEND_URL, 
                                     database_name=settings.GRAPH_BACKEND_DATABASE_NAME,
                                     username=settings.GRAPH_BACKEND_AUTH_USERNAME,
                                     password=settings.GRAPH_BACKEND_AUTH_PASSWORD,
                                     traversal_source=settings.GRAPH_BACKEND_GREMLIN_TRAVERSAL_SOURCE
                                 )
         else:
-            raise ConnectorNotFound(f"{self.backend_class_name} backend not found.")
+            raise BackendNotFound(f"{self.backend_class_name} backend not found.")
         
     def connect(self):
         return self.backend.connect()

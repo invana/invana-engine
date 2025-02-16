@@ -1,4 +1,0 @@
-
-
-class ConnectorNotFound(Exception):
-    pass
