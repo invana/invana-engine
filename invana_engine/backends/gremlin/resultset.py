@@ -12,12 +12,14 @@
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
 from gremlin_python.process.traversal import Cardinality
-from invana_engine2.invana.helpers.utils import divide_chunks
+from .utils import divide_chunks
 from gremlin_python.process.translator import Order
-# from invana_engine.invana.gremlin.traversal.traversal import __
-from invana_engine2.invana.base.resultsets import QueryResultSetBase
+from invana_engine.backends.base.requestsets import QueryResultSetBase
+# from invana_engine.backends.gremlin import InvanaTraversal
+
 
 class GremlinQueryResultSet(QueryResultSetBase):
+
 
     def __init__(self, traversal):
         self._traversal = traversal
@@ -69,6 +71,7 @@ class GremlinQueryResultSet(QueryResultSetBase):
         return self
 
     def range(self, *args):
+        # _ = self.get_traversal()
         self.get_traversal().range(*args)
         return self
 

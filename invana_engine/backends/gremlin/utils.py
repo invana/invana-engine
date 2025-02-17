@@ -14,7 +14,7 @@
 
 from concurrent.futures import Future
 from invana_engine.core.queries import QueryResponse, Query
-
+from invana_engine.types import RelationShip
 
 # def read_from_result_set_with_callback(result_set, callback, query: Query, finished_callback):
 #     def cb(f):
@@ -70,3 +70,32 @@ def get_id(_id):
 
 def divide_chunks(l, n):
     return [l[i * n:(i + 1) * n] for i in range((len(l) + n - 1) // n)]
+
+import typing as T
+if T.TYPE_CHECKING:
+    from invana_engine.graph import InvanaGraph
+
+def get_vertex_properties_of_edges(edges, graph: 'InvanaGraph'):
+    """
+    TODO - move this to gremlin
+    By default, edge json will not have inv and outv properties,
+    this method will fetch and stitch the fill vertex details to the edge inv and outv
+    """
+
+    vertex_ids = []
+    for edge in edges:
+        if not isinstance(edge, RelationShip):
+            raise Exception("relationship data should be RelationShip type")
+        vertex_ids.append(edge.inV.id)
+        vertex_ids.append(edge.outV.id)
+    unique_vertex_ids = list(set(vertex_ids))
+    vertex_instances = graph.backend.objects.search_v(
+        has__id__within=unique_vertex_ids).to_list()
+
+    vertices_dict = dict([(v.id, v) for v in vertex_instances])
+    for edge in edges:
+        edge.inV_back = edge.inV
+        edge.inV = vertices_dict[edge.inV.id]
+        edge.outV_back = edge.outV
+        edge.outV = vertices_dict[edge.outV.id]
+    return edges

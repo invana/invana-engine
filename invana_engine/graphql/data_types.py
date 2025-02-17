@@ -42,7 +42,7 @@ class AnyField(graphene.Scalar):
         return value
 
 
-class NodeType(graphene.Scalar):
+class NodeType(graphene.ObjectType):
     id = AnyField()
     type = graphene.String()
     label = graphene.String()

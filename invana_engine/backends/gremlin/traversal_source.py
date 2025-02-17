@@ -127,6 +127,11 @@ class InvanaTraversalSource(GraphTraversalSource):
         traversal = self.get_graph_traversal()
         traversal.create_edge(label, from_vtx_id, to_vtx_id, **properties)
         return traversal
+    
+    def range(self, *args):
+        traversal = self.get_graph_traversal()
+        traversal.range(*args)
+        return traversal
  
     # def traverse_through(self, *edge_labels,  direction=None, **edge_search_kwargs):
     #     traversal = self.get_graph_traversal()

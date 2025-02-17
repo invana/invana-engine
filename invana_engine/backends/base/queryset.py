@@ -19,6 +19,15 @@ class GenericQuerySetAbstract(QuerySetAbstract):
         pass
 
     @abc.abstractmethod
+    def search_v(self, *args, **kwargs):
+        pass
+
+    @abc.abstractmethod
+    def search_e(self, *args, **kwargs):
+        pass
+
+
+    @abc.abstractmethod
     def get_inv(self, **kwargs):
         pass
 

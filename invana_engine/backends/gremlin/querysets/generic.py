@@ -2,6 +2,8 @@ import typing as T
 if T.TYPE_CHECKING:
     from invana_engine.backends import GremlinBackend
 from invana_engine.backends.base.queryset import GenericQuerySetAbstract
+from ..resultset import GremlinQueryResultSet
+from invana_engine.settings import DEFAULT_PAGINATION_SIZE
 
 
 class GremlinQuerySet(GenericQuerySetAbstract):
@@ -9,14 +11,18 @@ class GremlinQuerySet(GenericQuerySetAbstract):
     def __init__(self, backend: 'GremlinBackend'):
         super().__init__(backend)
 
-    
     def run_query(self, *args, **kwargs):
         return self.backend.run_query(*args, **kwargs)
 
+    # order_by:str= None, limit:int = DEFAULT_PAGINATION_SIZE, skip: int=0,
+    def search_v(self,   **search_kwarg) -> GremlinQueryResultSet:
+        return GremlinQueryResultSet(self.backend.g.V().search(**search_kwarg))
+
+    def search_e(self, **search_kwarg) -> GremlinQueryResultSet:
+        return GremlinQueryResultSet(self.backend.g.E().search(**search_kwarg))
     
     def get_inv(self, **kwargs):
         pass
-
     
     def get_outv(self, *args, **properties):
         pass
