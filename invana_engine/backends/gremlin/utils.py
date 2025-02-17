@@ -82,6 +82,8 @@ def get_vertex_properties_of_edges(edges, graph: 'InvanaGraph'):
     this method will fetch and stitch the fill vertex details to the edge inv and outv
     """
 
+    nodes_map = {}
+
     vertex_ids = []
     for edge in edges:
         if not isinstance(edge, RelationShip):
@@ -93,9 +95,14 @@ def get_vertex_properties_of_edges(edges, graph: 'InvanaGraph'):
         has__id__within=unique_vertex_ids).to_list()
 
     vertices_dict = dict([(v.id, v) for v in vertex_instances])
+    
     for edge in edges:
         edge.inV_back = edge.inV
         edge.inV = vertices_dict[edge.inV.id]
         edge.outV_back = edge.outV
         edge.outV = vertices_dict[edge.outV.id]
-    return edges
+        # creating unique nodes map
+        nodes_map[edge.inV.id] = vertices_dict[edge.inV.id]
+        nodes_map[edge.outV.id] = vertices_dict[edge.outV.id]
+    return {"nodes": [datum.to_json() for datum in  list(nodes_map.values())],
+            "edges": [datum.to_json() for datum in  edges]}

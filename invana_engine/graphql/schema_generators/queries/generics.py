@@ -1,6 +1,6 @@
 import graphene
 from invana_engine.graph import InvanaGraph
-from invana_engine.graphql.data_types import NodeType, EdgeType
+from invana_engine.graphql.data_types import NodeType, EdgeType, NodesAndEdgesObjectType
 from invana_engine.settings import DEFAULT_PAGINATION_SIZE
 from invana_engine.backends.gremlin.utils import get_vertex_properties_of_edges
 
@@ -8,12 +8,12 @@ from invana_engine.backends.gremlin.utils import get_vertex_properties_of_edges
 class GenericQueriesObjectType(graphene.ObjectType):
 
 
-    _search_v = graphene.Field(graphene.List(NodeType),
+    _search_v = graphene.Field( NodesAndEdgesObjectType,
                                   filters=graphene.JSONString(),
                                 #   order_by=graphene.String(),
                                   limit=graphene.Int(default_value=DEFAULT_PAGINATION_SIZE),
                                   skip=graphene.Int())
-    _search_e = graphene.Field(graphene.List(EdgeType),
+    _search_e = graphene.Field(NodesAndEdgesObjectType,
                                filters=graphene.JSONString(),
                                get_vertex_properties=graphene.Boolean(default_value=False),
                                limit=graphene.Int(default_value=DEFAULT_PAGINATION_SIZE),
@@ -39,7 +39,9 @@ class GenericQueriesObjectType(graphene.ObjectType):
         # it is failing because of the range method in the GremlinQueryResultSet
         """
         data = _.to_list()
-        return [datum.to_json() for datum in data]
+        nodes = [datum.to_json() for datum in data]
+        edges = []
+        return {"nodes" : nodes, "edges": edges}
 
     def resolve__search_e(self, info: graphene.ResolveInfo, filters: dict = None,
                         #   order_by: str = None, 
@@ -61,5 +63,8 @@ class GenericQueriesObjectType(graphene.ObjectType):
         """
         data = _.to_list()
         if get_vertex_properties is True:
-            data = get_vertex_properties_of_edges(data, graph)
-        return [datum.to_json() for datum in data]
+            data =  get_vertex_properties_of_edges(data, graph)
+            return data
+        edges = [datum.to_json() for datum in data]
+        nodes = []
+        return {"nodes": nodes, "edges": edges}

@@ -73,6 +73,10 @@ class NodeOrEdgeType(EdgeType):
     pass
 
 
-
-class QueryResponseData(graphene.ObjectType):
+class QueryResponseObjectType(graphene.ObjectType):
     data = graphene.List(AnyField)
+
+
+class NodesAndEdgesObjectType(graphene.ObjectType):
+    nodes = graphene.List(NodeType)
+    edges = graphene.List(EdgeType)

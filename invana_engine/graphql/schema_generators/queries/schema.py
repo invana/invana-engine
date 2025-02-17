@@ -3,9 +3,9 @@ from ...data_types import QueryResponseObjectType
 from invana_engine.settings import DEFAULT_QUERY_TIMEOUT
 from invana_engine.graph import InvanaGraph
 
-class RunQueryObjectType(graphene.ObjectType):
+class SchemaQueryObjectType(graphene.ObjectType):
 
-    _run_query = graphene.Field(
+    _get_schema = graphene.Field(
                         QueryResponseObjectType, 
                         timeout=graphene.Int(
                             default_value=DEFAULT_QUERY_TIMEOUT,
