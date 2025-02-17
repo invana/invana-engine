@@ -38,10 +38,10 @@ class GenericQueriesObjectType(graphene.ObjectType):
         # skipping  -  _.range(skip, limit)
         # it is failing because of the range method in the GremlinQueryResultSet
         """
-        data = _.to_list()
-        nodes = [datum.to_json() for datum in data]
-        edges = []
-        return {"nodes" : nodes, "edges": edges}
+        return {
+            "nodes" : [datum.to_json() for datum in _.to_list()], 
+            "edges": []
+        }
 
     def resolve__search_e(self, info: graphene.ResolveInfo, filters: dict = None,
                         #   order_by: str = None, 
@@ -63,8 +63,8 @@ class GenericQueriesObjectType(graphene.ObjectType):
         """
         data = _.to_list()
         if get_vertex_properties is True:
-            data =  get_vertex_properties_of_edges(data, graph)
-            return data
-        edges = [datum.to_json() for datum in data]
-        nodes = []
-        return {"nodes": nodes, "edges": edges}
+            return get_vertex_properties_of_edges(data, graph)
+        return {
+            "nodes": [], 
+            "edges":  [datum.to_json() for datum in data]
+        }
