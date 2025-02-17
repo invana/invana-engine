@@ -10,7 +10,7 @@ class GenericQueriesObjectType(graphene.ObjectType):
 
     _search_v = graphene.Field(graphene.List(NodeType),
                                   filters=graphene.JSONString(),
-                                  order_by=graphene.String(),
+                                #   order_by=graphene.String(),
                                   limit=graphene.Int(default_value=DEFAULT_PAGINATION_SIZE),
                                   skip=graphene.Int())
     _search_e = graphene.Field(graphene.List(EdgeType),
@@ -23,16 +23,18 @@ class GenericQueriesObjectType(graphene.ObjectType):
 
     def resolve__search_v(self, info: graphene.ResolveInfo, 
                             filters: dict = None,
-                            order_by: str = None,
+                            # order_by: str = None,
                             limit: int = DEFAULT_PAGINATION_SIZE, skip: int = 0):
         filters = {} if filters is None else filters
         graph: InvanaGraph = info.context['request'].app.state.graph             
         _ = graph.backend.objects.search_v(
             limit=limit, skip=skip, **filters
         )
+        """
+
+        # order not working 
         if order_by:
             _.order_by(order_by)
-        """
         # skipping  -  _.range(skip, limit)
         # it is failing because of the range method in the GremlinQueryResultSet
         """
@@ -40,16 +42,20 @@ class GenericQueriesObjectType(graphene.ObjectType):
         return [datum.to_json() for datum in data]
 
     def resolve__search_e(self, info: graphene.ResolveInfo, filters: dict = None,
-                          order_by: str = None, get_vertex_properties: bool = None,
+                        #   order_by: str = None, 
+                          get_vertex_properties: bool = None,
                           limit: int = DEFAULT_PAGINATION_SIZE, skip: int = 0):
         filters = {} if filters is None else filters
         graph: InvanaGraph = info.context['request'].app.state.graph             
         _ = graph.backend.objects.search_e(
             limit=limit, skip=skip, **filters
         )
+
+        """
+        # order not working 
         if order_by:
             _.order_by(order_by)
-        """
+
         # skipping  -  _.range(skip, limit)
         # it is failing because of the range method in the GremlinQueryResultSet
         """
