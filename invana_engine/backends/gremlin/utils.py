@@ -14,7 +14,7 @@
 
 from concurrent.futures import Future
 from invana_engine.core.queries import QueryResponse, Query
-from invana_engine.types import RelationShip
+from invana_engine.types import RelationShip, Node
 
 # def read_from_result_set_with_callback(result_set, callback, query: Query, finished_callback):
 #     def cb(f):
@@ -91,7 +91,7 @@ def get_vertex_properties_of_edges(edges, graph: 'InvanaGraph'):
         vertex_ids.append(edge.inV.id)
         vertex_ids.append(edge.outV.id)
     unique_vertex_ids = list(set(vertex_ids))
-    vertex_instances = graph.backend.objects.search_v(
+    vertex_instances = graph.backend.objects.search_nodes(
         has__id__within=unique_vertex_ids).to_list()
 
     vertices_dict = dict([(v.id, v) for v in vertex_instances])
@@ -106,3 +106,28 @@ def get_vertex_properties_of_edges(edges, graph: 'InvanaGraph'):
         nodes_map[edge.outV.id] = vertices_dict[edge.outV.id]
     return {"nodes": [datum.to_json() for datum in  list(nodes_map.values())],
             "edges": [datum.to_json() for datum in  edges]}
+
+
+
+def get_neighbor_nodes_and_edges_of_nodes(nodes, graph: 'InvanaGraph'):
+    """
+    TODO - move this to gremlin
+    get the neighbor nodes and edges of the given nodes
+    
+    """
+    vertex_ids = []
+    for node in nodes:
+        if not isinstance(node, Node):
+            raise Exception("node data should be Node type")
+        vertex_ids.append(node.id)
+ 
+    unique_vertex_ids = list(set(vertex_ids))
+    vertex_instances = graph.backend.objects.search_nodes(
+        has__id__within=unique_vertex_ids)
+
+
+    vertex_instances._as('nodes').bothE()._as('edges').bothV()._as('neighbor_nodes')
+
+    data = vertex_instances.select('nodes', 'edges', 'neighbor_nodes').to_list()  
+    return {"nodes": data,
+            "edges": []}

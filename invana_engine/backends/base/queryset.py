@@ -19,11 +19,11 @@ class GenericQuerySetAbstract(QuerySetAbstract):
         pass
 
     @abc.abstractmethod
-    def search_v(self, *args, **kwargs):
+    def search_nodes(self, *args, **kwargs):
         pass
 
     @abc.abstractmethod
-    def search_e(self, *args, **kwargs):
+    def search_edges(self, *args, **kwargs):
         pass
 
 
